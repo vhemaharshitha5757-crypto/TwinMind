@@ -1,0 +1,59 @@
+MEETING TRANSCRIPT - INCIDENT INC031
+========================================================================
+Subject:      IAM Policy Over-Restriction Blocking Application Deployments
+Date/Time:    2025-08-11T13:00:00Z
+Participants: David Kim, Tom Williams, Sarah Chen
+Duration:     Approximately 3 minutes
+Type:         Emergency Incident Response Call
+========================================================================
+
+[BEGIN TRANSCRIPT]
+[David Kim]: Hey team, we've got a P2 incident on AWS IAM. CI/CD pipeline failing with AccessDenied errors on S3 artifact upload. I need everyone's eyes on this immediately.
+
+[Tom Williams]: I'm here. Let me pull up the iam-deploy-role-prod dashboard. When did this start exactly?
+
+[David Kim]: First alert came in at 13:00 UTC. IAM policy update applied to deployment role. I've been looking at the logs since then.
+
+[Sarah Chen]: I just joined the call. Give me a quick rundown. What are we seeing on the infrastructure side?
+
+[David Kim]: Multiple symptoms. ECR image push returning authorization failures. And we're also seeing Deployment role showing reduced permission set after recent IAM update.
+
+[Tom Williams]: OK, I've got the metrics up. All deployment pipelines affected across all environments. This doesn't look like a normal blip.
+
+[Sarah Chen]: Any recent deployments or configuration changes that could have triggered this? I want to rule out human error first.
+
+[David Kim]: I checked the change log for iam-deploy-role-prod. No deployments in the last 24 hours. No config changes either. This looks like an organic failure.
+
+[Tom Williams]: Based on what I'm seeing in the telemetry data, I think this is related to iam policy hardening removed essential deployment permissions (s3:putobject and ecr:pushimage) from . The error pattern is very consistent with that.
+
+[Sarah Chen]: That makes sense given the symptoms. I've seen similar patterns before. What's our best remediation path here?
+
+[David Kim]: I recommend we added back the required s3 and ecr permissions to the deployment iam role, validated all deployment . That should bring us back to a stable state.
+
+[Tom Williams]: Agreed. Let me start executing that now. Sarah, can you monitor the dashboards and confirm when metrics start recovering?
+
+[Sarah Chen]: Will do. I've got the monitoring screen up. Go ahead with the fix.
+
+[Tom Williams]: Alright, executing the remediation now. This will take a couple of minutes. Stand by.
+
+[Sarah Chen]: I'm starting to see positive movement on the dashboards. AWS IAM metrics are beginning to normalize.
+
+[David Kim]: Confirmed on my end too. Services are recovering. Let's keep monitoring for the next fifteen minutes to make sure we're stable.
+
+[Tom Williams]: Fix is fully applied. Everything looks green now. I'll document the resolution steps in the incident ticket.
+
+[David Kim]: Great work everyone. Let's schedule a post-mortem for tomorrow. Key action items from this incident: implement iam policy simulation testing before applying permission changes, create iam permission dependency map for ci/cd pipelines, and use aws access analyzer to validate policy changes against actual usage.
+
+[Sarah Chen]: I'll send out the post-mortem calendar invite and start drafting the incident report. Good job team, quick response on this one.
+
+[END TRANSCRIPT]
+
+========================================================================
+Action Items Captured:
+  - Implement IAM policy simulation testing before applying permission changes
+  - Create IAM permission dependency map for CI/CD pipelines
+  - Use AWS Access Analyzer to validate policy changes against actual usage
+  - Implement staged IAM policy rollout with canary testing
+
+Next Steps: Post-mortem meeting scheduled for following business day.
+========================================================================

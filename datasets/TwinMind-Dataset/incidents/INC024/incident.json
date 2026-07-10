@@ -1,0 +1,110 @@
+{
+  "incident_id": "INC024",
+  "title": "Configuration Drift Between Staging and Production Environments",
+  "timestamp": "2025-06-23T10:00:00Z",
+  "severity": "P3",
+  "department": "DevOps",
+  "system": "Ansible Configuration Management",
+  "component": "config-management-prod",
+  "location": "US-East-1 (AWS)",
+  "status": "Resolved",
+  "symptoms": [
+    "Feature working correctly in staging but failing in production",
+    "Database connection pool exhaustion in production not reproducible in staging",
+    "Ansible playbook showing 47 configuration differences between environments",
+    "Manual hotfix records found in production change log but not in Ansible code",
+    "Environment comparison tool showing critical parameter mismatches"
+  ],
+  "root_cause": "Accumulated configuration drift from 6 months of manual production hotfixes that were never backported to the Ansible configuration code or applied to staging",
+  "resolution": "Audited all 47 configuration differences, reconciled configurations by updating Ansible playbooks with production values, reapplied configuration to both environments, and verified parity",
+  "preventive_actions": [
+    "Implement configuration drift detection running daily with alerting",
+    "Enforce infrastructure-as-code policy prohibiting manual production changes",
+    "Create automated environment parity verification in CI pipeline",
+    "Schedule monthly configuration audit between staging and production",
+    "Implement change approval process requiring Ansible code updates for all changes"
+  ],
+  "affected_services": [
+    "deployment-pipeline",
+    "staging-environment",
+    "feature-releases"
+  ],
+  "engineers": [
+    "Tom Williams",
+    "Sarah Chen",
+    "James Wright"
+  ],
+  "timeline": [
+    {
+      "time": "10:00 UTC",
+      "event": "Feature deployment fails in production despite passing staging tests"
+    },
+    {
+      "time": "10:15 UTC",
+      "event": "Initial investigation unable to reproduce in staging"
+    },
+    {
+      "time": "10:45 UTC",
+      "event": "Tom Williams suspects configuration drift"
+    },
+    {
+      "time": "11:00 UTC",
+      "event": "Environment comparison reveals 47 configuration differences"
+    },
+    {
+      "time": "11:30 UTC",
+      "event": "Critical drift in database connection pool settings identified"
+    },
+    {
+      "time": "12:00 UTC",
+      "event": "Full audit of all configuration differences initiated"
+    },
+    {
+      "time": "13:00 UTC",
+      "event": "Ansible playbooks updated with reconciled configurations"
+    },
+    {
+      "time": "14:00 UTC",
+      "event": "Configurations applied to both environments, parity verified"
+    }
+  ],
+  "ocr_entities": [
+    "Configuration Drifts: 47",
+    "DB Max Connections: Staging=200 Prod=50",
+    "Thread Pool Size: Staging=100 Prod=64",
+    "Cache TTL: Staging=3600 Prod=1800",
+    "Environments: staging vs production",
+    "Last Sync: 187 days ago"
+  ],
+  "audio_entities": [
+    "James Wright",
+    "Sarah Chen",
+    "Tom Williams"
+  ],
+  "document_entities": [
+    "configuration-drift",
+    "ansible",
+    "devops",
+    "environment-parity",
+    "staging"
+  ],
+  "evidence": {
+    "document": "INC024_incident_report.pdf",
+    "image": "config_drift_comparison.png",
+    "audio": "INC024_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "Ansible",
+    "Configuration Drift",
+    "Staging Environment",
+    "Production Environment",
+    "Infrastructure as Code"
+  ],
+  "knowledge_graph_relations": [
+    "Manual_hotfixes CAUSED configuration_drift",
+    "Drift BROKE staging_production_parity",
+    "Ansible_reconciliation RESTORED environment_parity"
+  ],
+  "embedding_summary": "Configuration drift of 47 differences discovered between staging and production environments accumulated from 6 months of manual production hotfixes not backported to Ansible code. Feature deployment failures resulted. Resolved by auditing and reconciling all configurations in Ansible playbooks.",
+  "confidence": 0.91
+}

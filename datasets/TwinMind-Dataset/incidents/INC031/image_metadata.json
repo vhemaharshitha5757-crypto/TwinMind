@@ -1,0 +1,23 @@
+{
+  "filename": "iam_access_denied.png",
+  "caption": "Jenkins pipeline showing AccessDenied errors from IAM policy restriction",
+  "scene_description": "Jenkins pipeline console output showing red failure stages with AccessDenied error messages. An AWS IAM policy comparison view shows the removed permissions highlighted in red.",
+  "detected_objects": [
+    "Pipeline Console Output",
+    "IAM Policy Diff View",
+    "Error Message Details",
+    "Permission Matrix",
+    "Role ARN Display"
+  ],
+  "ocr_text": [
+    "Error: AccessDenied on s3:PutObject",
+    "Error: AccessDenied on ecr:PushImage",
+    "Role: iam-deploy-role-prod",
+    "Policy Version: v14 (updated 1h ago)",
+    "Removed: s3:PutObject, ecr:PushImage",
+    "Pipeline: prod-deploy FAILED"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "AWS IAM"
+}

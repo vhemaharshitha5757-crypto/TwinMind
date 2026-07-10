@@ -1,0 +1,59 @@
+MEETING TRANSCRIPT - INCIDENT INC037
+========================================================================
+Subject:      AWS S3 Access Denied Errors After Bucket Policy Update
+Date/Time:    2025-09-22T15:30:00Z
+Participants: Lisa Park, David Kim, Sarah Chen
+Duration:     Approximately 3 minutes
+Type:         Emergency Incident Response Call
+========================================================================
+
+[BEGIN TRANSCRIPT]
+[Lisa Park]: Hey team, we've got a P2 incident on AWS S3. S3 GetObject calls returning 403 AccessDenied for application IAM role. I need everyone's eyes on this immediately.
+
+[David Kim]: I'm here. Let me pull up the s3-prod-assets-bucket dashboard. When did this start exactly?
+
+[Lisa Park]: First alert came in at 15:30 UTC. S3 bucket policy updated to restrict public access. I've been looking at the logs since then.
+
+[Sarah Chen]: I just joined the call. Give me a quick rundown. What are we seeing on the infrastructure side?
+
+[Lisa Park]: Multiple symptoms. Website loading without CSS, JavaScript, or images. And we're also seeing CloudTrail logs showing denied S3 API calls from VPC endpoint.
+
+[David Kim]: OK, I've got the metrics up. S3 bucket policy recently modified removing VPC endpoint condition. This doesn't look like a normal blip.
+
+[Sarah Chen]: Any recent deployments or configuration changes that could have triggered this? I want to rule out human error first.
+
+[Lisa Park]: I checked the change log for s3-prod-assets-bucket. No deployments in the last 24 hours. No config changes either. This looks like an organic failure.
+
+[David Kim]: Based on what I'm seeing in the telemetry data, I think this is related to s3 bucket policy update intended to block public access also removed the vpc endpoint policy stateme. The error pattern is very consistent with that.
+
+[Sarah Chen]: That makes sense given the symptoms. I've seen similar patterns before. What's our best remediation path here?
+
+[Lisa Park]: I recommend we added vpc endpoint policy statement back to the s3 bucket policy while maintaining the public access. That should bring us back to a stable state.
+
+[David Kim]: Agreed. Let me start executing that now. Sarah, can you monitor the dashboards and confirm when metrics start recovering?
+
+[Sarah Chen]: Will do. I've got the monitoring screen up. Go ahead with the fix.
+
+[David Kim]: Alright, executing the remediation now. This will take a couple of minutes. Stand by.
+
+[Sarah Chen]: I'm starting to see positive movement on the dashboards. AWS S3 metrics are beginning to normalize.
+
+[Lisa Park]: Confirmed on my end too. Services are recovering. Let's keep monitoring for the next fifteen minutes to make sure we're stable.
+
+[David Kim]: Fix is fully applied. Everything looks green now. I'll document the resolution steps in the incident ticket.
+
+[Lisa Park]: Great work everyone. Let's schedule a post-mortem for tomorrow. Key action items from this incident: implement s3 bucket policy change simulation before applying, create bucket policy templates that include standard vpc endpoint access, and add s3 access monitoring with immediate alerting on accessdenied spikes.
+
+[Sarah Chen]: I'll send out the post-mortem calendar invite and start drafting the incident report. Good job team, quick response on this one.
+
+[END TRANSCRIPT]
+
+========================================================================
+Action Items Captured:
+  - Implement S3 bucket policy change simulation before applying
+  - Create bucket policy templates that include standard VPC endpoint access
+  - Add S3 access monitoring with immediate alerting on AccessDenied spikes
+  - Implement bucket policy change approval workflow
+
+Next Steps: Post-mortem meeting scheduled for following business day.
+========================================================================

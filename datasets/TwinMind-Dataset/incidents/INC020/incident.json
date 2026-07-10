@@ -1,0 +1,112 @@
+{
+  "incident_id": "INC020",
+  "title": "NFS Storage Mount Failure on Application Server Farm",
+  "timestamp": "2025-05-26T11:15:00Z",
+  "severity": "P2",
+  "department": "Storage Engineering",
+  "system": "NetApp NFS Cluster",
+  "component": "nfs-prod-share-01",
+  "location": "On-Premises DC-Chicago",
+  "status": "Resolved",
+  "symptoms": [
+    "NFS mount points showing stale file handle errors on application servers",
+    "Application processes in D (uninterruptible sleep) state waiting for NFS I/O",
+    "NetApp storage controller showing successful failover to partner node",
+    "NFS clients not reconnecting after storage controller failover",
+    "df and ls commands hanging indefinitely on affected mount points"
+  ],
+  "root_cause": "NFS hard mount configuration without intr or timeo options prevented automatic reconnection after NetApp storage controller failover during firmware maintenance",
+  "resolution": "Forced NFS unmount and remount with soft mount options on all affected servers, verified storage controller health, and updated NFS mount configuration to include reconnection parameters",
+  "preventive_actions": [
+    "Update NFS mount configuration to use soft mounts with timeout values",
+    "Implement NFS mount health monitoring with automatic remount capability",
+    "Coordinate storage controller maintenance with application team notifications",
+    "Add NFS client reconnection testing to storage maintenance procedures",
+    "Create automated NFS mount recovery script for failover scenarios"
+  ],
+  "affected_services": [
+    "file-upload-service",
+    "document-processing",
+    "media-storage",
+    "user-content-service"
+  ],
+  "engineers": [
+    "Chris Evans",
+    "Lisa Park",
+    "Alex Johnson"
+  ],
+  "timeline": [
+    {
+      "time": "11:15 UTC",
+      "event": "NetApp storage controller begins firmware maintenance failover"
+    },
+    {
+      "time": "11:17 UTC",
+      "event": "NFS mounts become stale on all 12 application servers"
+    },
+    {
+      "time": "11:20 UTC",
+      "event": "Application processes begin hanging on NFS I/O operations"
+    },
+    {
+      "time": "11:25 UTC",
+      "event": "Alert fires for application server unresponsiveness"
+    },
+    {
+      "time": "11:30 UTC",
+      "event": "Chris Evans identifies NFS mount failure as root cause"
+    },
+    {
+      "time": "11:38 UTC",
+      "event": "Storage controller failover confirmed successful"
+    },
+    {
+      "time": "11:42 UTC",
+      "event": "Forced unmount and remount initiated on all servers"
+    },
+    {
+      "time": "11:50 UTC",
+      "event": "All NFS mounts restored, application processes recovering"
+    }
+  ],
+  "ocr_entities": [
+    "NFS Share: nfs-prod-share-01",
+    "Affected Servers: 12/12 STALE",
+    "Controller: NetApp-01 (failed over)",
+    "I/O Wait: 100%",
+    "Processes in D state: 347",
+    "Mount Type: hard (no timeout)"
+  ],
+  "audio_entities": [
+    "Alex Johnson",
+    "Chris Evans",
+    "Lisa Park"
+  ],
+  "document_entities": [
+    "nfs",
+    "storage",
+    "mount",
+    "netapp",
+    "on-premises"
+  ],
+  "evidence": {
+    "document": "INC020_incident_report.pdf",
+    "image": "nfs_mount_failure.png",
+    "audio": "INC020_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "NFS",
+    "nfs-prod-share-01",
+    "NetApp",
+    "Storage Controller",
+    "Hard Mount",
+    "Failover"
+  ],
+  "knowledge_graph_relations": [
+    "Controller_failover CAUSED NFS_disconnect",
+    "Hard_mount_config PREVENTED auto_reconnection",
+    "Soft_mount_config ENABLES reconnection"
+  ],
+  "embedding_summary": "NFS mount failure on 12 application servers after NetApp storage controller failover during firmware maintenance. Hard mount configuration without timeout values prevented automatic reconnection. 35-minute outage affecting file upload and document processing. Resolved by forced remount with soft mount options.",
+  "confidence": 0.93
+}

@@ -1,0 +1,162 @@
+INCIDENT REPORT
+========================================================================
+
+Incident ID:       INC032
+Title:             Overnight Backup Job Failure Due to Expired Credentials
+Severity:          P2
+Date/Time:         2025-08-18T02:00:00Z
+Department:        Storage Engineering
+System:            AWS Backup Service
+Component:         backup-vault-prod-west
+Location:          US-West-2 (AWS)
+Assigned Engineer: Chris Evans
+Status:            Resolved
+
+========================================================================
+1. SUMMARY
+========================================================================
+
+The overnight production database backup job failed at 02:00 UTC on August 18, 2025. The backup service account password had expired after 90 days per the organization's password rotation policy, but the backup job configuration was not updated with the new credentials. The failure was not detected until the morning backup verification check at 08:00 UTC, meaning the daily backup was missed.
+
+This incident was classified as P2 severity and was assigned to
+Chris Evans in the Storage Engineering department. The affected system was
+AWS Backup Service, specifically the backup-vault-prod-west component located in US-West-2 (AWS).
+The incident was detected through automated monitoring and alerting systems,
+and the response team was engaged within minutes of the initial alert.
+
+========================================================================
+2. BUSINESS IMPACT
+========================================================================
+
+Daily production database backup missed for one day. Recovery Point Objective (RPO) extended from 24 hours to 48 hours. Compliance audit finding generated for missed backup window. No data loss occurred but disaster recovery posture was weakened.
+
+The incident triggered the organization's major incident response process,
+involving cross-functional coordination between engineering, operations, and
+business stakeholders. Customer support was notified and prepared to handle
+incoming queries related to the service degradation.
+
+========================================================================
+3. SYMPTOMS OBSERVED
+========================================================================
+
+The following symptoms were observed during the incident:
+
+  * Backup job in FAILED status in AWS Backup console
+  * Backup service account authentication failure in logs
+  * Backup vault showing no new recovery points since previous day
+  * Automated backup verification email not received by ops team
+  * Service account password expiry notification sent 14 days prior but unactioned
+
+These symptoms were correlated across multiple monitoring systems including
+application performance monitoring, infrastructure metrics, and log
+aggregation platforms. The incident response team confirmed the symptoms
+during their initial assessment and used them to guide the investigation.
+
+========================================================================
+4. TIMELINE OF EVENTS
+========================================================================
+
+  [02:00 UTC] Overnight backup job starts and immediately fails with auth error
+  [02:01 UTC] Backup job logs authentication failure, no retry configured
+  [08:00 UTC] Morning backup verification check reveals missing backup
+  [08:15 UTC] Chris Evans investigates, identifies credential expiry
+  [08:30 UTC] Service account credentials rotated and updated
+  [08:45 UTC] Manual backup initiated to restore recovery point
+  [09:30 UTC] Manual backup completed successfully
+  [09:45 UTC] Backup monitoring alerts configured, incident resolved
+
+========================================================================
+5. INVESTIGATION
+========================================================================
+
+Upon receiving the automated alert, the incident response team initiated a
+systematic investigation following established runbook procedures. The team
+began by examining the health and status of the backup-vault-prod-west component
+within the AWS Backup Service system deployed in US-West-2 (AWS).
+
+Initial telemetry data from the monitoring stack was reviewed, including
+application logs, infrastructure metrics, and recent deployment and change
+history. The investigation revealed that the primary symptoms were consistent
+across multiple data sources and monitoring tools.
+
+Log analysis from the affected component showed error patterns that pointed
+toward backup service account credentials expired after 90-day rotation policy, and the password rotation notification was not actioned by the team, leaving the backup job unable to authenticate. The team also reviewed recent change
+records, configuration modifications, and deployment history to rule out
+human-initiated causes. Cross-referencing the timeline of events with
+infrastructure metrics from the preceding 24-48 hours provided additional
+context that supported the final root cause determination.
+
+========================================================================
+6. ROOT CAUSE ANALYSIS
+========================================================================
+
+The root cause of this incident was determined to be:
+Backup service account credentials expired after 90-day rotation policy, and the password rotation notification was not actioned by the team, leaving the backup job unable to authenticate.
+
+Further analysis confirmed that this issue had been developing over time but
+was not detected by existing monitoring thresholds and alerting rules. The
+failure point was within the backup-vault-prod-west component of the AWS Backup Service
+system. Contributing factors included insufficient monitoring coverage for
+the specific failure mode encountered and the absence of automated
+remediation procedures for this particular scenario.
+
+========================================================================
+7. RESOLUTION
+========================================================================
+
+The incident was resolved by the following actions: Rotated the backup service account credentials, updated the backup job configuration, executed a manual backup to restore the recovery point, and set up credential expiry monitoring.
+
+The resolution was executed by Chris Evans with support from the incident
+response team. After applying the remediation steps, the team monitored the
+system for a stabilization period to confirm that the issue was fully
+resolved and no secondary or cascading failures had occurred. All affected
+services were verified to be operating within normal parameters before the
+incident was formally closed.
+
+========================================================================
+8. PREVENTIVE ACTIONS
+========================================================================
+
+The following preventive actions have been identified to reduce the
+likelihood and impact of similar incidents in the future:
+
+  1. Implement service account credential rotation automation
+  2. Add backup job success/failure monitoring with immediate alerts
+  3. Use IAM roles instead of service account credentials where possible
+  4. Create service account credential expiry dashboard
+  5. Implement backup verification automation with immediate escalation on failure
+
+These action items will be tracked in the engineering backlog and prioritized
+based on risk assessment and business impact analysis.
+
+========================================================================
+9. RELATED STANDARD OPERATING PROCEDURES
+========================================================================
+
+SOP-STOR-002: Backup Job Recovery; SOP-STOR-005: Credential Management for Backup Services
+
+========================================================================
+10. LESSONS LEARNED
+========================================================================
+
+This incident provided several important learnings for the organization.
+The detection of backup service account credentials expired after 90-day rotation policy, and the password rotation notification was not actioned by the team, leaving the backup job unable to authenticate was delayed due to gaps in
+monitoring coverage, highlighting the need for more comprehensive
+observability across the AWS Backup Service stack.
+
+The incident response process demonstrated effective team coordination and
+communication, but the overall time to resolution could be improved through
+automation of common diagnostic and remediation steps. The successful
+resolution validated existing runbooks and procedures while also identifying
+specific areas for improvement.
+
+The preventive actions identified during the post-mortem will strengthen
+organizational resilience against similar failure modes. Regular review of
+monitoring thresholds, alerting rules, and runbook procedures should be
+incorporated into the operational cadence to maintain readiness.
+
+========================================================================
+Report generated by TwinMind Incident Management System
+Date: 2025-08-18T02:00:00Z
+Classification: Internal - Confidential
+========================================================================

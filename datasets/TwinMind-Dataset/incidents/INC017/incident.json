@@ -1,0 +1,118 @@
+{
+  "incident_id": "INC017",
+  "title": "Microservice Dependency Cascade Failure Across Order Pipeline",
+  "timestamp": "2025-05-05T13:22:00Z",
+  "severity": "P1",
+  "department": "Backend Engineering",
+  "system": "Microservice Mesh",
+  "component": "inventory-svc-prod",
+  "location": "US-East-1 (AWS)",
+  "status": "Resolved",
+  "symptoms": [
+    "Inventory service returning 503 errors with connection pool exhaustion",
+    "Order service threads blocked waiting for inventory responses",
+    "Payment service connection pool exhausted from blocked order requests",
+    "API gateway timeout rate at 85% for all order-related endpoints",
+    "No circuit breakers tripping despite cascading failures"
+  ],
+  "root_cause": "Database connection pool leak in inventory service combined with absence of circuit breakers in the order pipeline, allowing a single service failure to cascade through all dependent services",
+  "resolution": "Restarted inventory service to clear leaked connections, implemented emergency circuit breakers on critical service boundaries, and scaled up affected services to handle recovery traffic",
+  "preventive_actions": [
+    "Implement circuit breakers on all inter-service communication boundaries",
+    "Add connection pool monitoring and leak detection for all services",
+    "Deploy service mesh with automatic retry and timeout policies",
+    "Create chaos engineering program to test cascade failure scenarios",
+    "Implement bulkhead pattern to isolate critical service dependencies"
+  ],
+  "affected_services": [
+    "order-processing",
+    "payment-processing",
+    "inventory-service",
+    "shipping-service",
+    "cart-service",
+    "product-catalog"
+  ],
+  "engineers": [
+    "James Wright",
+    "Mike Torres",
+    "Priya Sharma"
+  ],
+  "timeline": [
+    {
+      "time": "13:22 UTC",
+      "event": "Inventory service connection pool exhausted"
+    },
+    {
+      "time": "13:25 UTC",
+      "event": "Order service threads begin blocking on inventory calls"
+    },
+    {
+      "time": "13:28 UTC",
+      "event": "Payment service connection pool exhausted from blocked order requests"
+    },
+    {
+      "time": "13:30 UTC",
+      "event": "API gateway timeout rate spikes to 85%"
+    },
+    {
+      "time": "13:32 UTC",
+      "event": "P1 alert fires for order pipeline failure"
+    },
+    {
+      "time": "13:40 UTC",
+      "event": "Root cause traced to inventory service connection pool leak"
+    },
+    {
+      "time": "13:48 UTC",
+      "event": "Inventory service restarted, emergency circuit breakers deployed"
+    },
+    {
+      "time": "13:55 UTC",
+      "event": "Services recovering, order pipeline processing resuming"
+    },
+    {
+      "time": "14:04 UTC",
+      "event": "Full recovery confirmed, incident resolved"
+    }
+  ],
+  "ocr_entities": [
+    "inventory-svc: DOWN (conn pool: 0 free)",
+    "order-svc: DEGRADED (threads: 100% blocked)",
+    "payment-svc: DEGRADED (conn pool: exhausted)",
+    "api-gateway: 85% timeouts",
+    "Circuit Breakers: NONE CONFIGURED",
+    "Pipeline: ORDER FLOW"
+  ],
+  "audio_entities": [
+    "James Wright",
+    "Priya Sharma",
+    "Mike Torres"
+  ],
+  "document_entities": [
+    "microservice",
+    "cascade",
+    "circuit-breaker",
+    "dependency",
+    "outage"
+  ],
+  "evidence": {
+    "document": "INC017_incident_report.pdf",
+    "image": "cascade_failure_map.png",
+    "audio": "INC017_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "Inventory Service",
+    "Order Pipeline",
+    "Connection Pool",
+    "Circuit Breaker",
+    "Service Mesh",
+    "API Gateway"
+  ],
+  "knowledge_graph_relations": [
+    "Connection_pool_leak BROKE inventory_service",
+    "Missing_circuit_breakers ALLOWED cascade_propagation",
+    "Inventory_failure CASCADE_TO order_payment_services"
+  ],
+  "embedding_summary": "Cascade failure across order pipeline triggered by database connection pool leak in inventory service. Absence of circuit breakers allowed failure to propagate to order, payment, and API gateway services. 42-minute outage affecting 28,000 users with $450K revenue loss. Resolved by service restart and emergency circuit breaker deployment.",
+  "confidence": 0.94
+}

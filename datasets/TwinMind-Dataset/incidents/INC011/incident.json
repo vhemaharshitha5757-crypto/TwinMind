@@ -1,0 +1,118 @@
+{
+  "incident_id": "INC011",
+  "title": "TLS Certificate Expiry on Production Load Balancer",
+  "timestamp": "2025-03-24T00:01:00Z",
+  "severity": "P1",
+  "department": "Security Engineering",
+  "system": "AWS Application Load Balancer",
+  "component": "alb-prod-main-01",
+  "location": "US-East-1 (AWS)",
+  "status": "Resolved",
+  "symptoms": [
+    "SSL certificate error on all HTTPS connections to the platform",
+    "Browser security warnings blocking user access",
+    "Certificate expiry date showing March 23, 2025 in TLS handshake",
+    "AWS Certificate Manager showing failed renewal status",
+    "DNS validation CNAME record missing from Route 53"
+  ],
+  "root_cause": "TLS certificate auto-renewal failed silently because the DNS validation CNAME record was accidentally removed during a DNS zone migration 30 days prior",
+  "resolution": "Restored the DNS validation CNAME record, triggered manual certificate renewal in ACM, and applied the new certificate to the ALB within 35 minutes",
+  "preventive_actions": [
+    "Implement certificate expiry monitoring with 30-day, 14-day, and 7-day alerts",
+    "Add DNS validation record protection with deletion prevention",
+    "Create automated certificate renewal verification test",
+    "Implement certificate transparency log monitoring",
+    "Add certificate expiry check to weekly operational review"
+  ],
+  "affected_services": [
+    "web-platform",
+    "mobile-api",
+    "partner-portal",
+    "developer-docs",
+    "status-page"
+  ],
+  "engineers": [
+    "David Kim",
+    "Aisha Khan",
+    "Maria Garcia"
+  ],
+  "timeline": [
+    {
+      "time": "00:01 UTC",
+      "event": "TLS certificate expires on alb-prod-main-01"
+    },
+    {
+      "time": "00:02 UTC",
+      "event": "All HTTPS connections begin failing with certificate errors"
+    },
+    {
+      "time": "00:05 UTC",
+      "event": "Automated monitoring detects SSL handshake failures"
+    },
+    {
+      "time": "00:08 UTC",
+      "event": "David Kim paged, begins investigation"
+    },
+    {
+      "time": "00:12 UTC",
+      "event": "ACM renewal failure identified, DNS validation CNAME missing"
+    },
+    {
+      "time": "00:18 UTC",
+      "event": "DNS validation CNAME record restored in Route 53"
+    },
+    {
+      "time": "00:25 UTC",
+      "event": "Manual certificate renewal triggered in ACM"
+    },
+    {
+      "time": "00:32 UTC",
+      "event": "New certificate issued and applied to ALB"
+    },
+    {
+      "time": "00:36 UTC",
+      "event": "HTTPS access restored, incident resolved"
+    }
+  ],
+  "ocr_entities": [
+    "Certificate: *.company.com",
+    "Status: EXPIRED",
+    "Expiry: 2025-03-23T23:59:59Z",
+    "Renewal: FAILED",
+    "Reason: DNS validation record not found",
+    "ALB: alb-prod-main-01"
+  ],
+  "audio_entities": [
+    "Aisha Khan",
+    "David Kim",
+    "Maria Garcia"
+  ],
+  "document_entities": [
+    "tls",
+    "certificate",
+    "expiry",
+    "ssl",
+    "load-balancer"
+  ],
+  "evidence": {
+    "document": "INC011_incident_report.pdf",
+    "image": "tls_cert_expired.png",
+    "audio": "INC011_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "TLS Certificate",
+    "ALB",
+    "ACM",
+    "DNS Validation",
+    "CNAME Record",
+    "Route 53"
+  ],
+  "knowledge_graph_relations": [
+    "DNS_migration REMOVED validation_CNAME",
+    "Missing_CNAME CAUSED renewal_failure",
+    "Certificate EXPIRED_ON alb-prod-main-01",
+    "Manual_renewal RESTORED certificate"
+  ],
+  "embedding_summary": "TLS certificate expired on production ALB after auto-renewal silently failed due to missing DNS validation CNAME record removed during DNS zone migration. Complete HTTPS access failure for 35 minutes affecting 52,000 users. Resolved by restoring DNS record and triggering manual certificate renewal.",
+  "confidence": 0.97
+}

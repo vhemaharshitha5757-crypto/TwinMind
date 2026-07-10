@@ -1,0 +1,23 @@
+{
+  "filename": "s3_access_denied.png",
+  "caption": "CloudTrail showing AccessDenied errors on S3 bucket after policy change",
+  "scene_description": "AWS CloudTrail event log showing a stream of AccessDenied events for s3:GetObject operations. A bucket policy comparison shows the removed VPC endpoint statement. A website screenshot shows the broken page without assets.",
+  "detected_objects": [
+    "CloudTrail Event Log",
+    "Bucket Policy Diff View",
+    "AccessDenied Counter",
+    "VPC Endpoint Policy Section",
+    "Broken Website Preview"
+  ],
+  "ocr_text": [
+    "Event: s3:GetObject",
+    "Error: AccessDenied",
+    "Bucket: s3-prod-assets-bucket",
+    "Source: vpce-0a1b2c3d (VPC Endpoint)",
+    "Denied Requests: 45,231",
+    "Policy Change: VPC statement REMOVED"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "AWS S3"
+}

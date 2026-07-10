@@ -1,0 +1,23 @@
+{
+  "filename": "dns_failure_dashboard.png",
+  "caption": "Network monitoring showing DNS resolution failure across internal zones",
+  "scene_description": "A network monitoring dashboard showing DNS query success rate dropping from 100% to 0% for internal zones. A world map shows all regions affected. Error count panel shows NXDOMAIN responses climbing rapidly.",
+  "detected_objects": [
+    "DNS Success Rate Graph",
+    "NXDOMAIN Error Counter",
+    "Region Status Map",
+    "Hosted Zone Panel",
+    "VPC Association Status"
+  ],
+  "ocr_text": [
+    "DNS Success Rate: 0%",
+    "NXDOMAIN Errors: 1.2M/min",
+    "Hosted Zone: prod-internal",
+    "VPC Association: NONE",
+    "Affected Services: ALL",
+    "Status: CRITICAL"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "Route 53 Private Hosted Zone"
+}

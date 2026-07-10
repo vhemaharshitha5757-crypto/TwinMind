@@ -1,0 +1,111 @@
+{
+  "incident_id": "INC022",
+  "title": "Feature Flag Misconfiguration Exposing Unfinished Feature to All Users",
+  "timestamp": "2025-06-09T16:45:00Z",
+  "severity": "P2",
+  "department": "Application Engineering",
+  "system": "LaunchDarkly Feature Flags",
+  "component": "feature-flag-new-checkout-v2",
+  "location": "US-East-1 (AWS)",
+  "status": "Resolved",
+  "symptoms": [
+    "Checkout page rendering with broken CSS and missing elements",
+    "Payment validation errors for all checkout attempts through new flow",
+    "Feature flag dashboard showing 100% rollout instead of 5% canary",
+    "Customer support reports of checkout not working",
+    "Checkout conversion rate dropping sharply in analytics"
+  ],
+  "root_cause": "Feature flag targeting rule was modified from percentage-based (5%) to boolean true for all users during a flag audit that accidentally saved the wrong configuration",
+  "resolution": "Reverted the feature flag to 5% canary rollout, cleared CDN cache serving the new checkout assets, and verified the original checkout flow was restored for 95% of users",
+  "preventive_actions": [
+    "Implement feature flag change approval workflow for production flags",
+    "Add feature flag change alerting for unexpected rollout percentage changes",
+    "Create feature flag audit logging with diff comparison",
+    "Implement feature flag rollback automation triggered by conversion metrics",
+    "Add visual regression testing for feature-flagged UI changes"
+  ],
+  "affected_services": [
+    "checkout-service",
+    "payment-processing",
+    "cart-service",
+    "order-creation"
+  ],
+  "engineers": [
+    "Priya Sharma",
+    "Jenny Liu",
+    "Nina Patel"
+  ],
+  "timeline": [
+    {
+      "time": "16:45 UTC",
+      "event": "Feature flag new-checkout-v2 accidentally set to 100% rollout"
+    },
+    {
+      "time": "16:48 UTC",
+      "event": "Users begin reporting checkout issues"
+    },
+    {
+      "time": "16:50 UTC",
+      "event": "Checkout conversion rate drops sharply in real-time analytics"
+    },
+    {
+      "time": "16:52 UTC",
+      "event": "Customer support queue begins filling with checkout complaints"
+    },
+    {
+      "time": "16:55 UTC",
+      "event": "Priya Sharma identifies feature flag misconfiguration"
+    },
+    {
+      "time": "16:58 UTC",
+      "event": "Feature flag reverted to 5% canary rollout"
+    },
+    {
+      "time": "17:02 UTC",
+      "event": "CDN cache cleared for checkout assets"
+    },
+    {
+      "time": "17:07 UTC",
+      "event": "Checkout conversion rate recovering, incident resolved"
+    }
+  ],
+  "ocr_entities": [
+    "Flag: new-checkout-v2",
+    "Status: ON",
+    "Rollout: 100% (expected: 5%)",
+    "Changed By: priya.sharma",
+    "Changed At: 16:45 UTC",
+    "Conversion Rate: 2% (baseline: 12%)"
+  ],
+  "audio_entities": [
+    "Jenny Liu",
+    "Priya Sharma",
+    "Nina Patel"
+  ],
+  "document_entities": [
+    "feature-flag",
+    "launchdarkly",
+    "misconfiguration",
+    "checkout",
+    "ui"
+  ],
+  "evidence": {
+    "document": "INC022_incident_report.pdf",
+    "image": "feature_flag_misconfig.png",
+    "audio": "INC022_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "LaunchDarkly",
+    "Feature Flag",
+    "new-checkout-v2",
+    "Checkout Flow",
+    "Canary Rollout"
+  ],
+  "knowledge_graph_relations": [
+    "Flag_misconfiguration EXPOSED unfinished_checkout",
+    "100_percent_rollout REPLACED 5_percent_canary",
+    "Flag_revert RESTORED original_checkout"
+  ],
+  "embedding_summary": "Feature flag misconfiguration in LaunchDarkly exposed unfinished checkout-v2 to 100% of users instead of 5% canary group. Broken checkout flow caused conversion rate to drop from 12% to 2% for 22 minutes. 3,400 users encountered errors. Resolved by reverting flag to canary rollout.",
+  "confidence": 0.96
+}

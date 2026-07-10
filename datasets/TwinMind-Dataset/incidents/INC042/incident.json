@@ -1,0 +1,111 @@
+{
+  "incident_id": "INC042",
+  "title": "Webhook Delivery Timeout Due to Receiver Endpoint Slowdown",
+  "timestamp": "2025-10-27T11:30:00Z",
+  "severity": "P3",
+  "department": "API Engineering",
+  "system": "Webhook Delivery Service",
+  "component": "webhook-dispatcher-prod-01",
+  "location": "US-West-2 (AWS)",
+  "status": "Resolved",
+  "symptoms": [
+    "Webhook delivery queue depth growing from 0 to 580,000",
+    "All dispatcher threads blocked waiting on slow partner endpoint",
+    "Webhook delivery latency exceeding 30 seconds for all partners",
+    "Partner webhook health dashboard showing red for all subscribers",
+    "Shared thread pool with zero available threads"
+  ],
+  "root_cause": "Shared thread pool architecture in webhook dispatcher allowed one slow partner endpoint to block all dispatcher threads, preventing delivery to healthy partners",
+  "resolution": "Implemented per-partner thread pool isolation with individual timeout settings, added circuit breaker for slow endpoints, and drained the queued events with increased parallelism",
+  "preventive_actions": [
+    "Implement per-partner thread pool isolation (bulkhead pattern)",
+    "Add circuit breaker per webhook subscriber with configurable thresholds",
+    "Set aggressive connection and read timeouts for webhook delivery (5s max)",
+    "Implement webhook delivery priority queues for critical partners",
+    "Add partner endpoint health monitoring with automatic suspension"
+  ],
+  "affected_services": [
+    "webhook-delivery",
+    "partner-integrations",
+    "event-notifications",
+    "order-sync"
+  ],
+  "engineers": [
+    "Jenny Liu",
+    "Mike Torres",
+    "Sarah Chen"
+  ],
+  "timeline": [
+    {
+      "time": "11:30 UTC",
+      "event": "Partner endpoint response times spike to 30 seconds"
+    },
+    {
+      "time": "11:35 UTC",
+      "event": "Webhook dispatcher thread pool fully blocked"
+    },
+    {
+      "time": "11:40 UTC",
+      "event": "Queue depth begins growing rapidly for all partners"
+    },
+    {
+      "time": "11:50 UTC",
+      "event": "Alert fires for webhook delivery delays"
+    },
+    {
+      "time": "12:00 UTC",
+      "event": "Jenny Liu identifies slow partner blocking shared pool"
+    },
+    {
+      "time": "12:15 UTC",
+      "event": "Per-partner thread isolation implemented as emergency fix"
+    },
+    {
+      "time": "12:20 UTC",
+      "event": "Circuit breaker deployed, slow partner webhooks suspended"
+    },
+    {
+      "time": "12:30 UTC",
+      "event": "Queue draining, healthy partner deliveries resuming"
+    }
+  ],
+  "ocr_entities": [
+    "Queue Depth: 580,213",
+    "Threads: 50/50 (blocked)",
+    "Slow Partner: partner-xyz (30,000ms)",
+    "Other Partners: QUEUED",
+    "Delivery Rate: 0/min",
+    "Status: CONGESTED"
+  ],
+  "audio_entities": [
+    "Jenny Liu",
+    "Sarah Chen",
+    "Mike Torres"
+  ],
+  "document_entities": [
+    "webhook",
+    "timeout",
+    "delivery",
+    "queue",
+    "retry"
+  ],
+  "evidence": {
+    "document": "INC042_incident_report.pdf",
+    "image": "webhook_delivery_timeout.png",
+    "audio": "INC042_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "Webhook Dispatcher",
+    "webhook-dispatcher-prod-01",
+    "Thread Pool",
+    "Circuit Breaker",
+    "Bulkhead Pattern"
+  ],
+  "knowledge_graph_relations": [
+    "Slow_partner BLOCKED shared_thread_pool",
+    "Thread_exhaustion DELAYED all_deliveries",
+    "Bulkhead_pattern ISOLATES partner_impact"
+  ],
+  "embedding_summary": "Webhook delivery timeouts caused by one slow partner endpoint blocking all shared dispatcher threads. 580,000 events queued, all 120 partners experiencing delays for 45 minutes. Resolved by implementing per-partner thread pool isolation and circuit breakers.",
+  "confidence": 0.93
+}

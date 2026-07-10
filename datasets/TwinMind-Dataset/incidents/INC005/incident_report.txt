@@ -1,0 +1,162 @@
+INCIDENT REPORT
+========================================================================
+
+Incident ID:       INC005
+Title:             Java Microservice Memory Leak Causing OOM Crashes
+Severity:          P2
+Date/Time:         2025-02-10T11:05:00Z
+Department:        Backend Engineering
+System:            Order Processing Service
+Component:         order-svc-prod-03
+Location:          US-West-2 (AWS)
+Assigned Engineer: James Wright
+Status:            Resolved
+
+========================================================================
+1. SUMMARY
+========================================================================
+
+The Order Processing microservice (order-svc-prod-03) experienced repeated Out of Memory (OOM) crashes starting at 11:05 UTC on February 10, 2025. A memory leak in the HTTP connection pool manager was causing connections to be allocated but never released when upstream timeouts occurred. Heap memory grew from 2GB to the 8GB limit over approximately 6 hours before the JVM was killed by the OS OOM killer. The service restarted automatically but the leak recurred.
+
+This incident was classified as P2 severity and was assigned to
+James Wright in the Backend Engineering department. The affected system was
+Order Processing Service, specifically the order-svc-prod-03 component located in US-West-2 (AWS).
+The incident was detected through automated monitoring and alerting systems,
+and the response team was engaged within minutes of the initial alert.
+
+========================================================================
+2. BUSINESS IMPACT
+========================================================================
+
+Order processing throughput dropped by 33% (1 of 3 instances affected) during each OOM cycle. Approximately 1,200 orders experienced processing delays of 3-5 minutes during instance restarts. No orders were lost due to the message queue buffering, but customer notifications were delayed.
+
+The incident triggered the organization's major incident response process,
+involving cross-functional coordination between engineering, operations, and
+business stakeholders. Customer support was notified and prepared to handle
+incoming queries related to the service degradation.
+
+========================================================================
+3. SYMPTOMS OBSERVED
+========================================================================
+
+The following symptoms were observed during the incident:
+
+  * Java heap usage growing linearly from 2GB to 8GB over 6-hour cycles
+  * OOM killer terminating the Java process repeatedly
+  * HTTP connection pool showing 4,000+ active connections (expected max: 200)
+  * Increasing garbage collection pause times reaching 30+ seconds
+  * Order processing latency spikes during GC pauses and restarts
+
+These symptoms were correlated across multiple monitoring systems including
+application performance monitoring, infrastructure metrics, and log
+aggregation platforms. The incident response team confirmed the symptoms
+during their initial assessment and used them to guide the investigation.
+
+========================================================================
+4. TIMELINE OF EVENTS
+========================================================================
+
+  [11:05 UTC] First OOM kill event on order-svc-prod-03
+  [11:06 UTC] Service auto-restarts, automated alert fires
+  [11:15 UTC] James Wright begins investigation, notices recurring OOM pattern
+  [11:30 UTC] Heap dump analysis reveals HTTP connection objects consuming 70% of heap
+  [11:45 UTC] Root cause identified as connection leak in timeout handling path
+  [12:00 UTC] Hotfix developed and tested in staging environment
+  [12:20 UTC] Hotfix deployed to production, connection pool stabilizes
+  [12:35 UTC] Monitoring confirms heap usage stable at 2.5GB, incident resolved
+
+========================================================================
+5. INVESTIGATION
+========================================================================
+
+Upon receiving the automated alert, the incident response team initiated a
+systematic investigation following established runbook procedures. The team
+began by examining the health and status of the order-svc-prod-03 component
+within the Order Processing Service system deployed in US-West-2 (AWS).
+
+Initial telemetry data from the monitoring stack was reviewed, including
+application logs, infrastructure metrics, and recent deployment and change
+history. The investigation revealed that the primary symptoms were consistent
+across multiple data sources and monitoring tools.
+
+Log analysis from the affected component showed error patterns that pointed
+toward http connection pool leak in apache httpclient where connections were not released back to the pool when upstream service returned timeout exceptions. The team also reviewed recent change
+records, configuration modifications, and deployment history to rule out
+human-initiated causes. Cross-referencing the timeline of events with
+infrastructure metrics from the preceding 24-48 hours provided additional
+context that supported the final root cause determination.
+
+========================================================================
+6. ROOT CAUSE ANALYSIS
+========================================================================
+
+The root cause of this incident was determined to be:
+HTTP connection pool leak in Apache HttpClient where connections were not released back to the pool when upstream service returned timeout exceptions.
+
+Further analysis confirmed that this issue had been developing over time but
+was not detected by existing monitoring thresholds and alerting rules. The
+failure point was within the order-svc-prod-03 component of the Order Processing Service
+system. Contributing factors included insufficient monitoring coverage for
+the specific failure mode encountered and the absence of automated
+remediation procedures for this particular scenario.
+
+========================================================================
+7. RESOLUTION
+========================================================================
+
+The incident was resolved by the following actions: Deployed hotfix to properly close HTTP connections in the finally block of the upstream call handler, added connection pool idle timeout configuration, and increased heap dump collection for future diagnosis.
+
+The resolution was executed by James Wright with support from the incident
+response team. After applying the remediation steps, the team monitored the
+system for a stabilization period to confirm that the issue was fully
+resolved and no secondary or cascading failures had occurred. All affected
+services were verified to be operating within normal parameters before the
+incident was formally closed.
+
+========================================================================
+8. PREVENTIVE ACTIONS
+========================================================================
+
+The following preventive actions have been identified to reduce the
+likelihood and impact of similar incidents in the future:
+
+  1. Add JVM heap usage trend alerting with 6-hour moving average
+  2. Implement HTTP connection pool monitoring with dashboards
+  3. Add automated heap dump capture when heap exceeds 80%
+  4. Schedule quarterly code review of connection management patterns
+  5. Add connection leak detection in integration test suite
+
+These action items will be tracked in the engineering backlog and prioritized
+based on risk assessment and business impact analysis.
+
+========================================================================
+9. RELATED STANDARD OPERATING PROCEDURES
+========================================================================
+
+SOP-APP-002: Java Service Memory Issues; SOP-APP-008: OOM Crash Recovery
+
+========================================================================
+10. LESSONS LEARNED
+========================================================================
+
+This incident provided several important learnings for the organization.
+The detection of http connection pool leak in apache httpclient where connections were not released back to the pool when upstream service returned timeout exceptions was delayed due to gaps in
+monitoring coverage, highlighting the need for more comprehensive
+observability across the Order Processing Service stack.
+
+The incident response process demonstrated effective team coordination and
+communication, but the overall time to resolution could be improved through
+automation of common diagnostic and remediation steps. The successful
+resolution validated existing runbooks and procedures while also identifying
+specific areas for improvement.
+
+The preventive actions identified during the post-mortem will strengthen
+organizational resilience against similar failure modes. Regular review of
+monitoring thresholds, alerting rules, and runbook procedures should be
+incorporated into the operational cadence to maintain readiness.
+
+========================================================================
+Report generated by TwinMind Incident Management System
+Date: 2025-02-10T11:05:00Z
+Classification: Internal - Confidential
+========================================================================

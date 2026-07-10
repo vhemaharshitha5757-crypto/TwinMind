@@ -1,0 +1,111 @@
+{
+  "incident_id": "INC040",
+  "title": "HAProxy Returning 503 Errors Due to Backend Server Pool Drain",
+  "timestamp": "2025-10-13T16:20:00Z",
+  "severity": "P2",
+  "department": "SRE",
+  "system": "HAProxy Load Balancer",
+  "component": "haproxy-prod-chi-01",
+  "location": "On-Premises DC-Chicago",
+  "status": "Resolved",
+  "symptoms": [
+    "HAProxy returning 503 Service Unavailable for all requests",
+    "All backend servers showing DRAIN status in HAProxy stats page",
+    "HAProxy stats showing zero active backend servers",
+    "Maintenance script log showing all servers drained simultaneously",
+    "Backend servers healthy and responsive when accessed directly"
+  ],
+  "root_cause": "Maintenance automation script issued drain commands to all backend servers simultaneously instead of sequentially, leaving HAProxy with no available backends to serve traffic",
+  "resolution": "Manually re-enabled all backend servers in HAProxy, killed the errant maintenance script, and fixed the script to process servers sequentially with health verification between each",
+  "preventive_actions": [
+    "Fix maintenance script to drain servers one at a time with health verification",
+    "Implement minimum healthy backends guard preventing full pool drain",
+    "Add HAProxy backend availability monitoring with zero-backend alerting",
+    "Create maintenance window scheduling with change management approval",
+    "Implement HAProxy drain protection requiring manual override for last healthy backend"
+  ],
+  "affected_services": [
+    "internal-apps",
+    "hr-system",
+    "finance-portal",
+    "employee-directory"
+  ],
+  "engineers": [
+    "Alex Johnson",
+    "Chris Evans",
+    "Tom Williams"
+  ],
+  "timeline": [
+    {
+      "time": "16:20 UTC",
+      "event": "Maintenance script starts, drains all 8 backend servers simultaneously"
+    },
+    {
+      "time": "16:21 UTC",
+      "event": "HAProxy begins returning 503 with no available backends"
+    },
+    {
+      "time": "16:23 UTC",
+      "event": "Alert fires for 100% error rate on HAProxy"
+    },
+    {
+      "time": "16:25 UTC",
+      "event": "Alex Johnson investigates, sees all backends in DRAIN"
+    },
+    {
+      "time": "16:27 UTC",
+      "event": "Maintenance script identified and terminated"
+    },
+    {
+      "time": "16:28 UTC",
+      "event": "Backend servers manually re-enabled in HAProxy"
+    },
+    {
+      "time": "16:30 UTC",
+      "event": "Traffic flowing normally, all backends active"
+    },
+    {
+      "time": "16:35 UTC",
+      "event": "Incident resolved, maintenance script fix scheduled"
+    }
+  ],
+  "ocr_entities": [
+    "Backend: app-backend-pool",
+    "Active Servers: 0/8",
+    "Server Status: DRAIN (all)",
+    "Queued Requests: 2,418",
+    "503 Responses: 12,847",
+    "Maintenance Script: RUNNING"
+  ],
+  "audio_entities": [
+    "Alex Johnson",
+    "Chris Evans",
+    "Tom Williams"
+  ],
+  "document_entities": [
+    "haproxy",
+    "503",
+    "backend-drain",
+    "reverse-proxy",
+    "load-balancer"
+  ],
+  "evidence": {
+    "document": "INC040_incident_report.pdf",
+    "image": "haproxy_503_drain.png",
+    "audio": "INC040_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "HAProxy",
+    "haproxy-prod-chi-01",
+    "Backend Pool",
+    "Drain Mode",
+    "Maintenance Script"
+  ],
+  "knowledge_graph_relations": [
+    "Maintenance_script DRAINED all_backends",
+    "Full_drain CAUSED 503_errors",
+    "Manual_re-enable RESTORED backend_availability"
+  ],
+  "embedding_summary": "HAProxy returning 503 errors after maintenance script simultaneously drained all 8 backend servers instead of sequentially. Complete on-premises service outage for 15 minutes affecting 4,500 internal users. Resolved by manually re-enabling backends and fixing the maintenance script.",
+  "confidence": 0.97
+}

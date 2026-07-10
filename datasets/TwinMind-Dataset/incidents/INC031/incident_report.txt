@@ -1,0 +1,163 @@
+INCIDENT REPORT
+========================================================================
+
+Incident ID:       INC031
+Title:             IAM Policy Over-Restriction Blocking Application Deployments
+Severity:          P2
+Date/Time:         2025-08-11T13:00:00Z
+Department:        Security Engineering
+System:            AWS IAM
+Component:         iam-deploy-role-prod
+Location:          US-East-1 (AWS)
+Assigned Engineer: David Kim
+Status:            Resolved
+
+========================================================================
+1. SUMMARY
+========================================================================
+
+An IAM policy update at 13:00 UTC on August 11, 2025 as part of a least-privilege hardening initiative inadvertently removed permissions required by the CI/CD deployment pipeline. The updated policy removed s3:PutObject and ecr:PushImage permissions from the deployment role, blocking all production deployments. The team discovered the issue when three critical hotfix deployments failed consecutively.
+
+This incident was classified as P2 severity and was assigned to
+David Kim in the Security Engineering department. The affected system was
+AWS IAM, specifically the iam-deploy-role-prod component located in US-East-1 (AWS).
+The incident was detected through automated monitoring and alerting systems,
+and the response team was engaged within minutes of the initial alert.
+
+========================================================================
+2. BUSINESS IMPACT
+========================================================================
+
+All production deployments blocked for 1.5 hours. Three critical security hotfixes were delayed. Development team velocity halted as feature branches could not be deployed. No direct customer impact but security patching window was missed.
+
+The incident triggered the organization's major incident response process,
+involving cross-functional coordination between engineering, operations, and
+business stakeholders. Customer support was notified and prepared to handle
+incoming queries related to the service degradation.
+
+========================================================================
+3. SYMPTOMS OBSERVED
+========================================================================
+
+The following symptoms were observed during the incident:
+
+  * CI/CD pipeline failing with AccessDenied errors on S3 artifact upload
+  * ECR image push returning authorization failures
+  * Deployment role showing reduced permission set after recent IAM update
+  * All deployment pipelines affected across all environments
+  * Manual AWS CLI commands with the role also failing
+
+These symptoms were correlated across multiple monitoring systems including
+application performance monitoring, infrastructure metrics, and log
+aggregation platforms. The incident response team confirmed the symptoms
+during their initial assessment and used them to guide the investigation.
+
+========================================================================
+4. TIMELINE OF EVENTS
+========================================================================
+
+  [13:00 UTC] IAM policy update applied to deployment role
+  [13:15 UTC] First deployment pipeline fails with AccessDenied
+  [13:20 UTC] Second deployment attempt fails, pattern noticed
+  [13:30 UTC] Tom Williams reports all pipelines failing
+  [13:40 UTC] David Kim investigates, identifies recent IAM policy change
+  [13:50 UTC] Removed permissions confirmed as root cause
+  [14:00 UTC] Required permissions added back to deployment role
+  [14:15 UTC] Deployment pipelines verified operational
+  [14:30 UTC] Delayed hotfixes successfully deployed
+
+========================================================================
+5. INVESTIGATION
+========================================================================
+
+Upon receiving the automated alert, the incident response team initiated a
+systematic investigation following established runbook procedures. The team
+began by examining the health and status of the iam-deploy-role-prod component
+within the AWS IAM system deployed in US-East-1 (AWS).
+
+Initial telemetry data from the monitoring stack was reviewed, including
+application logs, infrastructure metrics, and recent deployment and change
+history. The investigation revealed that the primary symptoms were consistent
+across multiple data sources and monitoring tools.
+
+Log analysis from the affected component showed error patterns that pointed
+toward iam policy hardening removed essential deployment permissions (s3:putobject and ecr:pushimage) from the ci/cd service role without validating against actual permission usage. The team also reviewed recent change
+records, configuration modifications, and deployment history to rule out
+human-initiated causes. Cross-referencing the timeline of events with
+infrastructure metrics from the preceding 24-48 hours provided additional
+context that supported the final root cause determination.
+
+========================================================================
+6. ROOT CAUSE ANALYSIS
+========================================================================
+
+The root cause of this incident was determined to be:
+IAM policy hardening removed essential deployment permissions (s3:PutObject and ecr:PushImage) from the CI/CD service role without validating against actual permission usage.
+
+Further analysis confirmed that this issue had been developing over time but
+was not detected by existing monitoring thresholds and alerting rules. The
+failure point was within the iam-deploy-role-prod component of the AWS IAM
+system. Contributing factors included insufficient monitoring coverage for
+the specific failure mode encountered and the absence of automated
+remediation procedures for this particular scenario.
+
+========================================================================
+7. RESOLUTION
+========================================================================
+
+The incident was resolved by the following actions: Added back the required S3 and ECR permissions to the deployment IAM role, validated all deployment pipelines operational, and implemented IAM policy simulation testing.
+
+The resolution was executed by David Kim with support from the incident
+response team. After applying the remediation steps, the team monitored the
+system for a stabilization period to confirm that the issue was fully
+resolved and no secondary or cascading failures had occurred. All affected
+services were verified to be operating within normal parameters before the
+incident was formally closed.
+
+========================================================================
+8. PREVENTIVE ACTIONS
+========================================================================
+
+The following preventive actions have been identified to reduce the
+likelihood and impact of similar incidents in the future:
+
+  1. Implement IAM policy simulation testing before applying permission changes
+  2. Create IAM permission dependency map for CI/CD pipelines
+  3. Use AWS Access Analyzer to validate policy changes against actual usage
+  4. Implement staged IAM policy rollout with canary testing
+  5. Add IAM policy change approval workflow with deployment team review
+
+These action items will be tracked in the engineering backlog and prioritized
+based on risk assessment and business impact analysis.
+
+========================================================================
+9. RELATED STANDARD OPERATING PROCEDURES
+========================================================================
+
+SOP-SEC-007: IAM Policy Change Procedures; SOP-CICD-003: Pipeline Access Recovery
+
+========================================================================
+10. LESSONS LEARNED
+========================================================================
+
+This incident provided several important learnings for the organization.
+The detection of iam policy hardening removed essential deployment permissions (s3:putobject and ecr:pushimage) from the ci/cd service role without validating against actual permission usage was delayed due to gaps in
+monitoring coverage, highlighting the need for more comprehensive
+observability across the AWS IAM stack.
+
+The incident response process demonstrated effective team coordination and
+communication, but the overall time to resolution could be improved through
+automation of common diagnostic and remediation steps. The successful
+resolution validated existing runbooks and procedures while also identifying
+specific areas for improvement.
+
+The preventive actions identified during the post-mortem will strengthen
+organizational resilience against similar failure modes. Regular review of
+monitoring thresholds, alerting rules, and runbook procedures should be
+incorporated into the operational cadence to maintain readiness.
+
+========================================================================
+Report generated by TwinMind Incident Management System
+Date: 2025-08-11T13:00:00Z
+Classification: Internal - Confidential
+========================================================================

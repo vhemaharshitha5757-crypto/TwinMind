@@ -1,0 +1,23 @@
+{
+  "filename": "vault_secrets_misconfig.png",
+  "caption": "Vault audit showing production services accessing staging secrets path",
+  "scene_description": "HashiCorp Vault audit log interface showing production service accounts accessing the staging secrets engine path. A policy mapping visualization shows the incorrect path routing. An alert banner indicates environment isolation breach.",
+  "detected_objects": [
+    "Audit Log Timeline",
+    "Policy Mapping Visualization",
+    "Environment Isolation Alert",
+    "Secrets Path Browser",
+    "Service Account List"
+  ],
+  "ocr_text": [
+    "Service: order-svc-prod",
+    "Secrets Path: secret/staging/db-creds (WRONG)",
+    "Expected Path: secret/production/db-creds",
+    "Access Count: 2,347",
+    "Policy: prod-app-policy-v2 (misconfigured)",
+    "Alert: ENVIRONMENT ISOLATION BREACH"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "HashiCorp Vault"
+}

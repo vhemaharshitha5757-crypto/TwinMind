@@ -1,0 +1,23 @@
+{
+  "filename": "redis_memory_spike.png",
+  "caption": "Redis cluster memory utilization dashboard showing OOM across all nodes",
+  "scene_description": "A monitoring dashboard showing six Redis node memory graphs all reaching 100% simultaneously. Each panel shows a gradual climb over 48 hours followed by a flat line at the maximum. Alert indicators are red across all nodes.",
+  "detected_objects": [
+    "Memory Usage Graphs (6 nodes)",
+    "OOM Alert Indicators",
+    "Cluster Status Panel",
+    "Key Count Metric",
+    "Network I/O Graph"
+  ],
+  "ocr_text": [
+    "redis-node-01 Memory: 100%",
+    "redis-node-02 Memory: 100%",
+    "Cluster Status: CLUSTERDOWN",
+    "Total Keys: 847M",
+    "Evicted Keys: 0",
+    "Alert: CRITICAL - All Nodes OOM"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "Redis Cluster"
+}

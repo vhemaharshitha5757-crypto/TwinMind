@@ -1,0 +1,162 @@
+INCIDENT REPORT
+========================================================================
+
+Incident ID:       INC025
+Title:             HashiCorp Vault Secrets Engine Misconfiguration Leaking to Wrong Environment
+Severity:          P1
+Date/Time:         2025-06-30T22:15:00Z
+Department:        Security Engineering
+System:            HashiCorp Vault
+Component:         vault-prod-cluster-01
+Location:          US-East-1 (AWS)
+Assigned Engineer: David Kim
+Status:            Resolved
+
+========================================================================
+1. SUMMARY
+========================================================================
+
+A HashiCorp Vault secrets engine misconfiguration at 22:15 UTC on June 30, 2025 caused production application services to read staging database credentials instead of production credentials. The issue was introduced during a Vault policy migration where the secrets path mapping was incorrectly updated. Production services connected to the staging database, causing both data integrity concerns and staging environment instability.
+
+This incident was classified as P1 severity and was assigned to
+David Kim in the Security Engineering department. The affected system was
+HashiCorp Vault, specifically the vault-prod-cluster-01 component located in US-East-1 (AWS).
+The incident was detected through automated monitoring and alerting systems,
+and the response team was engaged within minutes of the initial alert.
+
+========================================================================
+2. BUSINESS IMPACT
+========================================================================
+
+Production services wrote approximately 2,300 records to the staging database over 18 minutes before detection. Staging database performance degraded under unexpected production traffic load. Data isolation between environments was breached. Security incident review was triggered. No customer data was exposed externally.
+
+The incident triggered the organization's major incident response process,
+involving cross-functional coordination between engineering, operations, and
+business stakeholders. Customer support was notified and prepared to handle
+incoming queries related to the service degradation.
+
+========================================================================
+3. SYMPTOMS OBSERVED
+========================================================================
+
+The following symptoms were observed during the incident:
+
+  * Production services connecting to staging database successfully but with wrong data
+  * Staging database showing unexpected write traffic and performance degradation
+  * Vault audit logs showing production services reading staging secrets path
+  * Data inconsistencies reported by QA team testing in staging
+  * Application logs showing unfamiliar database hostname in connection strings
+
+These symptoms were correlated across multiple monitoring systems including
+application performance monitoring, infrastructure metrics, and log
+aggregation platforms. The incident response team confirmed the symptoms
+during their initial assessment and used them to guide the investigation.
+
+========================================================================
+4. TIMELINE OF EVENTS
+========================================================================
+
+  [22:15 UTC] Vault policy migration deployed with incorrect path mapping
+  [22:18 UTC] Production services begin connecting to staging database
+  [22:20 UTC] Staging database performance alerts fire from unexpected traffic
+  [22:25 UTC] QA team reports unfamiliar data appearing in staging
+  [22:28 UTC] David Kim investigates, discovers Vault path misconfiguration
+  [22:30 UTC] Vault secrets path corrected to production path
+  [22:32 UTC] All database credentials rotated for both environments
+  [22:33 UTC] Erroneous records identified for cleanup in staging
+
+========================================================================
+5. INVESTIGATION
+========================================================================
+
+Upon receiving the automated alert, the incident response team initiated a
+systematic investigation following established runbook procedures. The team
+began by examining the health and status of the vault-prod-cluster-01 component
+within the HashiCorp Vault system deployed in US-East-1 (AWS).
+
+Initial telemetry data from the monitoring stack was reviewed, including
+application logs, infrastructure metrics, and recent deployment and change
+history. The investigation revealed that the primary symptoms were consistent
+across multiple data sources and monitoring tools.
+
+Log analysis from the affected component showed error patterns that pointed
+toward vault secrets path mapping error during policy migration pointed production applications to the staging secrets engine path instead of the production path. The team also reviewed recent change
+records, configuration modifications, and deployment history to rule out
+human-initiated causes. Cross-referencing the timeline of events with
+infrastructure metrics from the preceding 24-48 hours provided additional
+context that supported the final root cause determination.
+
+========================================================================
+6. ROOT CAUSE ANALYSIS
+========================================================================
+
+The root cause of this incident was determined to be:
+Vault secrets path mapping error during policy migration pointed production applications to the staging secrets engine path instead of the production path.
+
+Further analysis confirmed that this issue had been developing over time but
+was not detected by existing monitoring thresholds and alerting rules. The
+failure point was within the vault-prod-cluster-01 component of the HashiCorp Vault
+system. Contributing factors included insufficient monitoring coverage for
+the specific failure mode encountered and the absence of automated
+remediation procedures for this particular scenario.
+
+========================================================================
+7. RESOLUTION
+========================================================================
+
+The incident was resolved by the following actions: Corrected Vault secrets path mapping, rotated all database credentials for both environments, removed the 2,300 erroneous records from staging database, and verified environment isolation.
+
+The resolution was executed by David Kim with support from the incident
+response team. After applying the remediation steps, the team monitored the
+system for a stabilization period to confirm that the issue was fully
+resolved and no secondary or cascading failures had occurred. All affected
+services were verified to be operating within normal parameters before the
+incident was formally closed.
+
+========================================================================
+8. PREVENTIVE ACTIONS
+========================================================================
+
+The following preventive actions have been identified to reduce the
+likelihood and impact of similar incidents in the future:
+
+  1. Implement Vault policy change validation with environment isolation checks
+  2. Add secrets path verification in application startup health checks
+  3. Create automated environment isolation testing for Vault configurations
+  4. Implement Vault policy review requiring dual approval
+  5. Add database hostname verification in application connection initialization
+
+These action items will be tracked in the engineering backlog and prioritized
+based on risk assessment and business impact analysis.
+
+========================================================================
+9. RELATED STANDARD OPERATING PROCEDURES
+========================================================================
+
+SOP-SEC-003: Vault Configuration Management; SOP-SEC-008: Secrets Breach Response
+
+========================================================================
+10. LESSONS LEARNED
+========================================================================
+
+This incident provided several important learnings for the organization.
+The detection of vault secrets path mapping error during policy migration pointed production applications to the staging secrets engine path instead of the production path was delayed due to gaps in
+monitoring coverage, highlighting the need for more comprehensive
+observability across the HashiCorp Vault stack.
+
+The incident response process demonstrated effective team coordination and
+communication, but the overall time to resolution could be improved through
+automation of common diagnostic and remediation steps. The successful
+resolution validated existing runbooks and procedures while also identifying
+specific areas for improvement.
+
+The preventive actions identified during the post-mortem will strengthen
+organizational resilience against similar failure modes. Regular review of
+monitoring thresholds, alerting rules, and runbook procedures should be
+incorporated into the operational cadence to maintain readiness.
+
+========================================================================
+Report generated by TwinMind Incident Management System
+Date: 2025-06-30T22:15:00Z
+Classification: Internal - Confidential
+========================================================================

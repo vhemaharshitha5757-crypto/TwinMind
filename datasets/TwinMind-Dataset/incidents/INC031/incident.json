@@ -1,0 +1,116 @@
+{
+  "incident_id": "INC031",
+  "title": "IAM Policy Over-Restriction Blocking Application Deployments",
+  "timestamp": "2025-08-11T13:00:00Z",
+  "severity": "P2",
+  "department": "Security Engineering",
+  "system": "AWS IAM",
+  "component": "iam-deploy-role-prod",
+  "location": "US-East-1 (AWS)",
+  "status": "Resolved",
+  "symptoms": [
+    "CI/CD pipeline failing with AccessDenied errors on S3 artifact upload",
+    "ECR image push returning authorization failures",
+    "Deployment role showing reduced permission set after recent IAM update",
+    "All deployment pipelines affected across all environments",
+    "Manual AWS CLI commands with the role also failing"
+  ],
+  "root_cause": "IAM policy hardening removed essential deployment permissions (s3:PutObject and ecr:PushImage) from the CI/CD service role without validating against actual permission usage",
+  "resolution": "Added back the required S3 and ECR permissions to the deployment IAM role, validated all deployment pipelines operational, and implemented IAM policy simulation testing",
+  "preventive_actions": [
+    "Implement IAM policy simulation testing before applying permission changes",
+    "Create IAM permission dependency map for CI/CD pipelines",
+    "Use AWS Access Analyzer to validate policy changes against actual usage",
+    "Implement staged IAM policy rollout with canary testing",
+    "Add IAM policy change approval workflow with deployment team review"
+  ],
+  "affected_services": [
+    "deployment-pipeline",
+    "hotfix-delivery",
+    "feature-releases",
+    "security-patching"
+  ],
+  "engineers": [
+    "David Kim",
+    "Tom Williams",
+    "Sarah Chen"
+  ],
+  "timeline": [
+    {
+      "time": "13:00 UTC",
+      "event": "IAM policy update applied to deployment role"
+    },
+    {
+      "time": "13:15 UTC",
+      "event": "First deployment pipeline fails with AccessDenied"
+    },
+    {
+      "time": "13:20 UTC",
+      "event": "Second deployment attempt fails, pattern noticed"
+    },
+    {
+      "time": "13:30 UTC",
+      "event": "Tom Williams reports all pipelines failing"
+    },
+    {
+      "time": "13:40 UTC",
+      "event": "David Kim investigates, identifies recent IAM policy change"
+    },
+    {
+      "time": "13:50 UTC",
+      "event": "Removed permissions confirmed as root cause"
+    },
+    {
+      "time": "14:00 UTC",
+      "event": "Required permissions added back to deployment role"
+    },
+    {
+      "time": "14:15 UTC",
+      "event": "Deployment pipelines verified operational"
+    },
+    {
+      "time": "14:30 UTC",
+      "event": "Delayed hotfixes successfully deployed"
+    }
+  ],
+  "ocr_entities": [
+    "Error: AccessDenied on s3:PutObject",
+    "Error: AccessDenied on ecr:PushImage",
+    "Role: iam-deploy-role-prod",
+    "Policy Version: v14 (updated 1h ago)",
+    "Removed: s3:PutObject, ecr:PushImage",
+    "Pipeline: prod-deploy FAILED"
+  ],
+  "audio_entities": [
+    "Sarah Chen",
+    "David Kim",
+    "Tom Williams"
+  ],
+  "document_entities": [
+    "iam",
+    "policy",
+    "over-restriction",
+    "deployment",
+    "least-privilege"
+  ],
+  "evidence": {
+    "document": "INC031_incident_report.pdf",
+    "image": "iam_access_denied.png",
+    "audio": "INC031_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "AWS IAM",
+    "iam-deploy-role-prod",
+    "S3",
+    "ECR",
+    "CI/CD Pipeline",
+    "Least Privilege"
+  ],
+  "knowledge_graph_relations": [
+    "IAM_hardening REMOVED deploy_permissions",
+    "Missing_permissions BLOCKED deployments",
+    "Permission_restoration UNBLOCKED pipeline"
+  ],
+  "embedding_summary": "IAM policy hardening accidentally removed S3 and ECR permissions from CI/CD deployment role, blocking all production deployments for 1.5 hours. Three critical security hotfixes delayed. Resolved by restoring required permissions and implementing IAM policy simulation testing.",
+  "confidence": 0.96
+}

@@ -1,0 +1,112 @@
+{
+  "incident_id": "INC015",
+  "title": "Nginx Returning 502 Bad Gateway Due to Upstream Socket Exhaustion",
+  "timestamp": "2025-04-21T10:55:00Z",
+  "severity": "P2",
+  "department": "SRE",
+  "system": "Nginx Reverse Proxy Cluster",
+  "component": "nginx-prod-web-02",
+  "location": "US-West-2 (AWS)",
+  "status": "Resolved",
+  "symptoms": [
+    "Intermittent 502 Bad Gateway errors from nginx-prod-web-02",
+    "Nginx error log showing 'connect() failed: Cannot assign requested address'",
+    "Ephemeral port range exhausted (all 28,000 ports in TIME_WAIT)",
+    "Upstream servers healthy and responding normally to direct requests",
+    "Connection count on nginx node at kernel maximum"
+  ],
+  "root_cause": "Nginx keepalive configuration set to 0, disabling connection reuse to upstream servers, causing ephemeral port exhaustion during traffic spikes",
+  "resolution": "Corrected nginx keepalive configuration to maintain 256 persistent connections per upstream, restarted nginx to release TIME_WAIT sockets, and increased ephemeral port range",
+  "preventive_actions": [
+    "Audit nginx keepalive configuration across all proxy nodes",
+    "Add ephemeral port utilization monitoring with alerts",
+    "Implement nginx config validation in deployment pipeline",
+    "Create performance testing baseline for nginx connection handling",
+    "Add connection pool metrics to the SRE dashboard"
+  ],
+  "affected_services": [
+    "web-frontend",
+    "checkout-service",
+    "product-api",
+    "user-profile-service"
+  ],
+  "engineers": [
+    "Alex Johnson",
+    "Jenny Liu",
+    "Mike Torres"
+  ],
+  "timeline": [
+    {
+      "time": "10:55 UTC",
+      "event": "502 error rate spikes on nginx-prod-web-02"
+    },
+    {
+      "time": "10:57 UTC",
+      "event": "Error rate alert triggers, Alex Johnson begins investigation"
+    },
+    {
+      "time": "11:02 UTC",
+      "event": "Upstream servers confirmed healthy, issue isolated to nginx layer"
+    },
+    {
+      "time": "11:05 UTC",
+      "event": "Ephemeral port exhaustion identified from kernel TCP metrics"
+    },
+    {
+      "time": "11:08 UTC",
+      "event": "Keepalive misconfiguration found in nginx.conf"
+    },
+    {
+      "time": "11:10 UTC",
+      "event": "Keepalive configuration corrected, nginx restarted"
+    },
+    {
+      "time": "11:13 UTC",
+      "event": "TIME_WAIT connections draining, error rate declining"
+    },
+    {
+      "time": "11:15 UTC",
+      "event": "Error rate at 0%, all traffic flowing normally"
+    }
+  ],
+  "ocr_entities": [
+    "502 Error Rate: 30.2%",
+    "Ephemeral Ports Used: 28,000/28,232",
+    "TIME_WAIT Connections: 27,845",
+    "Upstream Latency: 45ms (normal)",
+    "Server: nginx-prod-web-02",
+    "Keepalive: 0 (disabled)"
+  ],
+  "audio_entities": [
+    "Alex Johnson",
+    "Jenny Liu",
+    "Mike Torres"
+  ],
+  "document_entities": [
+    "nginx",
+    "502",
+    "bad-gateway",
+    "upstream",
+    "socket-exhaustion"
+  ],
+  "evidence": {
+    "document": "INC015_incident_report.pdf",
+    "image": "nginx_502_errors.png",
+    "audio": "INC015_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "Nginx",
+    "nginx-prod-web-02",
+    "Keepalive",
+    "Ephemeral Ports",
+    "TIME_WAIT",
+    "Upstream Servers"
+  ],
+  "knowledge_graph_relations": [
+    "Keepalive_disabled CAUSED connection_per_request",
+    "Connection_churn EXHAUSTED ephemeral_ports",
+    "Keepalive_fix RESTORED connection_reuse"
+  ],
+  "embedding_summary": "Nginx 502 Bad Gateway errors caused by ephemeral port exhaustion due to keepalive misconfiguration disabling connection reuse to upstream servers. 30% of web traffic affected for 20 minutes. Resolved by enabling keepalive connections and expanding ephemeral port range.",
+  "confidence": 0.96
+}

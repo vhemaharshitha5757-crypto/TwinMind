@@ -1,0 +1,162 @@
+INCIDENT REPORT
+========================================================================
+
+Incident ID:       INC035
+Title:             MySQL Lock Wait Timeout on Reporting Queries
+Severity:          P3
+Date/Time:         2025-09-08T06:30:00Z
+Department:        Database Engineering
+System:            MySQL Database
+Component:         mysql-prod-primary-01
+Location:          US-West-2 (AWS)
+Assigned Engineer: Rajesh Kumar
+Status:            Resolved
+
+========================================================================
+1. SUMMARY
+========================================================================
+
+MySQL production database (mysql-prod-primary-01) experienced widespread lock wait timeout errors starting at 06:30 UTC on September 8, 2025. A long-running reporting query that was accidentally executed against the primary database (instead of the read replica) acquired a table-level lock that blocked all DML operations on the accounts table for 15 minutes. All application writes to the accounts table timed out.
+
+This incident was classified as P3 severity and was assigned to
+Rajesh Kumar in the Database Engineering department. The affected system was
+MySQL Database, specifically the mysql-prod-primary-01 component located in US-West-2 (AWS).
+The incident was detected through automated monitoring and alerting systems,
+and the response team was engaged within minutes of the initial alert.
+
+========================================================================
+2. BUSINESS IMPACT
+========================================================================
+
+Account-related operations blocked for 15 minutes. User registration, profile updates, and account settings changes all failed. Approximately 800 users were unable to register or update their accounts. Support tickets generated for registration failures.
+
+The incident triggered the organization's major incident response process,
+involving cross-functional coordination between engineering, operations, and
+business stakeholders. Customer support was notified and prepared to handle
+incoming queries related to the service degradation.
+
+========================================================================
+3. SYMPTOMS OBSERVED
+========================================================================
+
+The following symptoms were observed during the incident:
+
+  * InnoDB lock wait timeout exceeded errors across all account operations
+  * SHOW PROCESSLIST showing 340 queries waiting for lock on accounts table
+  * Single long-running SELECT query holding table-level lock for 15+ minutes
+  * Application logs showing 'Lock wait timeout exceeded; try restarting transaction'
+  * Only accounts table affected, other tables operating normally
+
+These symptoms were correlated across multiple monitoring systems including
+application performance monitoring, infrastructure metrics, and log
+aggregation platforms. The incident response team confirmed the symptoms
+during their initial assessment and used them to guide the investigation.
+
+========================================================================
+4. TIMELINE OF EVENTS
+========================================================================
+
+  [06:30 UTC] Reporting query starts executing against production primary
+  [06:35 UTC] Table-level lock acquired on accounts table
+  [06:37 UTC] Application writes to accounts table begin timing out
+  [06:38 UTC] Lock wait timeout alerts fire
+  [06:40 UTC] Rajesh Kumar investigates, identifies blocking query in processlist
+  [06:42 UTC] Blocking reporting query killed
+  [06:43 UTC] Blocked queries automatically retry and succeed
+  [06:45 UTC] All account operations restored, incident resolved
+
+========================================================================
+5. INVESTIGATION
+========================================================================
+
+Upon receiving the automated alert, the incident response team initiated a
+systematic investigation following established runbook procedures. The team
+began by examining the health and status of the mysql-prod-primary-01 component
+within the MySQL Database system deployed in US-West-2 (AWS).
+
+Initial telemetry data from the monitoring stack was reviewed, including
+application logs, infrastructure metrics, and recent deployment and change
+history. The investigation revealed that the primary symptoms were consistent
+across multiple data sources and monitoring tools.
+
+Log analysis from the affected component showed error patterns that pointed
+toward long-running analytical reporting query executed against production primary instead of read replica, acquiring a lock that blocked all writes to the accounts table. The team also reviewed recent change
+records, configuration modifications, and deployment history to rule out
+human-initiated causes. Cross-referencing the timeline of events with
+infrastructure metrics from the preceding 24-48 hours provided additional
+context that supported the final root cause determination.
+
+========================================================================
+6. ROOT CAUSE ANALYSIS
+========================================================================
+
+The root cause of this incident was determined to be:
+Long-running analytical reporting query executed against production primary instead of read replica, acquiring a lock that blocked all writes to the accounts table.
+
+Further analysis confirmed that this issue had been developing over time but
+was not detected by existing monitoring thresholds and alerting rules. The
+failure point was within the mysql-prod-primary-01 component of the MySQL Database
+system. Contributing factors included insufficient monitoring coverage for
+the specific failure mode encountered and the absence of automated
+remediation procedures for this particular scenario.
+
+========================================================================
+7. RESOLUTION
+========================================================================
+
+The incident was resolved by the following actions: Killed the blocking reporting query, waiting connections automatically retried, implemented query routing to prevent analytical queries from reaching the primary.
+
+The resolution was executed by Rajesh Kumar with support from the incident
+response team. After applying the remediation steps, the team monitored the
+system for a stabilization period to confirm that the issue was fully
+resolved and no secondary or cascading failures had occurred. All affected
+services were verified to be operating within normal parameters before the
+incident was formally closed.
+
+========================================================================
+8. PREVENTIVE ACTIONS
+========================================================================
+
+The following preventive actions have been identified to reduce the
+likelihood and impact of similar incidents in the future:
+
+  1. Implement query routing to automatically redirect analytical queries to read replicas
+  2. Set innodb_lock_wait_timeout to 10 seconds with application retry logic
+  3. Add long-running query detection with automatic kill after threshold
+  4. Create network-level access control limiting reporting tools to read replicas
+  5. Implement query classification and routing in the connection proxy
+
+These action items will be tracked in the engineering backlog and prioritized
+based on risk assessment and business impact analysis.
+
+========================================================================
+9. RELATED STANDARD OPERATING PROCEDURES
+========================================================================
+
+SOP-DB-007: Lock Wait Timeout Response; SOP-DB-013: Query Routing Configuration
+
+========================================================================
+10. LESSONS LEARNED
+========================================================================
+
+This incident provided several important learnings for the organization.
+The detection of long-running analytical reporting query executed against production primary instead of read replica, acquiring a lock that blocked all writes to the accounts table was delayed due to gaps in
+monitoring coverage, highlighting the need for more comprehensive
+observability across the MySQL Database stack.
+
+The incident response process demonstrated effective team coordination and
+communication, but the overall time to resolution could be improved through
+automation of common diagnostic and remediation steps. The successful
+resolution validated existing runbooks and procedures while also identifying
+specific areas for improvement.
+
+The preventive actions identified during the post-mortem will strengthen
+organizational resilience against similar failure modes. Regular review of
+monitoring thresholds, alerting rules, and runbook procedures should be
+incorporated into the operational cadence to maintain readiness.
+
+========================================================================
+Report generated by TwinMind Incident Management System
+Date: 2025-09-08T06:30:00Z
+Classification: Internal - Confidential
+========================================================================

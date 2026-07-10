@@ -1,0 +1,59 @@
+MEETING TRANSCRIPT - INCIDENT INC014
+========================================================================
+Subject:      RabbitMQ Queue Overflow Causing Message Loss
+Date/Time:    2025-04-14T22:10:00Z
+Participants: Mike Torres, Sarah Chen, Priya Sharma
+Duration:     Approximately 3 minutes
+Type:         Emergency Incident Response Call
+========================================================================
+
+[BEGIN TRANSCRIPT]
+[Mike Torres]: Hey team, we've got a P1 incident on RabbitMQ Cluster. RabbitMQ queue depth exceeding 4GB memory limit. I need everyone's eyes on this immediately.
+
+[Sarah Chen]: I'm here. Let me pull up the rabbitmq-prod-eu-01 dashboard. When did this start exactly?
+
+[Mike Torres]: First alert came in at 22:10 UTC. notification-events queue exceeds 4GB memory limit. I've been looking at the logs since then.
+
+[Priya Sharma]: I just joined the call. Give me a quick rundown. What are we seeing on the infrastructure side?
+
+[Mike Torres]: Multiple symptoms. Flow control activated on publisher connections. And we're also seeing Disk space alarm triggered on RabbitMQ nodes.
+
+[Sarah Chen]: OK, I've got the metrics up. Publisher application not handling flow control signals. This doesn't look like a normal blip.
+
+[Priya Sharma]: Any recent deployments or configuration changes that could have triggered this? I want to rule out human error first.
+
+[Mike Torres]: I checked the change log for rabbitmq-prod-eu-01. No deployments in the last 24 hours. No config changes either. This looks like an organic failure.
+
+[Sarah Chen]: Based on what I'm seeing in the telemetry data, I think this is related to publisher service did not implement rabbitmq backpressure handling, continuing to publish messages d. The error pattern is very consistent with that.
+
+[Priya Sharma]: That makes sense given the symptoms. I've seen similar patterns before. What's our best remediation path here?
+
+[Mike Torres]: I recommend we cleared the overflowed queue, implemented publisher-side backpressure handling with confirms, increa. That should bring us back to a stable state.
+
+[Sarah Chen]: Agreed. Let me start executing that now. Priya, can you monitor the dashboards and confirm when metrics start recovering?
+
+[Priya Sharma]: Will do. I've got the monitoring screen up. Go ahead with the fix.
+
+[Sarah Chen]: Alright, executing the remediation now. This will take a couple of minutes. Stand by.
+
+[Priya Sharma]: I'm starting to see positive movement on the dashboards. RabbitMQ Cluster metrics are beginning to normalize.
+
+[Mike Torres]: Confirmed on my end too. Services are recovering. Let's keep monitoring for the next fifteen minutes to make sure we're stable.
+
+[Sarah Chen]: Fix is fully applied. Everything looks green now. I'll document the resolution steps in the incident ticket.
+
+[Mike Torres]: Great work everyone. Let's schedule a post-mortem for tomorrow. Key action items from this incident: implement mandatory publisher confirms and backpressure handling, add queue depth monitoring with alerts at 1gb and 3gb, and configure dead letter queues for overflow scenarios.
+
+[Priya Sharma]: I'll send out the post-mortem calendar invite and start drafting the incident report. Good job team, quick response on this one.
+
+[END TRANSCRIPT]
+
+========================================================================
+Action Items Captured:
+  - Implement mandatory publisher confirms and backpressure handling
+  - Add queue depth monitoring with alerts at 1GB and 3GB
+  - Configure dead letter queues for overflow scenarios
+  - Implement message persistence for critical notification events
+
+Next Steps: Post-mortem meeting scheduled for following business day.
+========================================================================

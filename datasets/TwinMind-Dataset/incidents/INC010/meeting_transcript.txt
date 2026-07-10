@@ -1,0 +1,59 @@
+MEETING TRANSCRIPT - INCIDENT INC010
+========================================================================
+Subject:      Firewall Rule Change Blocking Critical API Traffic
+Date/Time:    2025-03-17T12:30:00Z
+Participants: David Kim, Maria Garcia, Jenny Liu
+Duration:     Approximately 3 minutes
+Type:         Emergency Incident Response Call
+========================================================================
+
+[BEGIN TRANSCRIPT]
+[David Kim]: Hey team, we've got a P2 incident on Azure Network Security Groups. 502 Bad Gateway errors on all API endpoints served by Azure backend. I need everyone's eyes on this immediately.
+
+[Maria Garcia]: I'm here. Let me pull up the nsg-prod-api-tier dashboard. When did this start exactly?
+
+[David Kim]: First alert came in at 12:30 UTC. NSG rule change applied as part of security hardening initiative. I've been looking at the logs since then.
+
+[Jenny Liu]: I just joined the call. Give me a quick rundown. What are we seeing on the infrastructure side?
+
+[David Kim]: Multiple symptoms. API gateway unable to reach backend services on port 443. And we're also seeing NSG flow logs showing DENY actions for API gateway source IPs.
+
+[Maria Garcia]: OK, I've got the metrics up. Backend services healthy and responsive when accessed directly. This doesn't look like a normal blip.
+
+[Jenny Liu]: Any recent deployments or configuration changes that could have triggered this? I want to rule out human error first.
+
+[David Kim]: I checked the change log for nsg-prod-api-tier. No deployments in the last 24 hours. No config changes either. This looks like an organic failure.
+
+[Maria Garcia]: Based on what I'm seeing in the telemetry data, I think this is related to network security group rule update during security hardening did not include the expanded api gatewa. The error pattern is very consistent with that.
+
+[Jenny Liu]: That makes sense given the symptoms. I've seen similar patterns before. What's our best remediation path here?
+
+[David Kim]: I recommend we added the expanded api gateway subnet range to the nsg allow rules, verified traffic flow restoratio. That should bring us back to a stable state.
+
+[Maria Garcia]: Agreed. Let me start executing that now. Jenny, can you monitor the dashboards and confirm when metrics start recovering?
+
+[Jenny Liu]: Will do. I've got the monitoring screen up. Go ahead with the fix.
+
+[Maria Garcia]: Alright, executing the remediation now. This will take a couple of minutes. Stand by.
+
+[Jenny Liu]: I'm starting to see positive movement on the dashboards. Azure Network Security Groups metrics are beginning to normalize.
+
+[David Kim]: Confirmed on my end too. Services are recovering. Let's keep monitoring for the next fifteen minutes to make sure we're stable.
+
+[Maria Garcia]: Fix is fully applied. Everything looks green now. I'll document the resolution steps in the incident ticket.
+
+[David Kim]: Great work everyone. Let's schedule a post-mortem for tomorrow. Key action items from this incident: implement pre-deployment nsg rule validation against known traffic patterns, create automated testing for nsg changes using synthetic api traffic, and maintain a service dependency map linking nsg rules to traffic flows.
+
+[Jenny Liu]: I'll send out the post-mortem calendar invite and start drafting the incident report. Good job team, quick response on this one.
+
+[END TRANSCRIPT]
+
+========================================================================
+Action Items Captured:
+  - Implement pre-deployment NSG rule validation against known traffic patterns
+  - Create automated testing for NSG changes using synthetic API traffic
+  - Maintain a service dependency map linking NSG rules to traffic flows
+  - Require dual-approval for NSG rule modifications in production
+
+Next Steps: Post-mortem meeting scheduled for following business day.
+========================================================================

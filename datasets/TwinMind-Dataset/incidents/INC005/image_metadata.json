@@ -1,0 +1,23 @@
+{
+  "filename": "java_heap_memory_leak.png",
+  "caption": "JVM heap memory graph showing sawtooth pattern indicating memory leak",
+  "scene_description": "A JMX monitoring dashboard showing a sawtooth pattern in heap memory usage. Each cycle shows memory climbing from 2GB to 8GB over 6 hours, then dropping when the process is killed and restarted. GC pause time graph below shows increasing pause durations.",
+  "detected_objects": [
+    "Heap Memory Graph",
+    "GC Pause Time Panel",
+    "Connection Pool Counter",
+    "Thread Count Graph",
+    "OOM Kill Event Markers"
+  ],
+  "ocr_text": [
+    "Heap Used: 7.8GB / 8GB",
+    "GC Pause: 34.2s",
+    "HTTP Connections: 4,127",
+    "Active Threads: 892",
+    "OOM Kills (24h): 4",
+    "Service: order-svc-prod-03"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "Order Processing Service"
+}

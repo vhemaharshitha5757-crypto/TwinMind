@@ -1,0 +1,162 @@
+INCIDENT REPORT
+========================================================================
+
+Incident ID:       INC045
+Title:             Session Store Redis Desynchronization Causing Random Logouts
+Severity:          P2
+Date/Time:         2025-11-17T14:00:00Z
+Department:        Backend Engineering
+System:            Redis Session Store
+Component:         redis-session-prod-01
+Location:          US-East-1 (AWS)
+Assigned Engineer: James Wright
+Status:            Resolved
+
+========================================================================
+1. SUMMARY
+========================================================================
+
+Users began experiencing random logouts at 14:00 UTC on November 17, 2025. The Redis session store (redis-session-prod-01) had two nodes that became desynchronized after a failed replication event. Session data was split between the two nodes, and depending on which node handled the lookup, users were either authenticated or logged out. The issue affected approximately 50% of session lookups.
+
+This incident was classified as P2 severity and was assigned to
+James Wright in the Backend Engineering department. The affected system was
+Redis Session Store, specifically the redis-session-prod-01 component located in US-East-1 (AWS).
+The incident was detected through automated monitoring and alerting systems,
+and the response team was engaged within minutes of the initial alert.
+
+========================================================================
+2. BUSINESS IMPACT
+========================================================================
+
+Random logouts affecting approximately 50% of active user sessions for 35 minutes. Users experienced intermittent access disruption, needing to re-login repeatedly. 8,400 users impacted. Customer satisfaction dropped significantly. Social media complaints about the instability.
+
+The incident triggered the organization's major incident response process,
+involving cross-functional coordination between engineering, operations, and
+business stakeholders. Customer support was notified and prepared to handle
+incoming queries related to the service degradation.
+
+========================================================================
+3. SYMPTOMS OBSERVED
+========================================================================
+
+The following symptoms were observed during the incident:
+
+  * Users reporting being randomly logged out every few minutes
+  * Session lookup success rate at approximately 50% (should be 100%)
+  * Redis cluster showing replication offset mismatch between nodes
+  * Application logs showing alternating session-found and session-not-found for same user
+  * Health check showing both Redis nodes as healthy individually
+
+These symptoms were correlated across multiple monitoring systems including
+application performance monitoring, infrastructure metrics, and log
+aggregation platforms. The incident response team confirmed the symptoms
+during their initial assessment and used them to guide the investigation.
+
+========================================================================
+4. TIMELINE OF EVENTS
+========================================================================
+
+  [14:00 UTC] Redis replication failure occurs, nodes become desynchronized
+  [14:05 UTC] Users begin reporting random logouts
+  [14:10 UTC] Support tickets accumulate, pattern of intermittent access identified
+  [14:15 UTC] James Wright investigates session store, discovers replication offset mismatch
+  [14:20 UTC] Redis replication desync confirmed as root cause
+  [14:25 UTC] Full resync initiated from primary to replica
+  [14:30 UTC] Session proxy restarted to clear routing inconsistencies
+  [14:35 UTC] Session lookups returning to 100% success rate, incident resolved
+
+========================================================================
+5. INVESTIGATION
+========================================================================
+
+Upon receiving the automated alert, the incident response team initiated a
+systematic investigation following established runbook procedures. The team
+began by examining the health and status of the redis-session-prod-01 component
+within the Redis Session Store system deployed in US-East-1 (AWS).
+
+Initial telemetry data from the monitoring stack was reviewed, including
+application logs, infrastructure metrics, and recent deployment and change
+history. The investigation revealed that the primary symptoms were consistent
+across multiple data sources and monitoring tools.
+
+Log analysis from the affected component showed error patterns that pointed
+toward redis replication failure caused session data split between two nodes with inconsistent state, leading to random session lookup failures depending on which node served the request. The team also reviewed recent change
+records, configuration modifications, and deployment history to rule out
+human-initiated causes. Cross-referencing the timeline of events with
+infrastructure metrics from the preceding 24-48 hours provided additional
+context that supported the final root cause determination.
+
+========================================================================
+6. ROOT CAUSE ANALYSIS
+========================================================================
+
+The root cause of this incident was determined to be:
+Redis replication failure caused session data split between two nodes with inconsistent state, leading to random session lookup failures depending on which node served the request.
+
+Further analysis confirmed that this issue had been developing over time but
+was not detected by existing monitoring thresholds and alerting rules. The
+failure point was within the redis-session-prod-01 component of the Redis Session Store
+system. Contributing factors included insufficient monitoring coverage for
+the specific failure mode encountered and the absence of automated
+remediation procedures for this particular scenario.
+
+========================================================================
+7. RESOLUTION
+========================================================================
+
+The incident was resolved by the following actions: Forced full resync of Redis replica from primary, restarted the session proxy to clear routing inconsistencies, and implemented session data verification on lookup.
+
+The resolution was executed by James Wright with support from the incident
+response team. After applying the remediation steps, the team monitored the
+system for a stabilization period to confirm that the issue was fully
+resolved and no secondary or cascading failures had occurred. All affected
+services were verified to be operating within normal parameters before the
+incident was formally closed.
+
+========================================================================
+8. PREVENTIVE ACTIONS
+========================================================================
+
+The following preventive actions have been identified to reduce the
+likelihood and impact of similar incidents in the future:
+
+  1. Implement Redis replication monitoring with offset difference alerting
+  2. Add session lookup consistency check with automatic fallback to primary
+  3. Deploy Redis Sentinel for automatic failover and replication health
+  4. Implement session backup in application-side encrypted cookies as fallback
+  5. Add session store health endpoint checking replication consistency
+
+These action items will be tracked in the engineering backlog and prioritized
+based on risk assessment and business impact analysis.
+
+========================================================================
+9. RELATED STANDARD OPERATING PROCEDURES
+========================================================================
+
+SOP-CACHE-002: Redis Session Store Recovery; SOP-AUTH-006: Session Integrity
+
+========================================================================
+10. LESSONS LEARNED
+========================================================================
+
+This incident provided several important learnings for the organization.
+The detection of redis replication failure caused session data split between two nodes with inconsistent state, leading to random session lookup failures depending on which node served the request was delayed due to gaps in
+monitoring coverage, highlighting the need for more comprehensive
+observability across the Redis Session Store stack.
+
+The incident response process demonstrated effective team coordination and
+communication, but the overall time to resolution could be improved through
+automation of common diagnostic and remediation steps. The successful
+resolution validated existing runbooks and procedures while also identifying
+specific areas for improvement.
+
+The preventive actions identified during the post-mortem will strengthen
+organizational resilience against similar failure modes. Regular review of
+monitoring thresholds, alerting rules, and runbook procedures should be
+incorporated into the operational cadence to maintain readiness.
+
+========================================================================
+Report generated by TwinMind Incident Management System
+Date: 2025-11-17T14:00:00Z
+Classification: Internal - Confidential
+========================================================================

@@ -1,0 +1,114 @@
+{
+  "incident_id": "INC002",
+  "title": "Redis Cache Cluster Complete Failure in Production",
+  "timestamp": "2025-01-22T14:17:00Z",
+  "severity": "P1",
+  "department": "Platform Engineering",
+  "system": "Redis Cluster",
+  "component": "redis-prod-cluster-01",
+  "location": "US-West-2 (AWS)",
+  "status": "Resolved",
+  "symptoms": [
+    "Redis CLUSTERDOWN errors in all application logs",
+    "All Redis nodes reporting OOM (Out of Memory) conditions",
+    "Application response times spiking from 200ms to 8000ms",
+    "Database connection pool exhaustion due to cache fallthrough",
+    "Customer complaints about slow page loads and timeouts"
+  ],
+  "root_cause": "Missing TTL configuration on high-frequency session metadata cache keys causing unbounded memory growth across all Redis cluster nodes",
+  "resolution": "Performed rolling restart of Redis cluster with memory limits enforced, deployed hotfix to add TTL on the affected cache key pattern, and scaled up database read replicas temporarily",
+  "preventive_actions": [
+    "Enforce mandatory TTL policy on all Redis write paths via code review checklist",
+    "Implement Redis memory usage alerting at 70% and 85% thresholds",
+    "Add automated cache eviction policies as safety net",
+    "Create runbook for Redis cluster recovery procedures",
+    "Deploy Redis memory profiling in staging environments"
+  ],
+  "affected_services": [
+    "session-service",
+    "product-catalog",
+    "search-service",
+    "recommendation-engine",
+    "cart-service"
+  ],
+  "engineers": [
+    "Sarah Chen",
+    "Alex Johnson",
+    "Priya Sharma"
+  ],
+  "timeline": [
+    {
+      "time": "14:17 UTC",
+      "event": "Redis cluster enters CLUSTERDOWN state, all nodes OOM"
+    },
+    {
+      "time": "14:19 UTC",
+      "event": "Automated alerts fire for cache failure and response time degradation"
+    },
+    {
+      "time": "14:22 UTC",
+      "event": "On-call engineer Sarah Chen begins investigation"
+    },
+    {
+      "time": "14:28 UTC",
+      "event": "Root cause identified as missing TTL on session metadata keys"
+    },
+    {
+      "time": "14:32 UTC",
+      "event": "Database read replicas scaled up to handle cache fallthrough"
+    },
+    {
+      "time": "14:38 UTC",
+      "event": "Rolling restart of Redis cluster initiated with memory limits"
+    },
+    {
+      "time": "14:45 UTC",
+      "event": "Hotfix deployed to add TTL on affected cache key pattern"
+    },
+    {
+      "time": "14:49 UTC",
+      "event": "Redis cluster fully operational, response times normalizing"
+    }
+  ],
+  "ocr_entities": [
+    "redis-node-01 Memory: 100%",
+    "redis-node-02 Memory: 100%",
+    "Cluster Status: CLUSTERDOWN",
+    "Total Keys: 847M",
+    "Evicted Keys: 0",
+    "Alert: CRITICAL - All Nodes OOM"
+  ],
+  "audio_entities": [
+    "Alex Johnson",
+    "Priya Sharma",
+    "Sarah Chen"
+  ],
+  "document_entities": [
+    "redis",
+    "cache",
+    "cluster",
+    "production",
+    "memory"
+  ],
+  "evidence": {
+    "document": "INC002_incident_report.pdf",
+    "image": "redis_memory_spike.png",
+    "audio": "INC002_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "Redis",
+    "redis-prod-cluster-01",
+    "TTL",
+    "OOM",
+    "Session Metadata",
+    "Connection Pool"
+  ],
+  "knowledge_graph_relations": [
+    "Redis_cluster ENTERED CLUSTERDOWN_state",
+    "Missing_TTL CAUSED unbounded_memory_growth",
+    "Cache_failure LED_TO database_overload",
+    "Hotfix RESTORED TTL_configuration"
+  ],
+  "embedding_summary": "Complete Redis cache cluster failure caused by missing TTL on session metadata keys leading to unbounded memory growth and OOM across all six nodes. Services degraded for 32 minutes as traffic fell through to database. Resolved by rolling restart with memory limits and TTL hotfix deployment.",
+  "confidence": 0.94
+}

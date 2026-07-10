@@ -1,0 +1,162 @@
+INCIDENT REPORT
+========================================================================
+
+Incident ID:       INC020
+Title:             NFS Storage Mount Failure on Application Server Farm
+Severity:          P2
+Date/Time:         2025-05-26T11:15:00Z
+Department:        Storage Engineering
+System:            NetApp NFS Cluster
+Component:         nfs-prod-share-01
+Location:          On-Premises DC-Chicago
+Assigned Engineer: Chris Evans
+Status:            Resolved
+
+========================================================================
+1. SUMMARY
+========================================================================
+
+The NFS mount point for shared application data (nfs-prod-share-01) became inaccessible on 12 application servers at 11:15 UTC on May 26, 2025. The NetApp storage controller experienced a failover to its partner node during routine firmware maintenance, but the NFS clients did not reconnect automatically due to hard mount configuration without timeout values. Application processes attempting to access the NFS share hung indefinitely.
+
+This incident was classified as P2 severity and was assigned to
+Chris Evans in the Storage Engineering department. The affected system was
+NetApp NFS Cluster, specifically the nfs-prod-share-01 component located in On-Premises DC-Chicago.
+The incident was detected through automated monitoring and alerting systems,
+and the response team was engaged within minutes of the initial alert.
+
+========================================================================
+2. BUSINESS IMPACT
+========================================================================
+
+12 application servers became unresponsive with hung I/O operations for 35 minutes. User file upload and document processing features were unavailable. Approximately 2,400 users were affected. 850 file upload operations failed and required retry.
+
+The incident triggered the organization's major incident response process,
+involving cross-functional coordination between engineering, operations, and
+business stakeholders. Customer support was notified and prepared to handle
+incoming queries related to the service degradation.
+
+========================================================================
+3. SYMPTOMS OBSERVED
+========================================================================
+
+The following symptoms were observed during the incident:
+
+  * NFS mount points showing stale file handle errors on application servers
+  * Application processes in D (uninterruptible sleep) state waiting for NFS I/O
+  * NetApp storage controller showing successful failover to partner node
+  * NFS clients not reconnecting after storage controller failover
+  * df and ls commands hanging indefinitely on affected mount points
+
+These symptoms were correlated across multiple monitoring systems including
+application performance monitoring, infrastructure metrics, and log
+aggregation platforms. The incident response team confirmed the symptoms
+during their initial assessment and used them to guide the investigation.
+
+========================================================================
+4. TIMELINE OF EVENTS
+========================================================================
+
+  [11:15 UTC] NetApp storage controller begins firmware maintenance failover
+  [11:17 UTC] NFS mounts become stale on all 12 application servers
+  [11:20 UTC] Application processes begin hanging on NFS I/O operations
+  [11:25 UTC] Alert fires for application server unresponsiveness
+  [11:30 UTC] Chris Evans identifies NFS mount failure as root cause
+  [11:38 UTC] Storage controller failover confirmed successful
+  [11:42 UTC] Forced unmount and remount initiated on all servers
+  [11:50 UTC] All NFS mounts restored, application processes recovering
+
+========================================================================
+5. INVESTIGATION
+========================================================================
+
+Upon receiving the automated alert, the incident response team initiated a
+systematic investigation following established runbook procedures. The team
+began by examining the health and status of the nfs-prod-share-01 component
+within the NetApp NFS Cluster system deployed in On-Premises DC-Chicago.
+
+Initial telemetry data from the monitoring stack was reviewed, including
+application logs, infrastructure metrics, and recent deployment and change
+history. The investigation revealed that the primary symptoms were consistent
+across multiple data sources and monitoring tools.
+
+Log analysis from the affected component showed error patterns that pointed
+toward nfs hard mount configuration without intr or timeo options prevented automatic reconnection after netapp storage controller failover during firmware maintenance. The team also reviewed recent change
+records, configuration modifications, and deployment history to rule out
+human-initiated causes. Cross-referencing the timeline of events with
+infrastructure metrics from the preceding 24-48 hours provided additional
+context that supported the final root cause determination.
+
+========================================================================
+6. ROOT CAUSE ANALYSIS
+========================================================================
+
+The root cause of this incident was determined to be:
+NFS hard mount configuration without intr or timeo options prevented automatic reconnection after NetApp storage controller failover during firmware maintenance.
+
+Further analysis confirmed that this issue had been developing over time but
+was not detected by existing monitoring thresholds and alerting rules. The
+failure point was within the nfs-prod-share-01 component of the NetApp NFS Cluster
+system. Contributing factors included insufficient monitoring coverage for
+the specific failure mode encountered and the absence of automated
+remediation procedures for this particular scenario.
+
+========================================================================
+7. RESOLUTION
+========================================================================
+
+The incident was resolved by the following actions: Forced NFS unmount and remount with soft mount options on all affected servers, verified storage controller health, and updated NFS mount configuration to include reconnection parameters.
+
+The resolution was executed by Chris Evans with support from the incident
+response team. After applying the remediation steps, the team monitored the
+system for a stabilization period to confirm that the issue was fully
+resolved and no secondary or cascading failures had occurred. All affected
+services were verified to be operating within normal parameters before the
+incident was formally closed.
+
+========================================================================
+8. PREVENTIVE ACTIONS
+========================================================================
+
+The following preventive actions have been identified to reduce the
+likelihood and impact of similar incidents in the future:
+
+  1. Update NFS mount configuration to use soft mounts with timeout values
+  2. Implement NFS mount health monitoring with automatic remount capability
+  3. Coordinate storage controller maintenance with application team notifications
+  4. Add NFS client reconnection testing to storage maintenance procedures
+  5. Create automated NFS mount recovery script for failover scenarios
+
+These action items will be tracked in the engineering backlog and prioritized
+based on risk assessment and business impact analysis.
+
+========================================================================
+9. RELATED STANDARD OPERATING PROCEDURES
+========================================================================
+
+SOP-STOR-001: NFS Mount Recovery; SOP-STOR-004: Storage Controller Maintenance
+
+========================================================================
+10. LESSONS LEARNED
+========================================================================
+
+This incident provided several important learnings for the organization.
+The detection of nfs hard mount configuration without intr or timeo options prevented automatic reconnection after netapp storage controller failover during firmware maintenance was delayed due to gaps in
+monitoring coverage, highlighting the need for more comprehensive
+observability across the NetApp NFS Cluster stack.
+
+The incident response process demonstrated effective team coordination and
+communication, but the overall time to resolution could be improved through
+automation of common diagnostic and remediation steps. The successful
+resolution validated existing runbooks and procedures while also identifying
+specific areas for improvement.
+
+The preventive actions identified during the post-mortem will strengthen
+organizational resilience against similar failure modes. Regular review of
+monitoring thresholds, alerting rules, and runbook procedures should be
+incorporated into the operational cadence to maintain readiness.
+
+========================================================================
+Report generated by TwinMind Incident Management System
+Date: 2025-05-26T11:15:00Z
+Classification: Internal - Confidential
+========================================================================

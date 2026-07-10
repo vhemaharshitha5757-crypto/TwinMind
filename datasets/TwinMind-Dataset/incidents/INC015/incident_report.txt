@@ -1,0 +1,162 @@
+INCIDENT REPORT
+========================================================================
+
+Incident ID:       INC015
+Title:             Nginx Returning 502 Bad Gateway Due to Upstream Socket Exhaustion
+Severity:          P2
+Date/Time:         2025-04-21T10:55:00Z
+Department:        SRE
+System:            Nginx Reverse Proxy Cluster
+Component:         nginx-prod-web-02
+Location:          US-West-2 (AWS)
+Assigned Engineer: Alex Johnson
+Status:            Resolved
+
+========================================================================
+1. SUMMARY
+========================================================================
+
+Nginx reverse proxy node nginx-prod-web-02 began returning 502 Bad Gateway errors for 30% of requests at 10:55 UTC on April 21, 2025. The issue was caused by ephemeral port exhaustion on the nginx node when communicating with upstream application servers. A keepalive misconfiguration was causing nginx to open a new connection for every request instead of reusing connections, rapidly consuming all available ephemeral ports.
+
+This incident was classified as P2 severity and was assigned to
+Alex Johnson in the SRE department. The affected system was
+Nginx Reverse Proxy Cluster, specifically the nginx-prod-web-02 component located in US-West-2 (AWS).
+The incident was detected through automated monitoring and alerting systems,
+and the response team was engaged within minutes of the initial alert.
+
+========================================================================
+2. BUSINESS IMPACT
+========================================================================
+
+30% of web traffic served by nginx-prod-web-02 received 502 errors for 20 minutes. Approximately 6,000 users encountered error pages. Revenue impact estimated at $25,000 from abandoned shopping carts and failed transactions.
+
+The incident triggered the organization's major incident response process,
+involving cross-functional coordination between engineering, operations, and
+business stakeholders. Customer support was notified and prepared to handle
+incoming queries related to the service degradation.
+
+========================================================================
+3. SYMPTOMS OBSERVED
+========================================================================
+
+The following symptoms were observed during the incident:
+
+  * Intermittent 502 Bad Gateway errors from nginx-prod-web-02
+  * Nginx error log showing 'connect() failed: Cannot assign requested address'
+  * Ephemeral port range exhausted (all 28,000 ports in TIME_WAIT)
+  * Upstream servers healthy and responding normally to direct requests
+  * Connection count on nginx node at kernel maximum
+
+These symptoms were correlated across multiple monitoring systems including
+application performance monitoring, infrastructure metrics, and log
+aggregation platforms. The incident response team confirmed the symptoms
+during their initial assessment and used them to guide the investigation.
+
+========================================================================
+4. TIMELINE OF EVENTS
+========================================================================
+
+  [10:55 UTC] 502 error rate spikes on nginx-prod-web-02
+  [10:57 UTC] Error rate alert triggers, Alex Johnson begins investigation
+  [11:02 UTC] Upstream servers confirmed healthy, issue isolated to nginx layer
+  [11:05 UTC] Ephemeral port exhaustion identified from kernel TCP metrics
+  [11:08 UTC] Keepalive misconfiguration found in nginx.conf
+  [11:10 UTC] Keepalive configuration corrected, nginx restarted
+  [11:13 UTC] TIME_WAIT connections draining, error rate declining
+  [11:15 UTC] Error rate at 0%, all traffic flowing normally
+
+========================================================================
+5. INVESTIGATION
+========================================================================
+
+Upon receiving the automated alert, the incident response team initiated a
+systematic investigation following established runbook procedures. The team
+began by examining the health and status of the nginx-prod-web-02 component
+within the Nginx Reverse Proxy Cluster system deployed in US-West-2 (AWS).
+
+Initial telemetry data from the monitoring stack was reviewed, including
+application logs, infrastructure metrics, and recent deployment and change
+history. The investigation revealed that the primary symptoms were consistent
+across multiple data sources and monitoring tools.
+
+Log analysis from the affected component showed error patterns that pointed
+toward nginx keepalive configuration set to 0, disabling connection reuse to upstream servers, causing ephemeral port exhaustion during traffic spikes. The team also reviewed recent change
+records, configuration modifications, and deployment history to rule out
+human-initiated causes. Cross-referencing the timeline of events with
+infrastructure metrics from the preceding 24-48 hours provided additional
+context that supported the final root cause determination.
+
+========================================================================
+6. ROOT CAUSE ANALYSIS
+========================================================================
+
+The root cause of this incident was determined to be:
+Nginx keepalive configuration set to 0, disabling connection reuse to upstream servers, causing ephemeral port exhaustion during traffic spikes.
+
+Further analysis confirmed that this issue had been developing over time but
+was not detected by existing monitoring thresholds and alerting rules. The
+failure point was within the nginx-prod-web-02 component of the Nginx Reverse Proxy Cluster
+system. Contributing factors included insufficient monitoring coverage for
+the specific failure mode encountered and the absence of automated
+remediation procedures for this particular scenario.
+
+========================================================================
+7. RESOLUTION
+========================================================================
+
+The incident was resolved by the following actions: Corrected nginx keepalive configuration to maintain 256 persistent connections per upstream, restarted nginx to release TIME_WAIT sockets, and increased ephemeral port range.
+
+The resolution was executed by Alex Johnson with support from the incident
+response team. After applying the remediation steps, the team monitored the
+system for a stabilization period to confirm that the issue was fully
+resolved and no secondary or cascading failures had occurred. All affected
+services were verified to be operating within normal parameters before the
+incident was formally closed.
+
+========================================================================
+8. PREVENTIVE ACTIONS
+========================================================================
+
+The following preventive actions have been identified to reduce the
+likelihood and impact of similar incidents in the future:
+
+  1. Audit nginx keepalive configuration across all proxy nodes
+  2. Add ephemeral port utilization monitoring with alerts
+  3. Implement nginx config validation in deployment pipeline
+  4. Create performance testing baseline for nginx connection handling
+  5. Add connection pool metrics to the SRE dashboard
+
+These action items will be tracked in the engineering backlog and prioritized
+based on risk assessment and business impact analysis.
+
+========================================================================
+9. RELATED STANDARD OPERATING PROCEDURES
+========================================================================
+
+SOP-WEB-001: Nginx Troubleshooting; SOP-WEB-004: Reverse Proxy Recovery
+
+========================================================================
+10. LESSONS LEARNED
+========================================================================
+
+This incident provided several important learnings for the organization.
+The detection of nginx keepalive configuration set to 0, disabling connection reuse to upstream servers, causing ephemeral port exhaustion during traffic spikes was delayed due to gaps in
+monitoring coverage, highlighting the need for more comprehensive
+observability across the Nginx Reverse Proxy Cluster stack.
+
+The incident response process demonstrated effective team coordination and
+communication, but the overall time to resolution could be improved through
+automation of common diagnostic and remediation steps. The successful
+resolution validated existing runbooks and procedures while also identifying
+specific areas for improvement.
+
+The preventive actions identified during the post-mortem will strengthen
+organizational resilience against similar failure modes. Regular review of
+monitoring thresholds, alerting rules, and runbook procedures should be
+incorporated into the operational cadence to maintain readiness.
+
+========================================================================
+Report generated by TwinMind Incident Management System
+Date: 2025-04-21T10:55:00Z
+Classification: Internal - Confidential
+========================================================================

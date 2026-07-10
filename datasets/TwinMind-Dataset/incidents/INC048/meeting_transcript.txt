@@ -1,0 +1,59 @@
+MEETING TRANSCRIPT - INCIDENT INC048
+========================================================================
+Subject:      Kubernetes HPA Autoscaling Failure During Traffic Surge
+Date/Time:    2025-12-08T18:00:00Z
+Participants: Alex Johnson, Mike Torres, Nina Patel
+Duration:     Approximately 3 minutes
+Type:         Emergency Incident Response Call
+========================================================================
+
+[BEGIN TRANSCRIPT]
+[Alex Johnson]: Hey team, we've got a P1 incident on Google Kubernetes Engine. Frontend pod CPU at 95% across all 3 replicas (HPA minimum). I need everyone's eyes on this immediately.
+
+[Mike Torres]: I'm here. Let me pull up the hpa-frontend-prod dashboard. When did this start exactly?
+
+[Alex Johnson]: First alert came in at 16:00 UTC. Metrics-server pod OOMKilled (unnoticed). I've been looking at the logs since then.
+
+[Nina Patel]: I just joined the call. Give me a quick rundown. What are we seeing on the infrastructure side?
+
+[Alex Johnson]: Multiple symptoms. HPA showing 'unable to fetch metrics' in describe output. And we're also seeing metrics-server pod in CrashLoopBackOff from earlier OOM.
+
+[Mike Torres]: OK, I've got the metrics up. Request timeout rate at 65% on frontend endpoints. This doesn't look like a normal blip.
+
+[Nina Patel]: Any recent deployments or configuration changes that could have triggered this? I want to rule out human error first.
+
+[Alex Johnson]: I checked the change log for hpa-frontend-prod. No deployments in the last 24 hours. No config changes either. This looks like an organic failure.
+
+[Mike Torres]: Based on what I'm seeing in the telemetry data, I think this is related to metrics-server pod oomkilled 2 hours prior, leaving hpa without cpu metrics to trigger autoscaling d. The error pattern is very consistent with that.
+
+[Nina Patel]: That makes sense given the symptoms. I've seen similar patterns before. What's our best remediation path here?
+
+[Alex Johnson]: I recommend we restarted metrics-server with increased memory allocation, manually scaled frontend to 20 replicas w. That should bring us back to a stable state.
+
+[Mike Torres]: Agreed. Let me start executing that now. Nina, can you monitor the dashboards and confirm when metrics start recovering?
+
+[Nina Patel]: Will do. I've got the monitoring screen up. Go ahead with the fix.
+
+[Mike Torres]: Alright, executing the remediation now. This will take a couple of minutes. Stand by.
+
+[Nina Patel]: I'm starting to see positive movement on the dashboards. Google Kubernetes Engine metrics are beginning to normalize.
+
+[Alex Johnson]: Confirmed on my end too. Services are recovering. Let's keep monitoring for the next fifteen minutes to make sure we're stable.
+
+[Mike Torres]: Fix is fully applied. Everything looks green now. I'll document the resolution steps in the incident ticket.
+
+[Alex Johnson]: Great work everyone. Let's schedule a post-mortem for tomorrow. Key action items from this incident: implement metrics-server health monitoring with immediate alerting, increase metrics-server memory allocation with proper resource requests, and add hpa fallback using custom metrics from prometheus as secondary source.
+
+[Nina Patel]: I'll send out the post-mortem calendar invite and start drafting the incident report. Good job team, quick response on this one.
+
+[END TRANSCRIPT]
+
+========================================================================
+Action Items Captured:
+  - Implement metrics-server health monitoring with immediate alerting
+  - Increase metrics-server memory allocation with proper resource requests
+  - Add HPA fallback using custom metrics from Prometheus as secondary source
+  - Implement manual scaling alerts when HPA is unable to function
+
+Next Steps: Post-mortem meeting scheduled for following business day.
+========================================================================

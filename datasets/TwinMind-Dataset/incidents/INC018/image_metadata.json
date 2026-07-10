@@ -1,0 +1,23 @@
+{
+  "filename": "cpu_spike_search.png",
+  "caption": "ECS monitoring showing CPU spike to 98% on search service tasks",
+  "scene_description": "An ECS monitoring dashboard showing CPU utilization jumping from a baseline of 25% to 98% across all search service tasks. Response time graph shows a corresponding spike. Thread state analysis shows CPU-bound threads in regex execution.",
+  "detected_objects": [
+    "CPU Utilization Graph",
+    "Response Time Panel",
+    "Thread State Analysis",
+    "ECS Task List",
+    "Deployment Timeline"
+  ],
+  "ocr_text": [
+    "CPU Utilization: 98%",
+    "Response Time: 12,340ms",
+    "Active Threads: 256/256 (CPU-bound)",
+    "Service: search-svc",
+    "Deployment: v2.4.1 (30min ago)",
+    "Status: CRITICAL"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "ECS Fargate Cluster"
+}

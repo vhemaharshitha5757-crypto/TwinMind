@@ -1,0 +1,117 @@
+{
+  "incident_id": "INC026",
+  "title": "Network Partition Between Availability Zones Causing Split-Brain",
+  "timestamp": "2025-07-07T01:45:00Z",
+  "severity": "P1",
+  "department": "Networking",
+  "system": "AWS VPC Networking",
+  "component": "vpc-prod-us-east-1",
+  "location": "US-East-1 (AWS)",
+  "status": "Resolved",
+  "symptoms": [
+    "Network connectivity loss between AZ-a and AZ-b subnets",
+    "Database cluster showing two active primary nodes simultaneously",
+    "Application servers in AZ-b unable to reach services in AZ-a",
+    "Consensus layer triggering automatic failover in isolated AZ",
+    "Conflicting write operations detected after partition healed"
+  ],
+  "root_cause": "AWS inter-AZ network fabric degradation caused complete connectivity loss between us-east-1a and us-east-1b, and the consensus algorithm had insufficient quorum requirements to prevent split-brain",
+  "resolution": "Partition self-healed after 12 minutes, manual split-brain resolution performed by identifying and merging conflicting records, consensus algorithm updated to require majority quorum across all AZs",
+  "preventive_actions": [
+    "Update consensus algorithm to require strict majority quorum across AZs",
+    "Implement fencing tokens to prevent split-brain write conflicts",
+    "Add network partition detection with automatic write-lock on minority partition",
+    "Create data reconciliation runbook for split-brain scenarios",
+    "Deploy cross-AZ network monitoring with partition detection alerts"
+  ],
+  "affected_services": [
+    "database-cluster",
+    "order-service",
+    "payment-service",
+    "inventory-service",
+    "notification-service"
+  ],
+  "engineers": [
+    "Maria Garcia",
+    "Rajesh Kumar",
+    "David Kim"
+  ],
+  "timeline": [
+    {
+      "time": "01:45 UTC",
+      "event": "Network partition detected between us-east-1a and us-east-1b"
+    },
+    {
+      "time": "01:47 UTC",
+      "event": "Consensus layer in AZ-b promotes replica to primary"
+    },
+    {
+      "time": "01:48 UTC",
+      "event": "Split-brain condition begins with two active primaries"
+    },
+    {
+      "time": "01:50 UTC",
+      "event": "Alerts fire for network partition and dual-primary detection"
+    },
+    {
+      "time": "01:52 UTC",
+      "event": "Maria Garcia assesses situation, confirms partition"
+    },
+    {
+      "time": "01:55 UTC",
+      "event": "Decision to wait for partition healing rather than force intervention"
+    },
+    {
+      "time": "01:57 UTC",
+      "event": "Network partition self-heals, connectivity restored"
+    },
+    {
+      "time": "02:00 UTC",
+      "event": "Split-brain detected, conflicting records identified"
+    },
+    {
+      "time": "02:15 UTC",
+      "event": "Original primary restored as sole primary, reconciliation begins"
+    }
+  ],
+  "ocr_entities": [
+    "AZ-a: db-primary-01 (ACTIVE)",
+    "AZ-b: db-replica-02 (PROMOTED TO PRIMARY)",
+    "Partition Duration: 12 min",
+    "Conflicting Records: 847",
+    "Network Status: PARTITIONED",
+    "Alert: SPLIT-BRAIN DETECTED"
+  ],
+  "audio_entities": [
+    "Rajesh Kumar",
+    "David Kim",
+    "Maria Garcia"
+  ],
+  "document_entities": [
+    "network-partition",
+    "split-brain",
+    "availability-zone",
+    "vpc",
+    "consensus"
+  ],
+  "evidence": {
+    "document": "INC026_incident_report.pdf",
+    "image": "network_partition_azs.png",
+    "audio": "INC026_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "VPC",
+    "Availability Zone",
+    "Network Partition",
+    "Split-Brain",
+    "Consensus Algorithm",
+    "Quorum"
+  ],
+  "knowledge_graph_relations": [
+    "Network_partition ISOLATED AZ-a_from_AZ-b",
+    "Consensus_failover CAUSED split-brain",
+    "Quorum_update PREVENTS future_split-brain"
+  ],
+  "embedding_summary": "Network partition between AWS Availability Zones caused split-brain condition with two active database primaries writing conflicting data for 12 minutes. 847 conflicting records required manual reconciliation. Resolved by merging conflicts and updating consensus algorithm to require strict majority quorum.",
+  "confidence": 0.92
+}

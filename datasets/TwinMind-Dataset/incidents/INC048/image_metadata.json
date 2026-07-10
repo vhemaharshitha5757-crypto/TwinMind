@@ -1,0 +1,23 @@
+{
+  "filename": "k8s_hpa_failure.png",
+  "caption": "Kubernetes HPA status showing unable to fetch metrics during traffic surge",
+  "scene_description": "Kubernetes dashboard showing HPA for frontend service stuck at 3 replicas despite 95% CPU. A metrics-server pod is shown in CrashLoopBackOff. Traffic graph shows massive surge with timeout rate climbing.",
+  "detected_objects": [
+    "HPA Status Panel",
+    "Metrics-Server Status",
+    "CPU Utilization Graph",
+    "Pod Replica Count",
+    "Traffic and Timeout Graph"
+  ],
+  "ocr_text": [
+    "HPA: frontend-hpa",
+    "Current Replicas: 3 (min: 3, max: 50)",
+    "Target CPU: 70% (Actual: 95%)",
+    "Metrics-Server: CrashLoopBackOff",
+    "Error: unable to fetch metrics",
+    "Timeout Rate: 65%"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "Google Kubernetes Engine"
+}

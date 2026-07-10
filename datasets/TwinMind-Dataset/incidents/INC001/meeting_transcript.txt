@@ -1,0 +1,59 @@
+MEETING TRANSCRIPT - INCIDENT INC001
+========================================================================
+Subject:      PostgreSQL Primary Database Crash on Production Cluster
+Date/Time:    2025-01-15T02:34:00Z
+Participants: Rajesh Kumar, Sarah Chen, Mike Torres
+Duration:     Approximately 3 minutes
+Type:         Emergency Incident Response Call
+========================================================================
+
+[BEGIN TRANSCRIPT]
+[Rajesh Kumar]: Hey team, we've got a P1 incident on PostgreSQL Cluster. All application services returning connection refused errors to PostgreSQL. I need everyone's eyes on this immediately.
+
+[Sarah Chen]: I'm here. Let me pull up the db-prod-primary-01 dashboard. When did this start exactly?
+
+[Rajesh Kumar]: First alert came in at 02:34 UTC. PostgreSQL primary server crashes, automated PagerDuty alert triggered. I've been looking at the logs since then.
+
+[Mike Torres]: I just joined the call. Give me a quick rundown. What are we seeing on the infrastructure side?
+
+[Rajesh Kumar]: Multiple symptoms. PostgreSQL process terminated with SIGABRT on db-prod-primary-01. And we're also seeing WAL corruption errors (PANIC: could not locate valid checkpoint) in database logs.
+
+[Sarah Chen]: OK, I've got the metrics up. Zero active database connections across all connection poolers. This doesn't look like a normal blip.
+
+[Mike Torres]: Any recent deployments or configuration changes that could have triggered this? I want to rule out human error first.
+
+[Rajesh Kumar]: I checked the change log for db-prod-primary-01. No deployments in the last 24 hours. No config changes either. This looks like an organic failure.
+
+[Sarah Chen]: Based on what I'm seeing in the telemetry data, I think this is related to wal segment corruption caused by a failing nvme ssd with degrading sectors on the primary database s. The error pattern is very consistent with that.
+
+[Mike Torres]: That makes sense given the symptoms. I've seen similar patterns before. What's our best remediation path here?
+
+[Rajesh Kumar]: I recommend we promoted synchronous standby replica db-prod-standby-01 to primary, reconfigured pgbouncer connectio. That should bring us back to a stable state.
+
+[Sarah Chen]: Agreed. Let me start executing that now. Mike, can you monitor the dashboards and confirm when metrics start recovering?
+
+[Mike Torres]: Will do. I've got the monitoring screen up. Go ahead with the fix.
+
+[Sarah Chen]: Alright, executing the remediation now. This will take a couple of minutes. Stand by.
+
+[Mike Torres]: I'm starting to see positive movement on the dashboards. PostgreSQL Cluster metrics are beginning to normalize.
+
+[Rajesh Kumar]: Confirmed on my end too. Services are recovering. Let's keep monitoring for the next fifteen minutes to make sure we're stable.
+
+[Sarah Chen]: Fix is fully applied. Everything looks green now. I'll document the resolution steps in the incident ticket.
+
+[Rajesh Kumar]: Great work everyone. Let's schedule a post-mortem for tomorrow. Key action items from this incident: implement smart drive monitoring with alerts on reallocated sector count, add disk i/o latency alerting at p95 greater than 5ms, and deploy automated wal integrity verification every 6 hours.
+
+[Mike Torres]: I'll send out the post-mortem calendar invite and start drafting the incident report. Good job team, quick response on this one.
+
+[END TRANSCRIPT]
+
+========================================================================
+Action Items Captured:
+  - Implement SMART drive monitoring with alerts on reallocated sector count
+  - Add disk I/O latency alerting at p95 greater than 5ms
+  - Deploy automated WAL integrity verification every 6 hours
+  - Schedule quarterly NVMe health audits across database fleet
+
+Next Steps: Post-mortem meeting scheduled for following business day.
+========================================================================

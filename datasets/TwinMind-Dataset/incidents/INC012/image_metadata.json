@@ -1,0 +1,23 @@
+{
+  "filename": "spot_instance_terminated.png",
+  "caption": "AWS console showing spot instance termination and batch job interruption",
+  "scene_description": "AWS EC2 console showing the terminated spot instance with a spot interruption notice. A CloudWatch graph shows the 2-minute warning that went unhandled. Batch processing progress bar frozen at 75%.",
+  "detected_objects": [
+    "Instance State Panel",
+    "Spot Interruption Notice",
+    "Batch Progress Bar",
+    "CloudWatch Warning Graph",
+    "Instance Type Label"
+  ],
+  "ocr_text": [
+    "Instance: batch-processor-spot-12",
+    "State: Terminated",
+    "Reason: Spot instance interruption",
+    "Batch Progress: 75%",
+    "Warning Lead Time: 2 min",
+    "Instance Type: r5.4xlarge"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "AWS EC2 Spot Instances"
+}

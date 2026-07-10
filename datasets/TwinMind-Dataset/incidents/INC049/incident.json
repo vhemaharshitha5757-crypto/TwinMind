@@ -1,0 +1,108 @@
+{
+  "incident_id": "INC049",
+  "title": "Kong API Gateway Plugin Crash on Request Transformation",
+  "timestamp": "2025-12-15T10:40:00Z",
+  "severity": "P2",
+  "department": "API Engineering",
+  "system": "Kong API Gateway",
+  "component": "kong-prod-east-01",
+  "location": "US-East-1 (AWS)",
+  "status": "Resolved",
+  "symptoms": [
+    "Intermittent 500 Internal Server Error from Kong gateway (8% of requests)",
+    "Kong error logs showing Lua runtime nil reference error in transformation plugin",
+    "Errors correlating with requests containing Unicode characters in headers",
+    "Plugin execution metrics showing crashes on specific request patterns",
+    "Non-ASCII header values triggering the plugin failure"
+  ],
+  "root_cause": "Custom Lua request transformation plugin did not handle multi-byte UTF-8 character encoding in HTTP header values, causing nil reference crash when processing Unicode characters",
+  "resolution": "Deployed patched version of the transformation plugin with proper UTF-8 handling, enabled Unicode-safe string operations in Lua, and added input validation for header encoding",
+  "preventive_actions": [
+    "Implement UTF-8 input handling testing for all custom Kong plugins",
+    "Add plugin crash monitoring with automatic fallback to bypass mode",
+    "Create internationalization test suite for API gateway plugins",
+    "Implement Lua error handling best practices in plugin development guidelines",
+    "Add canary testing with diverse character sets for plugin deployments"
+  ],
+  "affected_services": [
+    "partner-api",
+    "mobile-api",
+    "international-users",
+    "search-api"
+  ],
+  "engineers": [
+    "Jenny Liu",
+    "James Wright",
+    "Priya Sharma"
+  ],
+  "timeline": [
+    {
+      "time": "10:40 UTC",
+      "event": "First 500 errors appear from Kong gateway"
+    },
+    {
+      "time": "10:45 UTC",
+      "event": "Error pattern identified as intermittent (8% rate)"
+    },
+    {
+      "time": "10:50 UTC",
+      "event": "Jenny Liu begins investigation"
+    },
+    {
+      "time": "10:55 UTC",
+      "event": "Lua plugin crash error identified in Kong logs"
+    },
+    {
+      "time": "11:00 UTC",
+      "event": "Unicode character trigger pattern discovered"
+    },
+    {
+      "time": "11:02 UTC",
+      "event": "Plugin temporarily set to bypass mode for affected routes"
+    },
+    {
+      "time": "11:05 UTC",
+      "event": "Patched plugin version developed with UTF-8 handling"
+    }
+  ],
+  "ocr_entities": [
+    "500 Error Rate: 8%",
+    "Plugin: request-transformer-v2",
+    "Error: attempt to index nil value (header_value)",
+    "Trigger: UTF-8 multi-byte chars in headers",
+    "Affected Requests: 2,847",
+    "Kong: kong-prod-east-01"
+  ],
+  "audio_entities": [
+    "Jenny Liu",
+    "Priya Sharma",
+    "James Wright"
+  ],
+  "document_entities": [
+    "kong",
+    "api-gateway",
+    "plugin-crash",
+    "transformation",
+    "lua"
+  ],
+  "evidence": {
+    "document": "INC049_incident_report.pdf",
+    "image": "kong_plugin_crash.png",
+    "audio": "INC049_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "Kong",
+    "kong-prod-east-01",
+    "Lua Plugin",
+    "UTF-8",
+    "Request Transformation",
+    "Unicode"
+  ],
+  "knowledge_graph_relations": [
+    "Unicode_characters CRASHED Lua_plugin",
+    "Plugin_crash CAUSED 500_errors",
+    "UTF8_handling_fix RESOLVED crashes"
+  ],
+  "embedding_summary": "Kong API Gateway custom Lua plugin crash when processing Unicode characters in HTTP headers. 8% of requests failing with 500 errors for 25 minutes. International users disproportionately affected. Resolved by patching plugin with proper UTF-8 character handling.",
+  "confidence": 0.95
+}

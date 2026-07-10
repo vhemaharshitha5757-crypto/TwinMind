@@ -1,0 +1,162 @@
+INCIDENT REPORT
+========================================================================
+
+Incident ID:       INC034
+Title:             PostgreSQL Deadlock on High-Concurrency Transaction Path
+Severity:          P2
+Date/Time:         2025-09-01T14:20:00Z
+Department:        Database Engineering
+System:            PostgreSQL Cluster
+Component:         db-prod-primary-02
+Location:          US-East-1 (AWS)
+Assigned Engineer: Rajesh Kumar
+Status:            Resolved
+
+========================================================================
+1. SUMMARY
+========================================================================
+
+PostgreSQL production database (db-prod-primary-02) experienced recurring deadlocks on the order_items and inventory tables at 14:20 UTC on September 1, 2025. The order processing and inventory update services were acquiring locks on these tables in opposite orders during high-concurrency periods. Deadlock frequency increased from 2/hour to 150/hour during a flash sale event, causing transaction failures and order processing errors.
+
+This incident was classified as P2 severity and was assigned to
+Rajesh Kumar in the Database Engineering department. The affected system was
+PostgreSQL Cluster, specifically the db-prod-primary-02 component located in US-East-1 (AWS).
+The incident was detected through automated monitoring and alerting systems,
+and the response team was engaged within minutes of the initial alert.
+
+========================================================================
+2. BUSINESS IMPACT
+========================================================================
+
+Order processing error rate spiked to 8% during the flash sale (normal: 0.1%). Approximately 1,200 orders failed on first attempt, with 85% succeeding on automatic retry. 180 orders required manual intervention. Customer experience during the sale event was degraded.
+
+The incident triggered the organization's major incident response process,
+involving cross-functional coordination between engineering, operations, and
+business stakeholders. Customer support was notified and prepared to handle
+incoming queries related to the service degradation.
+
+========================================================================
+3. SYMPTOMS OBSERVED
+========================================================================
+
+The following symptoms were observed during the incident:
+
+  * PostgreSQL logs showing deadlock detected errors at 150/hour
+  * Order processing service returning intermittent 500 errors
+  * Database lock wait queue growing during peak concurrent transactions
+  * pg_stat_activity showing blocked queries waiting for conflicting locks
+  * Automatic retries consuming additional database capacity
+
+These symptoms were correlated across multiple monitoring systems including
+application performance monitoring, infrastructure metrics, and log
+aggregation platforms. The incident response team confirmed the symptoms
+during their initial assessment and used them to guide the investigation.
+
+========================================================================
+4. TIMELINE OF EVENTS
+========================================================================
+
+  [14:20 UTC] Flash sale begins, transaction concurrency spikes
+  [14:25 UTC] Deadlock frequency increases from 2/hour to 50/hour
+  [14:30 UTC] Order error rate exceeds 5%, alerting triggers
+  [14:35 UTC] Rajesh Kumar investigates, identifies deadlock pattern
+  [14:45 UTC] Lock ordering conflict between services confirmed
+  [15:00 UTC] Emergency code fix prepared for consistent lock ordering
+  [15:20 UTC] Fix deployed, deadlock frequency drops immediately
+  [15:30 UTC] Deadlock rate back to baseline, order processing stable
+
+========================================================================
+5. INVESTIGATION
+========================================================================
+
+Upon receiving the automated alert, the incident response team initiated a
+systematic investigation following established runbook procedures. The team
+began by examining the health and status of the db-prod-primary-02 component
+within the PostgreSQL Cluster system deployed in US-East-1 (AWS).
+
+Initial telemetry data from the monitoring stack was reviewed, including
+application logs, infrastructure metrics, and recent deployment and change
+history. The investigation revealed that the primary symptoms were consistent
+across multiple data sources and monitoring tools.
+
+Log analysis from the affected component showed error patterns that pointed
+toward order processing and inventory update services acquiring row-level locks on order_items and inventory tables in opposite order, creating a classic deadlock cycle under high concurrency. The team also reviewed recent change
+records, configuration modifications, and deployment history to rule out
+human-initiated causes. Cross-referencing the timeline of events with
+infrastructure metrics from the preceding 24-48 hours provided additional
+context that supported the final root cause determination.
+
+========================================================================
+6. ROOT CAUSE ANALYSIS
+========================================================================
+
+The root cause of this incident was determined to be:
+Order processing and inventory update services acquiring row-level locks on order_items and inventory tables in opposite order, creating a classic deadlock cycle under high concurrency.
+
+Further analysis confirmed that this issue had been developing over time but
+was not detected by existing monitoring thresholds and alerting rules. The
+failure point was within the db-prod-primary-02 component of the PostgreSQL Cluster
+system. Contributing factors included insufficient monitoring coverage for
+the specific failure mode encountered and the absence of automated
+remediation procedures for this particular scenario.
+
+========================================================================
+7. RESOLUTION
+========================================================================
+
+The incident was resolved by the following actions: Refactored both services to acquire locks in consistent alphabetical table order (inventory first, then order_items), added advisory locks for critical sections, and implemented optimistic concurrency control for inventory updates.
+
+The resolution was executed by Rajesh Kumar with support from the incident
+response team. After applying the remediation steps, the team monitored the
+system for a stabilization period to confirm that the issue was fully
+resolved and no secondary or cascading failures had occurred. All affected
+services were verified to be operating within normal parameters before the
+incident was formally closed.
+
+========================================================================
+8. PREVENTIVE ACTIONS
+========================================================================
+
+The following preventive actions have been identified to reduce the
+likelihood and impact of similar incidents in the future:
+
+  1. Establish and enforce consistent lock ordering convention across all services
+  2. Implement deadlock detection monitoring with frequency-based alerting
+  3. Add advisory locks for multi-table transaction critical sections
+  4. Create load testing scenario simulating flash sale concurrency levels
+  5. Implement circuit breaker on order processing to handle deadlock storms
+
+These action items will be tracked in the engineering backlog and prioritized
+based on risk assessment and business impact analysis.
+
+========================================================================
+9. RELATED STANDARD OPERATING PROCEDURES
+========================================================================
+
+SOP-DB-006: Deadlock Investigation; SOP-DB-011: Transaction Concurrency Issues
+
+========================================================================
+10. LESSONS LEARNED
+========================================================================
+
+This incident provided several important learnings for the organization.
+The detection of order processing and inventory update services acquiring row-level locks on order_items and inventory tables in opposite order, creating a classic deadlock cycle under high concurrency was delayed due to gaps in
+monitoring coverage, highlighting the need for more comprehensive
+observability across the PostgreSQL Cluster stack.
+
+The incident response process demonstrated effective team coordination and
+communication, but the overall time to resolution could be improved through
+automation of common diagnostic and remediation steps. The successful
+resolution validated existing runbooks and procedures while also identifying
+specific areas for improvement.
+
+The preventive actions identified during the post-mortem will strengthen
+organizational resilience against similar failure modes. Regular review of
+monitoring thresholds, alerting rules, and runbook procedures should be
+incorporated into the operational cadence to maintain readiness.
+
+========================================================================
+Report generated by TwinMind Incident Management System
+Date: 2025-09-01T14:20:00Z
+Classification: Internal - Confidential
+========================================================================

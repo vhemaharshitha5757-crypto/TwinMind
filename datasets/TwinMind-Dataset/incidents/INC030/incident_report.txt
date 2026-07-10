@@ -1,0 +1,162 @@
+INCIDENT REPORT
+========================================================================
+
+Incident ID:       INC030
+Title:             Application Log Corruption Due to Concurrent File Access
+Severity:          P3
+Date/Time:         2025-08-04T03:15:00Z
+Department:        SRE
+System:            Centralized Logging Pipeline
+Component:         log-aggregator-prod-02
+Location:          US-West-2 (AWS)
+Assigned Engineer: Alex Johnson
+Status:            Resolved
+
+========================================================================
+1. SUMMARY
+========================================================================
+
+Application log files on log-aggregator-prod-02 became corrupted at 03:15 UTC on August 4, 2025. The Fluentd log shipper and the logrotate process were both writing to and rotating the same log files simultaneously without coordination. This resulted in partial log lines, interleaved entries from different services, and binary garbage in the log files. The corrupted logs were shipped to ElasticSearch, contaminating the search index.
+
+This incident was classified as P3 severity and was assigned to
+Alex Johnson in the SRE department. The affected system was
+Centralized Logging Pipeline, specifically the log-aggregator-prod-02 component located in US-West-2 (AWS).
+The incident was detected through automated monitoring and alerting systems,
+and the response team was engaged within minutes of the initial alert.
+
+========================================================================
+2. BUSINESS IMPACT
+========================================================================
+
+2 hours of log data corrupted across 8 production services. ElasticSearch index for the affected time window contained unusable entries. Incident investigation capabilities were degraded for the affected period. Compliance audit trail had gaps requiring manual reconstruction.
+
+The incident triggered the organization's major incident response process,
+involving cross-functional coordination between engineering, operations, and
+business stakeholders. Customer support was notified and prepared to handle
+incoming queries related to the service degradation.
+
+========================================================================
+3. SYMPTOMS OBSERVED
+========================================================================
+
+The following symptoms were observed during the incident:
+
+  * Log files containing partial lines and binary garbage characters
+  * ElasticSearch queries returning malformed log entries
+  * Fluentd error logs showing parse failures on corrupted data
+  * Logrotate and Fluentd competing for file handles on same files
+  * Kibana dashboards showing malformed log visualization
+
+These symptoms were correlated across multiple monitoring systems including
+application performance monitoring, infrastructure metrics, and log
+aggregation platforms. The incident response team confirmed the symptoms
+during their initial assessment and used them to guide the investigation.
+
+========================================================================
+4. TIMELINE OF EVENTS
+========================================================================
+
+  [03:15 UTC] Log corruption begins when logrotate and Fluentd access files simultaneously
+  [03:20 UTC] Fluentd parse errors spike in monitoring
+  [04:00 UTC] Corrupted log entries accumulating in ElasticSearch
+  [05:15 UTC] Alex Johnson notices corrupted entries during routine log review
+  [05:30 UTC] Root cause identified as Fluentd/logrotate race condition
+  [05:45 UTC] Logrotate disabled, Fluentd-native rotation configured
+  [06:00 UTC] Corrupted ElasticSearch entries tagged for cleanup
+  [06:30 UTC] Log pipeline stabilized, new entries clean
+
+========================================================================
+5. INVESTIGATION
+========================================================================
+
+Upon receiving the automated alert, the incident response team initiated a
+systematic investigation following established runbook procedures. The team
+began by examining the health and status of the log-aggregator-prod-02 component
+within the Centralized Logging Pipeline system deployed in US-West-2 (AWS).
+
+Initial telemetry data from the monitoring stack was reviewed, including
+application logs, infrastructure metrics, and recent deployment and change
+history. The investigation revealed that the primary symptoms were consistent
+across multiple data sources and monitoring tools.
+
+Log analysis from the affected component showed error patterns that pointed
+toward race condition between fluentd log shipper and logrotate process both accessing the same log files simultaneously without file locking or coordination. The team also reviewed recent change
+records, configuration modifications, and deployment history to rule out
+human-initiated causes. Cross-referencing the timeline of events with
+infrastructure metrics from the preceding 24-48 hours provided additional
+context that supported the final root cause determination.
+
+========================================================================
+6. ROOT CAUSE ANALYSIS
+========================================================================
+
+The root cause of this incident was determined to be:
+Race condition between Fluentd log shipper and logrotate process both accessing the same log files simultaneously without file locking or coordination.
+
+Further analysis confirmed that this issue had been developing over time but
+was not detected by existing monitoring thresholds and alerting rules. The
+failure point was within the log-aggregator-prod-02 component of the Centralized Logging Pipeline
+system. Contributing factors included insufficient monitoring coverage for
+the specific failure mode encountered and the absence of automated
+remediation procedures for this particular scenario.
+
+========================================================================
+7. RESOLUTION
+========================================================================
+
+The incident was resolved by the following actions: Implemented Fluentd-native log rotation to replace system logrotate, cleared corrupted entries from ElasticSearch index, and re-ingested logs from application-level buffers where available.
+
+The resolution was executed by Alex Johnson with support from the incident
+response team. After applying the remediation steps, the team monitored the
+system for a stabilization period to confirm that the issue was fully
+resolved and no secondary or cascading failures had occurred. All affected
+services were verified to be operating within normal parameters before the
+incident was formally closed.
+
+========================================================================
+8. PREVENTIVE ACTIONS
+========================================================================
+
+The following preventive actions have been identified to reduce the
+likelihood and impact of similar incidents in the future:
+
+  1. Migrate to Fluentd-native log rotation for all managed log files
+  2. Implement log integrity verification in the shipping pipeline
+  3. Add file locking mechanism for shared log file access
+  4. Create log corruption detection alerting in ElasticSearch
+  5. Implement application-level log buffering for recovery scenarios
+
+These action items will be tracked in the engineering backlog and prioritized
+based on risk assessment and business impact analysis.
+
+========================================================================
+9. RELATED STANDARD OPERATING PROCEDURES
+========================================================================
+
+SOP-LOG-001: Log Pipeline Recovery; SOP-LOG-003: Log Corruption Remediation
+
+========================================================================
+10. LESSONS LEARNED
+========================================================================
+
+This incident provided several important learnings for the organization.
+The detection of race condition between fluentd log shipper and logrotate process both accessing the same log files simultaneously without file locking or coordination was delayed due to gaps in
+monitoring coverage, highlighting the need for more comprehensive
+observability across the Centralized Logging Pipeline stack.
+
+The incident response process demonstrated effective team coordination and
+communication, but the overall time to resolution could be improved through
+automation of common diagnostic and remediation steps. The successful
+resolution validated existing runbooks and procedures while also identifying
+specific areas for improvement.
+
+The preventive actions identified during the post-mortem will strengthen
+organizational resilience against similar failure modes. Regular review of
+monitoring thresholds, alerting rules, and runbook procedures should be
+incorporated into the operational cadence to maintain readiness.
+
+========================================================================
+Report generated by TwinMind Incident Management System
+Date: 2025-08-04T03:15:00Z
+Classification: Internal - Confidential
+========================================================================

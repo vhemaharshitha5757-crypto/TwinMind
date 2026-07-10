@@ -1,0 +1,162 @@
+INCIDENT REPORT
+========================================================================
+
+Incident ID:       INC014
+Title:             RabbitMQ Queue Overflow Causing Message Loss
+Severity:          P1
+Date/Time:         2025-04-14T22:10:00Z
+Department:        Platform Engineering
+System:            RabbitMQ Cluster
+Component:         rabbitmq-prod-eu-01
+Location:          EU-West-1 (AWS)
+Assigned Engineer: Mike Torres
+Status:            Resolved
+
+========================================================================
+1. SUMMARY
+========================================================================
+
+The RabbitMQ production cluster (rabbitmq-prod-eu-01) in the EU region experienced a queue overflow event at 22:10 UTC on April 14, 2025. The notification-events queue grew beyond its configured memory limit of 4GB, triggering RabbitMQ's flow control mechanism. However, the publisher did not implement backpressure handling and continued publishing, eventually causing the broker to drop messages when disk space was also exhausted. An estimated 34,000 notification messages were permanently lost.
+
+This incident was classified as P1 severity and was assigned to
+Mike Torres in the Platform Engineering department. The affected system was
+RabbitMQ Cluster, specifically the rabbitmq-prod-eu-01 component located in EU-West-1 (AWS).
+The incident was detected through automated monitoring and alerting systems,
+and the response team was engaged within minutes of the initial alert.
+
+========================================================================
+2. BUSINESS IMPACT
+========================================================================
+
+34,000 customer notification messages (email and SMS) were permanently lost. Customers did not receive order confirmation, shipping, and payment notifications for a 2-hour window. Customer support received 1,800 inquiries about missing notifications. Manual notification resend was required for affected customers.
+
+The incident triggered the organization's major incident response process,
+involving cross-functional coordination between engineering, operations, and
+business stakeholders. Customer support was notified and prepared to handle
+incoming queries related to the service degradation.
+
+========================================================================
+3. SYMPTOMS OBSERVED
+========================================================================
+
+The following symptoms were observed during the incident:
+
+  * RabbitMQ queue depth exceeding 4GB memory limit
+  * Flow control activated on publisher connections
+  * Disk space alarm triggered on RabbitMQ nodes
+  * Publisher application not handling flow control signals
+  * Message publish confirmations failing silently
+
+These symptoms were correlated across multiple monitoring systems including
+application performance monitoring, infrastructure metrics, and log
+aggregation platforms. The incident response team confirmed the symptoms
+during their initial assessment and used them to guide the investigation.
+
+========================================================================
+4. TIMELINE OF EVENTS
+========================================================================
+
+  [22:10 UTC] notification-events queue exceeds 4GB memory limit
+  [22:15 UTC] RabbitMQ flow control activated, publishers throttled
+  [22:20 UTC] Alert fires for queue depth exceeding threshold
+  [22:30 UTC] Mike Torres investigates, identifies publisher ignoring flow control
+  [22:45 UTC] Disk space alarm triggers, messages begin being dropped
+  [23:00 UTC] Queue cleared, publisher hotfix deployed with backpressure handling
+  [23:30 UTC] Queue processing normalized, lost message audit initiated
+  [00:10 UTC] 34,000 lost notifications resent from application event log
+
+========================================================================
+5. INVESTIGATION
+========================================================================
+
+Upon receiving the automated alert, the incident response team initiated a
+systematic investigation following established runbook procedures. The team
+began by examining the health and status of the rabbitmq-prod-eu-01 component
+within the RabbitMQ Cluster system deployed in EU-West-1 (AWS).
+
+Initial telemetry data from the monitoring stack was reviewed, including
+application logs, infrastructure metrics, and recent deployment and change
+history. The investigation revealed that the primary symptoms were consistent
+across multiple data sources and monitoring tools.
+
+Log analysis from the affected component showed error patterns that pointed
+toward publisher service did not implement rabbitmq backpressure handling, continuing to publish messages during flow control, leading to message drops when both memory and disk limits were breached. The team also reviewed recent change
+records, configuration modifications, and deployment history to rule out
+human-initiated causes. Cross-referencing the timeline of events with
+infrastructure metrics from the preceding 24-48 hours provided additional
+context that supported the final root cause determination.
+
+========================================================================
+6. ROOT CAUSE ANALYSIS
+========================================================================
+
+The root cause of this incident was determined to be:
+Publisher service did not implement RabbitMQ backpressure handling, continuing to publish messages during flow control, leading to message drops when both memory and disk limits were breached.
+
+Further analysis confirmed that this issue had been developing over time but
+was not detected by existing monitoring thresholds and alerting rules. The
+failure point was within the rabbitmq-prod-eu-01 component of the RabbitMQ Cluster
+system. Contributing factors included insufficient monitoring coverage for
+the specific failure mode encountered and the absence of automated
+remediation procedures for this particular scenario.
+
+========================================================================
+7. RESOLUTION
+========================================================================
+
+The incident was resolved by the following actions: Cleared the overflowed queue, implemented publisher-side backpressure handling with confirms, increased disk space allocation, and resent lost notifications from application event log.
+
+The resolution was executed by Mike Torres with support from the incident
+response team. After applying the remediation steps, the team monitored the
+system for a stabilization period to confirm that the issue was fully
+resolved and no secondary or cascading failures had occurred. All affected
+services were verified to be operating within normal parameters before the
+incident was formally closed.
+
+========================================================================
+8. PREVENTIVE ACTIONS
+========================================================================
+
+The following preventive actions have been identified to reduce the
+likelihood and impact of similar incidents in the future:
+
+  1. Implement mandatory publisher confirms and backpressure handling
+  2. Add queue depth monitoring with alerts at 1GB and 3GB
+  3. Configure dead letter queues for overflow scenarios
+  4. Implement message persistence for critical notification events
+  5. Create disaster recovery playbook for message loss scenarios
+
+These action items will be tracked in the engineering backlog and prioritized
+based on risk assessment and business impact analysis.
+
+========================================================================
+9. RELATED STANDARD OPERATING PROCEDURES
+========================================================================
+
+SOP-MSG-002: RabbitMQ Queue Overflow Response; SOP-MSG-005: Message Recovery Procedures
+
+========================================================================
+10. LESSONS LEARNED
+========================================================================
+
+This incident provided several important learnings for the organization.
+The detection of publisher service did not implement rabbitmq backpressure handling, continuing to publish messages during flow control, leading to message drops when both memory and disk limits were breached was delayed due to gaps in
+monitoring coverage, highlighting the need for more comprehensive
+observability across the RabbitMQ Cluster stack.
+
+The incident response process demonstrated effective team coordination and
+communication, but the overall time to resolution could be improved through
+automation of common diagnostic and remediation steps. The successful
+resolution validated existing runbooks and procedures while also identifying
+specific areas for improvement.
+
+The preventive actions identified during the post-mortem will strengthen
+organizational resilience against similar failure modes. Regular review of
+monitoring thresholds, alerting rules, and runbook procedures should be
+incorporated into the operational cadence to maintain readiness.
+
+========================================================================
+Report generated by TwinMind Incident Management System
+Date: 2025-04-14T22:10:00Z
+Classification: Internal - Confidential
+========================================================================

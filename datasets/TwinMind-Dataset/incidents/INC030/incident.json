@@ -1,0 +1,112 @@
+{
+  "incident_id": "INC030",
+  "title": "Application Log Corruption Due to Concurrent File Access",
+  "timestamp": "2025-08-04T03:15:00Z",
+  "severity": "P3",
+  "department": "SRE",
+  "system": "Centralized Logging Pipeline",
+  "component": "log-aggregator-prod-02",
+  "location": "US-West-2 (AWS)",
+  "status": "Resolved",
+  "symptoms": [
+    "Log files containing partial lines and binary garbage characters",
+    "ElasticSearch queries returning malformed log entries",
+    "Fluentd error logs showing parse failures on corrupted data",
+    "Logrotate and Fluentd competing for file handles on same files",
+    "Kibana dashboards showing malformed log visualization"
+  ],
+  "root_cause": "Race condition between Fluentd log shipper and logrotate process both accessing the same log files simultaneously without file locking or coordination",
+  "resolution": "Implemented Fluentd-native log rotation to replace system logrotate, cleared corrupted entries from ElasticSearch index, and re-ingested logs from application-level buffers where available",
+  "preventive_actions": [
+    "Migrate to Fluentd-native log rotation for all managed log files",
+    "Implement log integrity verification in the shipping pipeline",
+    "Add file locking mechanism for shared log file access",
+    "Create log corruption detection alerting in ElasticSearch",
+    "Implement application-level log buffering for recovery scenarios"
+  ],
+  "affected_services": [
+    "log-pipeline",
+    "elasticsearch-cluster",
+    "kibana-dashboards",
+    "audit-trail"
+  ],
+  "engineers": [
+    "Alex Johnson",
+    "Nina Patel",
+    "Sarah Chen"
+  ],
+  "timeline": [
+    {
+      "time": "03:15 UTC",
+      "event": "Log corruption begins when logrotate and Fluentd access files simultaneously"
+    },
+    {
+      "time": "03:20 UTC",
+      "event": "Fluentd parse errors spike in monitoring"
+    },
+    {
+      "time": "04:00 UTC",
+      "event": "Corrupted log entries accumulating in ElasticSearch"
+    },
+    {
+      "time": "05:15 UTC",
+      "event": "Alex Johnson notices corrupted entries during routine log review"
+    },
+    {
+      "time": "05:30 UTC",
+      "event": "Root cause identified as Fluentd/logrotate race condition"
+    },
+    {
+      "time": "05:45 UTC",
+      "event": "Logrotate disabled, Fluentd-native rotation configured"
+    },
+    {
+      "time": "06:00 UTC",
+      "event": "Corrupted ElasticSearch entries tagged for cleanup"
+    },
+    {
+      "time": "06:30 UTC",
+      "event": "Log pipeline stabilized, new entries clean"
+    }
+  ],
+  "ocr_entities": [
+    "Parse Errors: 24,847/min",
+    "Corrupted Documents: 187,231",
+    "Affected Services: 8",
+    "Pipeline: log-aggregator-prod-02",
+    "Fluentd Status: ERROR",
+    "Log Integrity: COMPROMISED"
+  ],
+  "audio_entities": [
+    "Alex Johnson",
+    "Sarah Chen",
+    "Nina Patel"
+  ],
+  "document_entities": [
+    "logging",
+    "corruption",
+    "file-access",
+    "log-rotation",
+    "fluentd"
+  ],
+  "evidence": {
+    "document": "INC030_incident_report.pdf",
+    "image": "log_corruption_dashboard.png",
+    "audio": "INC030_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "Fluentd",
+    "log-aggregator-prod-02",
+    "Logrotate",
+    "ElasticSearch",
+    "File Locking",
+    "Log Corruption"
+  ],
+  "knowledge_graph_relations": [
+    "Fluentd_and_logrotate RACE_CONDITION_ON log_files",
+    "Race_condition CAUSED log_corruption",
+    "Fluentd_rotation REPLACES system_logrotate"
+  ],
+  "embedding_summary": "Application log corruption on log-aggregator-prod-02 caused by race condition between Fluentd log shipper and logrotate process accessing same files simultaneously. 2 hours of corrupted logs across 8 services contaminated ElasticSearch index. Resolved by migrating to Fluentd-native log rotation.",
+  "confidence": 0.91
+}

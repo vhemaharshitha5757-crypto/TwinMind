@@ -1,0 +1,23 @@
+{
+  "filename": "oauth_refresh_loop.png",
+  "caption": "Authentication dashboard showing OAuth2 token refresh storm from mobile clients",
+  "scene_description": "An authentication service dashboard showing token refresh request rate spiking to 3.2 million per minute. CPU utilization at 100%. A client breakdown shows mobile app as the sole source of the storm. Normal web client traffic is barely visible.",
+  "detected_objects": [
+    "Request Rate Graph",
+    "CPU Utilization Panel",
+    "Client Breakdown Chart",
+    "Error Rate Counter",
+    "Rate Limit Status"
+  ],
+  "ocr_text": [
+    "Token Refresh Rate: 3.2M/min",
+    "Auth CPU: 100%",
+    "Source: mobile-app-client (99.9%)",
+    "Login Failures: 47,231",
+    "Rate Limit: NOT CONFIGURED",
+    "Status: OVERLOADED"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "OAuth2 Authorization Server"
+}

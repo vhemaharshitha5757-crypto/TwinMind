@@ -1,0 +1,23 @@
+{
+  "filename": "kafka_consumer_lag.png",
+  "caption": "Kafka monitoring showing consumer lag spike on order-events topic",
+  "scene_description": "A Kafka monitoring dashboard showing consumer lag climbing steeply from 0 to 2.4 million. A consumer group panel shows frequent rebalance events. GC pause time graph shows spikes above the 30-second session timeout line.",
+  "detected_objects": [
+    "Consumer Lag Graph",
+    "Rebalance Event Timeline",
+    "GC Pause Time Panel",
+    "Throughput Chart",
+    "Consumer Group Members List"
+  ],
+  "ocr_text": [
+    "Consumer Lag: 2,412,847",
+    "Topic: order-events",
+    "Rebalances (1h): 47",
+    "GC Pause Max: 48.3s",
+    "Session Timeout: 30s",
+    "Consumer Group: order-processor"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "Apache Kafka Cluster"
+}

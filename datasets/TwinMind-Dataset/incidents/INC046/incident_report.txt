@@ -1,0 +1,163 @@
+INCIDENT REPORT
+========================================================================
+
+Incident ID:       INC046
+Title:             ElasticSearch Cluster Red Status Due to Unassigned Shards
+Severity:          P1
+Date/Time:         2025-11-24T03:20:00Z
+Department:        Data Engineering
+System:            ElasticSearch Cluster
+Component:         es-prod-cluster-01
+Location:          US-East-1 (AWS)
+Assigned Engineer: Priya Sharma
+Status:            Resolved
+
+========================================================================
+1. SUMMARY
+========================================================================
+
+The production ElasticSearch cluster (es-prod-cluster-01) entered RED status at 03:20 UTC on November 24, 2025. A data node (es-data-05) experienced a disk failure, and the cluster attempted to reallocate its 240 primary shards to remaining nodes. However, the remaining nodes did not have sufficient disk space for reallocation (disk watermark exceeded), leaving 240 shards unassigned and the cluster in RED status with partial data unavailability.
+
+This incident was classified as P1 severity and was assigned to
+Priya Sharma in the Data Engineering department. The affected system was
+ElasticSearch Cluster, specifically the es-prod-cluster-01 component located in US-East-1 (AWS).
+The incident was detected through automated monitoring and alerting systems,
+and the response team was engaged within minutes of the initial alert.
+
+========================================================================
+2. BUSINESS IMPACT
+========================================================================
+
+Search functionality partially degraded for 1 hour. Queries returning incomplete results for 15% of indexed data. Log ingestion pipeline backed up as indexing to affected shards failed. Security log search capability impaired during the incident. SOC team unable to run critical security queries.
+
+The incident triggered the organization's major incident response process,
+involving cross-functional coordination between engineering, operations, and
+business stakeholders. Customer support was notified and prepared to handle
+incoming queries related to the service degradation.
+
+========================================================================
+3. SYMPTOMS OBSERVED
+========================================================================
+
+The following symptoms were observed during the incident:
+
+  * ElasticSearch cluster health showing RED status
+  * 240 unassigned primary shards across 12 indices
+  * Remaining data nodes showing disk utilization above 85% watermark
+  * Search queries returning partial results with missing data
+  * Log ingestion pipeline backing up with indexing rejections
+
+These symptoms were correlated across multiple monitoring systems including
+application performance monitoring, infrastructure metrics, and log
+aggregation platforms. The incident response team confirmed the symptoms
+during their initial assessment and used them to guide the investigation.
+
+========================================================================
+4. TIMELINE OF EVENTS
+========================================================================
+
+  [03:20 UTC] es-data-05 goes offline due to disk failure
+  [03:22 UTC] Cluster attempts shard reallocation, disk watermark blocks it
+  [03:24 UTC] Cluster enters RED status with 240 unassigned shards
+  [03:25 UTC] P1 alert fires for cluster red status
+  [03:30 UTC] Priya Sharma begins investigation
+  [03:45 UTC] Disk failure on es-data-05 confirmed, remaining nodes over watermark
+  [04:00 UTC] Two new data nodes provisioned and joined to cluster
+  [04:15 UTC] Shard reallocation initiated to new nodes
+  [04:20 UTC] Cluster recovering, status changing from RED to YELLOW
+
+========================================================================
+5. INVESTIGATION
+========================================================================
+
+Upon receiving the automated alert, the incident response team initiated a
+systematic investigation following established runbook procedures. The team
+began by examining the health and status of the es-prod-cluster-01 component
+within the ElasticSearch Cluster system deployed in US-East-1 (AWS).
+
+Initial telemetry data from the monitoring stack was reviewed, including
+application logs, infrastructure metrics, and recent deployment and change
+history. The investigation revealed that the primary symptoms were consistent
+across multiple data sources and monitoring tools.
+
+Log analysis from the affected component showed error patterns that pointed
+toward data node disk failure combined with insufficient free disk space on remaining nodes preventing shard reallocation, caused by undersized cluster for the current data volume. The team also reviewed recent change
+records, configuration modifications, and deployment history to rule out
+human-initiated causes. Cross-referencing the timeline of events with
+infrastructure metrics from the preceding 24-48 hours provided additional
+context that supported the final root cause determination.
+
+========================================================================
+6. ROOT CAUSE ANALYSIS
+========================================================================
+
+The root cause of this incident was determined to be:
+Data node disk failure combined with insufficient free disk space on remaining nodes preventing shard reallocation, caused by undersized cluster for the current data volume.
+
+Further analysis confirmed that this issue had been developing over time but
+was not detected by existing monitoring thresholds and alerting rules. The
+failure point was within the es-prod-cluster-01 component of the ElasticSearch Cluster
+system. Contributing factors included insufficient monitoring coverage for
+the specific failure mode encountered and the absence of automated
+remediation procedures for this particular scenario.
+
+========================================================================
+7. RESOLUTION
+========================================================================
+
+The incident was resolved by the following actions: Added two new data nodes with 2TB storage each, manually triggered shard reallocation, recovered data from replicas on healthy nodes, and replaced the failed disk on es-data-05.
+
+The resolution was executed by Priya Sharma with support from the incident
+response team. After applying the remediation steps, the team monitored the
+system for a stabilization period to confirm that the issue was fully
+resolved and no secondary or cascading failures had occurred. All affected
+services were verified to be operating within normal parameters before the
+incident was formally closed.
+
+========================================================================
+8. PREVENTIVE ACTIONS
+========================================================================
+
+The following preventive actions have been identified to reduce the
+likelihood and impact of similar incidents in the future:
+
+  1. Implement disk space capacity planning with 40% headroom for reallocation
+  2. Add disk watermark monitoring with alerts at 70% utilization
+  3. Deploy disk health monitoring (SMART) on all ElasticSearch data nodes
+  4. Implement ILM (Index Lifecycle Management) for automatic data tiering
+  5. Create cluster capacity right-sizing review quarterly
+
+These action items will be tracked in the engineering backlog and prioritized
+based on risk assessment and business impact analysis.
+
+========================================================================
+9. RELATED STANDARD OPERATING PROCEDURES
+========================================================================
+
+SOP-SEARCH-001: ElasticSearch Cluster Recovery; SOP-SEARCH-003: Shard Reallocation
+
+========================================================================
+10. LESSONS LEARNED
+========================================================================
+
+This incident provided several important learnings for the organization.
+The detection of data node disk failure combined with insufficient free disk space on remaining nodes preventing shard reallocation, caused by undersized cluster for the current data volume was delayed due to gaps in
+monitoring coverage, highlighting the need for more comprehensive
+observability across the ElasticSearch Cluster stack.
+
+The incident response process demonstrated effective team coordination and
+communication, but the overall time to resolution could be improved through
+automation of common diagnostic and remediation steps. The successful
+resolution validated existing runbooks and procedures while also identifying
+specific areas for improvement.
+
+The preventive actions identified during the post-mortem will strengthen
+organizational resilience against similar failure modes. Regular review of
+monitoring thresholds, alerting rules, and runbook procedures should be
+incorporated into the operational cadence to maintain readiness.
+
+========================================================================
+Report generated by TwinMind Incident Management System
+Date: 2025-11-24T03:20:00Z
+Classification: Internal - Confidential
+========================================================================

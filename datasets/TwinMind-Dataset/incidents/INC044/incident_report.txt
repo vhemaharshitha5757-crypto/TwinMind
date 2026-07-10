@@ -1,0 +1,162 @@
+INCIDENT REPORT
+========================================================================
+
+Incident ID:       INC044
+Title:             LDAP Authentication Bind Failure After Directory Server Patch
+Severity:          P1
+Date/Time:         2025-11-10T05:30:00Z
+Department:        Identity Engineering
+System:            Microsoft Active Directory
+Component:         ad-dc-london-02
+Location:          On-Premises DC-London
+Assigned Engineer: Aisha Khan
+Status:            Resolved
+
+========================================================================
+1. SUMMARY
+========================================================================
+
+LDAP authentication bind operations began failing on the London Active Directory domain controller (ad-dc-london-02) at 05:30 UTC on November 10, 2025, immediately following an overnight security patch. The patch updated the LDAP channel binding requirements from 'when supported' to 'always required', but legacy application LDAP clients did not support channel binding. All applications using simple LDAP bind against this DC were unable to authenticate users.
+
+This incident was classified as P1 severity and was assigned to
+Aisha Khan in the Identity Engineering department. The affected system was
+Microsoft Active Directory, specifically the ad-dc-london-02 component located in On-Premises DC-London.
+The incident was detected through automated monitoring and alerting systems,
+and the response team was engaged within minutes of the initial alert.
+
+========================================================================
+2. BUSINESS IMPACT
+========================================================================
+
+All LDAP-dependent applications in EMEA unable to authenticate users for 40 minutes. VPN authentication, internal wiki, ticketing system, and 8 other internal applications affected. 3,100 EMEA employees unable to log in at start of business. Productivity loss estimated at 2,000 person-hours.
+
+The incident triggered the organization's major incident response process,
+involving cross-functional coordination between engineering, operations, and
+business stakeholders. Customer support was notified and prepared to handle
+incoming queries related to the service degradation.
+
+========================================================================
+3. SYMPTOMS OBSERVED
+========================================================================
+
+The following symptoms were observed during the incident:
+
+  * LDAP bind operations returning 'Strong auth required' error (LDAP error 8)
+  * Applications using simple bind all failing authentication
+  * Active Directory event log showing LDAP channel binding enforcement
+  * Windows security patch KB5032190 installed at 04:00 UTC
+  * Applications using Kerberos authentication unaffected
+
+These symptoms were correlated across multiple monitoring systems including
+application performance monitoring, infrastructure metrics, and log
+aggregation platforms. The incident response team confirmed the symptoms
+during their initial assessment and used them to guide the investigation.
+
+========================================================================
+4. TIMELINE OF EVENTS
+========================================================================
+
+  [04:00 UTC] Security patch KB5032190 installed on ad-dc-london-02
+  [05:30 UTC] EMEA business hours begin, LDAP bind failures start occurring
+  [05:35 UTC] Multiple applications report authentication failures
+  [05:40 UTC] IT helpdesk flooded with login failure tickets
+  [05:45 UTC] Aisha Khan investigates, links failures to overnight patch
+  [05:55 UTC] LDAP channel binding policy change identified
+  [06:00 UTC] Channel binding policy reverted to 'when supported'
+  [06:10 UTC] LDAP authentication restored, applications recovering
+
+========================================================================
+5. INVESTIGATION
+========================================================================
+
+Upon receiving the automated alert, the incident response team initiated a
+systematic investigation following established runbook procedures. The team
+began by examining the health and status of the ad-dc-london-02 component
+within the Microsoft Active Directory system deployed in On-Premises DC-London.
+
+Initial telemetry data from the monitoring stack was reviewed, including
+application logs, infrastructure metrics, and recent deployment and change
+history. The investigation revealed that the primary symptoms were consistent
+across multiple data sources and monitoring tools.
+
+Log analysis from the affected component showed error patterns that pointed
+toward security patch changed ldap channel binding policy from 'when supported' to 'always required', breaking all legacy applications using simple ldap bind without channel binding support. The team also reviewed recent change
+records, configuration modifications, and deployment history to rule out
+human-initiated causes. Cross-referencing the timeline of events with
+infrastructure metrics from the preceding 24-48 hours provided additional
+context that supported the final root cause determination.
+
+========================================================================
+6. ROOT CAUSE ANALYSIS
+========================================================================
+
+The root cause of this incident was determined to be:
+Security patch changed LDAP channel binding policy from 'when supported' to 'always required', breaking all legacy applications using simple LDAP bind without channel binding support.
+
+Further analysis confirmed that this issue had been developing over time but
+was not detected by existing monitoring thresholds and alerting rules. The
+failure point was within the ad-dc-london-02 component of the Microsoft Active Directory
+system. Contributing factors included insufficient monitoring coverage for
+the specific failure mode encountered and the absence of automated
+remediation procedures for this particular scenario.
+
+========================================================================
+7. RESOLUTION
+========================================================================
+
+The incident was resolved by the following actions: Temporarily reverted LDAP channel binding policy to 'when supported', scheduled application updates to support channel binding, and created migration plan for channel binding enforcement.
+
+The resolution was executed by Aisha Khan with support from the incident
+response team. After applying the remediation steps, the team monitored the
+system for a stabilization period to confirm that the issue was fully
+resolved and no secondary or cascading failures had occurred. All affected
+services were verified to be operating within normal parameters before the
+incident was formally closed.
+
+========================================================================
+8. PREVENTIVE ACTIONS
+========================================================================
+
+The following preventive actions have been identified to reduce the
+likelihood and impact of similar incidents in the future:
+
+  1. Inventory all applications using LDAP simple bind for migration planning
+  2. Implement LDAP channel binding support in all application LDAP clients
+  3. Create AD patch testing environment mirroring production LDAP usage
+  4. Add pre-patch validation of LDAP binding compatibility
+  5. Schedule phased LDAP channel binding enforcement with application readiness gates
+
+These action items will be tracked in the engineering backlog and prioritized
+based on risk assessment and business impact analysis.
+
+========================================================================
+9. RELATED STANDARD OPERATING PROCEDURES
+========================================================================
+
+SOP-AUTH-004: LDAP Authentication Failure Response; SOP-SEC-009: AD Patch Rollback
+
+========================================================================
+10. LESSONS LEARNED
+========================================================================
+
+This incident provided several important learnings for the organization.
+The detection of security patch changed ldap channel binding policy from 'when supported' to 'always required', breaking all legacy applications using simple ldap bind without channel binding support was delayed due to gaps in
+monitoring coverage, highlighting the need for more comprehensive
+observability across the Microsoft Active Directory stack.
+
+The incident response process demonstrated effective team coordination and
+communication, but the overall time to resolution could be improved through
+automation of common diagnostic and remediation steps. The successful
+resolution validated existing runbooks and procedures while also identifying
+specific areas for improvement.
+
+The preventive actions identified during the post-mortem will strengthen
+organizational resilience against similar failure modes. Regular review of
+monitoring thresholds, alerting rules, and runbook procedures should be
+incorporated into the operational cadence to maintain readiness.
+
+========================================================================
+Report generated by TwinMind Incident Management System
+Date: 2025-11-10T05:30:00Z
+Classification: Internal - Confidential
+========================================================================

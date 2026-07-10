@@ -1,0 +1,112 @@
+{
+  "incident_id": "INC006",
+  "title": "Kubernetes Pods in CrashLoopBackOff Across Payment Namespace",
+  "timestamp": "2025-02-17T06:12:00Z",
+  "severity": "P1",
+  "department": "Platform Engineering",
+  "system": "Google Kubernetes Engine",
+  "component": "payment-namespace-pods",
+  "location": "GCP us-central1",
+  "status": "Resolved",
+  "symptoms": [
+    "All 12 pods in payment namespace showing CrashLoopBackOff status",
+    "Pod logs showing database authentication failure on startup",
+    "Kubernetes events showing repeated container restarts with increasing backoff",
+    "Payment API returning 503 Service Unavailable to all callers",
+    "Message queue depth growing rapidly for payment events"
+  ],
+  "root_cause": "Kubernetes secret rotation updated database credentials but pod deployments were pinned to the old secret version, causing authentication failures on every pod restart",
+  "resolution": "Updated pod deployment manifests to reference the new secret version, performed rolling restart of all payment namespace pods, and drained the queued transactions",
+  "preventive_actions": [
+    "Implement automatic secret version synchronization in deployments",
+    "Add pre-rotation validation checks for secret consumers",
+    "Create Kubernetes admission webhook to prevent secret version mismatches",
+    "Implement graceful degradation for database connectivity in payment services",
+    "Add payment namespace pod health monitoring with business-level alerts"
+  ],
+  "affected_services": [
+    "payment-processor",
+    "refund-service",
+    "payment-webhook",
+    "billing-service",
+    "subscription-manager"
+  ],
+  "engineers": [
+    "Alex Johnson",
+    "David Kim",
+    "Maria Garcia"
+  ],
+  "timeline": [
+    {
+      "time": "06:12 UTC",
+      "event": "All payment namespace pods enter CrashLoopBackOff state"
+    },
+    {
+      "time": "06:14 UTC",
+      "event": "P1 alert fires for payment service unavailability"
+    },
+    {
+      "time": "06:18 UTC",
+      "event": "Alex Johnson begins investigation, confirms all pods crashing"
+    },
+    {
+      "time": "06:24 UTC",
+      "event": "Pod logs reveal database authentication failures"
+    },
+    {
+      "time": "06:30 UTC",
+      "event": "Root cause identified as secret version mismatch from rotation"
+    },
+    {
+      "time": "06:38 UTC",
+      "event": "Deployment manifests updated to reference correct secret version"
+    },
+    {
+      "time": "06:42 UTC",
+      "event": "Rolling restart initiated, pods begin coming online"
+    },
+    {
+      "time": "06:50 UTC",
+      "event": "All pods healthy, queued transactions being processed"
+    }
+  ],
+  "ocr_entities": [
+    "Namespace: payment-prod",
+    "Pod Status: CrashLoopBackOff (12/12)",
+    "Restarts: 15-23",
+    "Event: Back-off restarting failed container",
+    "Error: FATAL password authentication failed",
+    "Secret: db-credentials-v2 NOT FOUND"
+  ],
+  "audio_entities": [
+    "Alex Johnson",
+    "David Kim",
+    "Maria Garcia"
+  ],
+  "document_entities": [
+    "kubernetes",
+    "crashloopbackoff",
+    "pods",
+    "payment",
+    "gke"
+  ],
+  "evidence": {
+    "document": "INC006_incident_report.pdf",
+    "image": "k8s_crashloop_pods.png",
+    "audio": "INC006_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "GKE",
+    "payment-namespace",
+    "Kubernetes Secrets",
+    "Database Credentials",
+    "CrashLoopBackOff"
+  ],
+  "knowledge_graph_relations": [
+    "Secret_rotation BROKE pod_authentication",
+    "Pods ENTERED CrashLoopBackOff_state",
+    "Deployment_update RESTORED secret_reference"
+  ],
+  "embedding_summary": "Kubernetes pods in payment namespace entered CrashLoopBackOff after secret rotation updated database credentials without updating pod deployment references. Complete payment processing outage for 38 minutes affecting 5,600 transactions. Resolved by updating deployment manifests and performing rolling restart.",
+  "confidence": 0.95
+}

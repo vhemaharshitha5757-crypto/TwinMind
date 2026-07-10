@@ -1,0 +1,23 @@
+{
+  "filename": "kong_gateway_timeout.png",
+  "caption": "Kong API Gateway monitoring showing 504 errors and worker exhaustion",
+  "scene_description": "A Kong monitoring dashboard showing a massive spike in 504 errors from near-zero to 45,000 per minute. Worker utilization graph shows 100%. A second panel shows upstream health checks all passing green, confirming the issue is at the gateway layer.",
+  "detected_objects": [
+    "504 Error Rate Graph",
+    "Worker Utilization Panel",
+    "Upstream Health Status",
+    "Request Latency Histogram",
+    "Plugin Execution Time Chart"
+  ],
+  "ocr_text": [
+    "504 Errors: 45,231/min",
+    "Worker Utilization: 100%",
+    "Free Workers: 0/256",
+    "Upstream Health: ALL HEALTHY",
+    "Rate Limit Plugin: TIMEOUT",
+    "Region: EU-West-1"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "Kong API Gateway"
+}

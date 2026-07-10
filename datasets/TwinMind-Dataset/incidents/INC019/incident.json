@@ -1,0 +1,112 @@
+{
+  "incident_id": "INC019",
+  "title": "Database Node RAM Exhaustion Causing Query Failures",
+  "timestamp": "2025-05-19T04:40:00Z",
+  "severity": "P2",
+  "department": "Database Engineering",
+  "system": "MySQL Cluster",
+  "component": "mysql-analytics-node-02",
+  "location": "US-West-2 (AWS)",
+  "status": "Resolved",
+  "symptoms": [
+    "MySQL process killed by OOM killer on analytics node",
+    "System memory at 128GB/128GB with 0 swap available",
+    "Multiple concurrent queries with large temporary table allocations",
+    "Analytics dashboard queries returning connection refused errors",
+    "InnoDB buffer pool consuming 96GB plus 30GB in temporary tables"
+  ],
+  "root_cause": "Multiple concurrent analytics queries with unbounded temporary table sizes exhausting all 128GB of RAM on the analytics read replica, triggering OOM killer",
+  "resolution": "Restarted MySQL process, implemented query memory limits using MAX_EXECUTION_TIME and tmp_table_size configurations, and staggered analytics report scheduling",
+  "preventive_actions": [
+    "Implement per-query memory limits for analytics workloads",
+    "Stagger analytics report scheduling to prevent concurrent heavy queries",
+    "Add RAM utilization monitoring with early warning at 80%",
+    "Configure swap space as safety net for temporary memory spikes",
+    "Implement query admission control limiting concurrent analytical queries to 5"
+  ],
+  "affected_services": [
+    "analytics-dashboard",
+    "bi-reports",
+    "executive-dashboard",
+    "data-export-service"
+  ],
+  "engineers": [
+    "Rajesh Kumar",
+    "Nina Patel",
+    "Tom Williams"
+  ],
+  "timeline": [
+    {
+      "time": "04:40 UTC",
+      "event": "MySQL process killed by OOM killer on analytics node"
+    },
+    {
+      "time": "04:42 UTC",
+      "event": "Analytics dashboard alerts fire for query failures"
+    },
+    {
+      "time": "04:48 UTC",
+      "event": "Rajesh Kumar investigates, confirms OOM kill event"
+    },
+    {
+      "time": "04:55 UTC",
+      "event": "Memory profiling reveals 23 concurrent heavy queries"
+    },
+    {
+      "time": "05:05 UTC",
+      "event": "MySQL process restarted with reduced buffer pool"
+    },
+    {
+      "time": "05:10 UTC",
+      "event": "Temporary table size limits configured"
+    },
+    {
+      "time": "05:15 UTC",
+      "event": "Analytics report schedule staggered"
+    },
+    {
+      "time": "05:20 UTC",
+      "event": "Analytics node stable, dashboards refreshing"
+    }
+  ],
+  "ocr_entities": [
+    "System RAM: 128GB / 128GB",
+    "InnoDB Buffer Pool: 96GB",
+    "Tmp Tables: 30.4GB",
+    "Concurrent Queries: 23",
+    "OOM Score: 998",
+    "Node: mysql-analytics-node-02"
+  ],
+  "audio_entities": [
+    "Rajesh Kumar",
+    "Tom Williams",
+    "Nina Patel"
+  ],
+  "document_entities": [
+    "ram",
+    "memory",
+    "mysql",
+    "analytics",
+    "query-failure"
+  ],
+  "evidence": {
+    "document": "INC019_incident_report.pdf",
+    "image": "mysql_ram_exhaustion.png",
+    "audio": "INC019_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "MySQL",
+    "mysql-analytics-node-02",
+    "OOM Killer",
+    "Temporary Tables",
+    "InnoDB Buffer Pool",
+    "Analytics Queries"
+  ],
+  "knowledge_graph_relations": [
+    "Concurrent_queries EXHAUSTED system_RAM",
+    "OOM_killer TERMINATED MySQL_process",
+    "Query_limits PREVENT memory_exhaustion"
+  ],
+  "embedding_summary": "MySQL analytics read replica RAM exhaustion from concurrent analytics queries with unbounded temporary table allocations consuming all 128GB. Analytics dashboards unavailable for 40 minutes. Resolved by MySQL restart, implementing query memory limits, and staggering report schedules.",
+  "confidence": 0.94
+}

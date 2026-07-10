@@ -1,0 +1,59 @@
+MEETING TRANSCRIPT - INCIDENT INC023
+========================================================================
+Subject:      CDN Serving Stale Cached Content After Backend Update
+Date/Time:    2025-06-16T08:20:00Z
+Participants: Sarah Chen, Tom Williams, Lisa Park
+Duration:     Approximately 3 minutes
+Type:         Emergency Incident Response Call
+========================================================================
+
+[BEGIN TRANSCRIPT]
+[Sarah Chen]: Hey team, we've got a P3 incident on AWS CloudFront CDN. Product prices on the website not matching backend database values. I need everyone's eyes on this immediately.
+
+[Tom Williams]: I'm here. Let me pull up the cdn-dist-prod-01 dashboard. When did this start exactly?
+
+[Sarah Chen]: First alert came in at 08:20 UTC. Backend product pricing update deployed. I've been looking at the logs since then.
+
+[Lisa Park]: I just joined the call. Give me a quick rundown. What are we seeing on the infrastructure side?
+
+[Sarah Chen]: Multiple symptoms. CDN cache headers showing content served from stale cache. And we're also seeing CloudFront invalidation request in failed state.
+
+[Tom Williams]: OK, I've got the metrics up. Deployment script logging IAM credential error for invalidation API. This doesn't look like a normal blip.
+
+[Lisa Park]: Any recent deployments or configuration changes that could have triggered this? I want to rule out human error first.
+
+[Sarah Chen]: I checked the change log for cdn-dist-prod-01. No deployments in the last 24 hours. No config changes either. This looks like an organic failure.
+
+[Tom Williams]: Based on what I'm seeing in the telemetry data, I think this is related to cdn cache invalidation failed silently during deployment because the iam service account credentials. The error pattern is very consistent with that.
+
+[Lisa Park]: That makes sense given the symptoms. I've seen similar patterns before. What's our best remediation path here?
+
+[Sarah Chen]: I recommend we rotated iam credentials, triggered manual cloudfront cache invalidation for all product-related path. That should bring us back to a stable state.
+
+[Tom Williams]: Agreed. Let me start executing that now. Lisa, can you monitor the dashboards and confirm when metrics start recovering?
+
+[Lisa Park]: Will do. I've got the monitoring screen up. Go ahead with the fix.
+
+[Tom Williams]: Alright, executing the remediation now. This will take a couple of minutes. Stand by.
+
+[Lisa Park]: I'm starting to see positive movement on the dashboards. AWS CloudFront CDN metrics are beginning to normalize.
+
+[Sarah Chen]: Confirmed on my end too. Services are recovering. Let's keep monitoring for the next fifteen minutes to make sure we're stable.
+
+[Tom Williams]: Fix is fully applied. Everything looks green now. I'll document the resolution steps in the incident ticket.
+
+[Sarah Chen]: Great work everyone. Let's schedule a post-mortem for tomorrow. Key action items from this incident: implement iam credential rotation monitoring with expiry alerts, add cache invalidation verification step in deployment pipeline, and create automated cache freshness testing after deployments.
+
+[Lisa Park]: I'll send out the post-mortem calendar invite and start drafting the incident report. Good job team, quick response on this one.
+
+[END TRANSCRIPT]
+
+========================================================================
+Action Items Captured:
+  - Implement IAM credential rotation monitoring with expiry alerts
+  - Add cache invalidation verification step in deployment pipeline
+  - Create automated cache freshness testing after deployments
+  - Implement cache-busting versioned URLs for dynamic content
+
+Next Steps: Post-mortem meeting scheduled for following business day.
+========================================================================

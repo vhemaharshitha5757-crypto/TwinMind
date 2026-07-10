@@ -1,0 +1,162 @@
+INCIDENT REPORT
+========================================================================
+
+Incident ID:       INC013
+Title:             Kafka Consumer Lag Spike Causing Event Processing Delays
+Severity:          P2
+Date/Time:         2025-04-07T03:18:00Z
+Department:        Data Engineering
+System:            Apache Kafka Cluster
+Component:         kafka-prod-broker-03
+Location:          US-East-1 (AWS)
+Assigned Engineer: Priya Sharma
+Status:            Resolved
+
+========================================================================
+1. SUMMARY
+========================================================================
+
+Kafka consumer lag on the order-events topic spiked from near-zero to 2.4 million messages at 03:18 UTC on April 7, 2025. The consumer group order-processor experienced a rebalance storm triggered by one consumer instance hitting a GC pause longer than the session timeout. The repeated rebalances prevented consumers from making progress, causing the lag to grow at 15,000 messages per minute.
+
+This incident was classified as P2 severity and was assigned to
+Priya Sharma in the Data Engineering department. The affected system was
+Apache Kafka Cluster, specifically the kafka-prod-broker-03 component located in US-East-1 (AWS).
+The incident was detected through automated monitoring and alerting systems,
+and the response team was engaged within minutes of the initial alert.
+
+========================================================================
+2. BUSINESS IMPACT
+========================================================================
+
+Order processing delayed by up to 45 minutes during the lag buildup period. Real-time order tracking became unreliable. Warehouse fulfillment systems received delayed picking instructions. Approximately 2,400 orders experienced delayed confirmation emails. No order data was lost.
+
+The incident triggered the organization's major incident response process,
+involving cross-functional coordination between engineering, operations, and
+business stakeholders. Customer support was notified and prepared to handle
+incoming queries related to the service degradation.
+
+========================================================================
+3. SYMPTOMS OBSERVED
+========================================================================
+
+The following symptoms were observed during the incident:
+
+  * Consumer lag on order-events topic exceeding 2.4 million messages
+  * Consumer group showing repeated rebalance events every 30 seconds
+  * Individual consumer instances showing long GC pauses over 45 seconds
+  * Order processing throughput dropped from 15K/min to near zero
+  * Burr consumer lag monitoring alerts firing continuously
+
+These symptoms were correlated across multiple monitoring systems including
+application performance monitoring, infrastructure metrics, and log
+aggregation platforms. The incident response team confirmed the symptoms
+during their initial assessment and used them to guide the investigation.
+
+========================================================================
+4. TIMELINE OF EVENTS
+========================================================================
+
+  [03:18 UTC] Consumer lag begins climbing on order-events topic
+  [03:22 UTC] Consumer group rebalance detected by monitoring
+  [03:30 UTC] Lag alert fires at 100K message threshold
+  [03:40 UTC] Priya Sharma begins investigation, identifies rebalance storm
+  [03:55 UTC] GC pauses exceeding session timeout confirmed as trigger
+  [04:10 UTC] Session timeout increased, GC parameters tuned
+  [04:20 UTC] Consumer group stabilizes, lag begins draining
+  [04:45 UTC] Lag fully drained, order processing current
+
+========================================================================
+5. INVESTIGATION
+========================================================================
+
+Upon receiving the automated alert, the incident response team initiated a
+systematic investigation following established runbook procedures. The team
+began by examining the health and status of the kafka-prod-broker-03 component
+within the Apache Kafka Cluster system deployed in US-East-1 (AWS).
+
+Initial telemetry data from the monitoring stack was reviewed, including
+application logs, infrastructure metrics, and recent deployment and change
+history. The investigation revealed that the primary symptoms were consistent
+across multiple data sources and monitoring tools.
+
+Log analysis from the affected component showed error patterns that pointed
+toward consumer group rebalance storm triggered by gc pauses exceeding the session timeout (30s) on one consumer instance, causing repeated group coordinator disruptions. The team also reviewed recent change
+records, configuration modifications, and deployment history to rule out
+human-initiated causes. Cross-referencing the timeline of events with
+infrastructure metrics from the preceding 24-48 hours provided additional
+context that supported the final root cause determination.
+
+========================================================================
+6. ROOT CAUSE ANALYSIS
+========================================================================
+
+The root cause of this incident was determined to be:
+Consumer group rebalance storm triggered by GC pauses exceeding the session timeout (30s) on one consumer instance, causing repeated group coordinator disruptions.
+
+Further analysis confirmed that this issue had been developing over time but
+was not detected by existing monitoring thresholds and alerting rules. The
+failure point was within the kafka-prod-broker-03 component of the Apache Kafka Cluster
+system. Contributing factors included insufficient monitoring coverage for
+the specific failure mode encountered and the absence of automated
+remediation procedures for this particular scenario.
+
+========================================================================
+7. RESOLUTION
+========================================================================
+
+The incident was resolved by the following actions: Increased consumer session timeout to 120 seconds, tuned JVM garbage collection parameters, added a dedicated consumer instance, and manually reset consumer offsets to drain the lag.
+
+The resolution was executed by Priya Sharma with support from the incident
+response team. After applying the remediation steps, the team monitored the
+system for a stabilization period to confirm that the issue was fully
+resolved and no secondary or cascading failures had occurred. All affected
+services were verified to be operating within normal parameters before the
+incident was formally closed.
+
+========================================================================
+8. PREVENTIVE ACTIONS
+========================================================================
+
+The following preventive actions have been identified to reduce the
+likelihood and impact of similar incidents in the future:
+
+  1. Tune JVM GC parameters for all Kafka consumer services
+  2. Increase session timeout to accommodate worst-case GC pauses
+  3. Implement consumer lag alerting at 100K and 500K message thresholds
+  4. Add consumer group stability monitoring for rebalance frequency
+  5. Deploy Kafka consumer auto-scaling based on lag metrics
+
+These action items will be tracked in the engineering backlog and prioritized
+based on risk assessment and business impact analysis.
+
+========================================================================
+9. RELATED STANDARD OPERATING PROCEDURES
+========================================================================
+
+SOP-MSG-001: Kafka Consumer Lag Response; SOP-MSG-003: Consumer Group Recovery
+
+========================================================================
+10. LESSONS LEARNED
+========================================================================
+
+This incident provided several important learnings for the organization.
+The detection of consumer group rebalance storm triggered by gc pauses exceeding the session timeout (30s) on one consumer instance, causing repeated group coordinator disruptions was delayed due to gaps in
+monitoring coverage, highlighting the need for more comprehensive
+observability across the Apache Kafka Cluster stack.
+
+The incident response process demonstrated effective team coordination and
+communication, but the overall time to resolution could be improved through
+automation of common diagnostic and remediation steps. The successful
+resolution validated existing runbooks and procedures while also identifying
+specific areas for improvement.
+
+The preventive actions identified during the post-mortem will strengthen
+organizational resilience against similar failure modes. Regular review of
+monitoring thresholds, alerting rules, and runbook procedures should be
+incorporated into the operational cadence to maintain readiness.
+
+========================================================================
+Report generated by TwinMind Incident Management System
+Date: 2025-04-07T03:18:00Z
+Classification: Internal - Confidential
+========================================================================

@@ -1,0 +1,162 @@
+INCIDENT REPORT
+========================================================================
+
+Incident ID:       INC036
+Title:             MongoDB Connection Pool Exhaustion on User Service
+Severity:          P2
+Date/Time:         2025-09-15T20:10:00Z
+Department:        Backend Engineering
+System:            MongoDB Atlas Cluster
+Component:         mongo-user-prod-cluster
+Location:          US-East-1 (AWS)
+Assigned Engineer: James Wright
+Status:            Resolved
+
+========================================================================
+1. SUMMARY
+========================================================================
+
+The User Service MongoDB connection pool was exhausted at 20:10 UTC on September 15, 2025. A new feature deployment introduced a code path that opened MongoDB connections without properly closing them in error cases. Under load, connection leaks accumulated until the pool reached its 500-connection maximum. New requests could not obtain database connections and failed with timeout errors.
+
+This incident was classified as P2 severity and was assigned to
+James Wright in the Backend Engineering department. The affected system was
+MongoDB Atlas Cluster, specifically the mongo-user-prod-cluster component located in US-East-1 (AWS).
+The incident was detected through automated monitoring and alerting systems,
+and the response team was engaged within minutes of the initial alert.
+
+========================================================================
+2. BUSINESS IMPACT
+========================================================================
+
+User authentication and profile loading failed for 25 minutes. All user-related API endpoints returned 503 errors. Approximately 7,200 users unable to log in or access their profiles. Mobile app users experienced blank profile screens.
+
+The incident triggered the organization's major incident response process,
+involving cross-functional coordination between engineering, operations, and
+business stakeholders. Customer support was notified and prepared to handle
+incoming queries related to the service degradation.
+
+========================================================================
+3. SYMPTOMS OBSERVED
+========================================================================
+
+The following symptoms were observed during the incident:
+
+  * MongoDB connection pool at 500/500 connections with all marked as in-use
+  * User service returning 503 errors on all user-related endpoints
+  * MongoDB Atlas showing connection count at cluster maximum
+  * Application logs showing MongoTimeoutException on connection acquisition
+  * Connection pool metrics showing zero available connections for 20+ minutes
+
+These symptoms were correlated across multiple monitoring systems including
+application performance monitoring, infrastructure metrics, and log
+aggregation platforms. The incident response team confirmed the symptoms
+during their initial assessment and used them to guide the investigation.
+
+========================================================================
+4. TIMELINE OF EVENTS
+========================================================================
+
+  [20:10 UTC] MongoDB connection pool reaches maximum capacity
+  [20:12 UTC] User service begins returning 503 errors
+  [20:15 UTC] Alert fires for user service endpoint failures
+  [20:20 UTC] James Wright investigates, identifies connection pool exhaustion
+  [20:25 UTC] Recent deployment identified, connection leak found in error handler
+  [20:30 UTC] Hotfix prepared with proper connection closing
+  [20:32 UTC] User service instances restarted to release leaked connections
+  [20:35 UTC] Hotfix deployed, connection pool recovering, incident resolved
+
+========================================================================
+5. INVESTIGATION
+========================================================================
+
+Upon receiving the automated alert, the incident response team initiated a
+systematic investigation following established runbook procedures. The team
+began by examining the health and status of the mongo-user-prod-cluster component
+within the MongoDB Atlas Cluster system deployed in US-East-1 (AWS).
+
+Initial telemetry data from the monitoring stack was reviewed, including
+application logs, infrastructure metrics, and recent deployment and change
+history. The investigation revealed that the primary symptoms were consistent
+across multiple data sources and monitoring tools.
+
+Log analysis from the affected component showed error patterns that pointed
+toward code path in new feature deployment opened mongodb connections in a try block but failed to close them in the catch/error handler, causing connection leaks under error conditions. The team also reviewed recent change
+records, configuration modifications, and deployment history to rule out
+human-initiated causes. Cross-referencing the timeline of events with
+infrastructure metrics from the preceding 24-48 hours provided additional
+context that supported the final root cause determination.
+
+========================================================================
+6. ROOT CAUSE ANALYSIS
+========================================================================
+
+The root cause of this incident was determined to be:
+Code path in new feature deployment opened MongoDB connections in a try block but failed to close them in the catch/error handler, causing connection leaks under error conditions.
+
+Further analysis confirmed that this issue had been developing over time but
+was not detected by existing monitoring thresholds and alerting rules. The
+failure point was within the mongo-user-prod-cluster component of the MongoDB Atlas Cluster
+system. Contributing factors included insufficient monitoring coverage for
+the specific failure mode encountered and the absence of automated
+remediation procedures for this particular scenario.
+
+========================================================================
+7. RESOLUTION
+========================================================================
+
+The incident was resolved by the following actions: Deployed hotfix to properly close connections in error handlers using try-with-resources pattern, restarted user service instances to release leaked connections, and verified pool recovery.
+
+The resolution was executed by James Wright with support from the incident
+response team. After applying the remediation steps, the team monitored the
+system for a stabilization period to confirm that the issue was fully
+resolved and no secondary or cascading failures had occurred. All affected
+services were verified to be operating within normal parameters before the
+incident was formally closed.
+
+========================================================================
+8. PREVENTIVE ACTIONS
+========================================================================
+
+The following preventive actions have been identified to reduce the
+likelihood and impact of similar incidents in the future:
+
+  1. Enforce try-with-resources pattern for all database connection usage via static analysis
+  2. Add connection pool utilization monitoring with alerts at 70% capacity
+  3. Implement connection pool leak detection in integration tests
+  4. Set connection pool max lifetime to force recycling of stale connections
+  5. Add connection leak detection logging in the MongoDB driver configuration
+
+These action items will be tracked in the engineering backlog and prioritized
+based on risk assessment and business impact analysis.
+
+========================================================================
+9. RELATED STANDARD OPERATING PROCEDURES
+========================================================================
+
+SOP-DB-002: MongoDB Connection Issues; SOP-APP-006: Connection Pool Recovery
+
+========================================================================
+10. LESSONS LEARNED
+========================================================================
+
+This incident provided several important learnings for the organization.
+The detection of code path in new feature deployment opened mongodb connections in a try block but failed to close them in the catch/error handler, causing connection leaks under error conditions was delayed due to gaps in
+monitoring coverage, highlighting the need for more comprehensive
+observability across the MongoDB Atlas Cluster stack.
+
+The incident response process demonstrated effective team coordination and
+communication, but the overall time to resolution could be improved through
+automation of common diagnostic and remediation steps. The successful
+resolution validated existing runbooks and procedures while also identifying
+specific areas for improvement.
+
+The preventive actions identified during the post-mortem will strengthen
+organizational resilience against similar failure modes. Regular review of
+monitoring thresholds, alerting rules, and runbook procedures should be
+incorporated into the operational cadence to maintain readiness.
+
+========================================================================
+Report generated by TwinMind Incident Management System
+Date: 2025-09-15T20:10:00Z
+Classification: Internal - Confidential
+========================================================================

@@ -1,0 +1,23 @@
+{
+  "filename": "nginx_502_errors.png",
+  "caption": "Nginx monitoring showing 502 error spike and connection exhaustion",
+  "scene_description": "A dashboard showing nginx 502 error rate spiking to 30% of responses. A TCP connection state graph shows nearly all ephemeral ports in TIME_WAIT state. Upstream response time panel shows normal latency, confirming the issue is at the proxy layer.",
+  "detected_objects": [
+    "Error Rate Graph",
+    "TCP State Distribution",
+    "Upstream Response Time",
+    "Connection Count Panel",
+    "Server Status Card"
+  ],
+  "ocr_text": [
+    "502 Error Rate: 30.2%",
+    "Ephemeral Ports Used: 28,000/28,232",
+    "TIME_WAIT Connections: 27,845",
+    "Upstream Latency: 45ms (normal)",
+    "Server: nginx-prod-web-02",
+    "Keepalive: 0 (disabled)"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "Nginx Reverse Proxy Cluster"
+}

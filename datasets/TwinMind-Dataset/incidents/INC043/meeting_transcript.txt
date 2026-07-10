@@ -1,0 +1,59 @@
+MEETING TRANSCRIPT - INCIDENT INC043
+========================================================================
+Subject:      SMTP Relay Failure Blocking All Outgoing Email Notifications
+Date/Time:    2025-11-03T06:00:00Z
+Participants: Priya Sharma, Jenny Liu, Nina Patel
+Duration:     Approximately 3 minutes
+Type:         Emergency Incident Response Call
+========================================================================
+
+[BEGIN TRANSCRIPT]
+[Priya Sharma]: Hey team, we've got a P2 incident on Amazon SES SMTP Relay. SES returning 'Daily sending quota exceeded' errors. I need everyone's eyes on this immediately.
+
+[Jenny Liu]: I'm here. Let me pull up the ses-smtp-prod-01 dashboard. When did this start exactly?
+
+[Priya Sharma]: First alert came in at 06:00 UTC. Marketing batch email job starts with incorrect segment filter. I've been looking at the logs since then.
+
+[Nina Patel]: I just joined the call. Give me a quick rundown. What are we seeing on the infrastructure side?
+
+[Priya Sharma]: Multiple symptoms. Email delivery queue growing with no outbound processing. And we're also seeing SES dashboard showing 2.1M emails sent (daily quota: 2M).
+
+[Jenny Liu]: OK, I've got the metrics up. Marketing batch job log showing incorrect segment filter. This doesn't look like a normal blip.
+
+[Nina Patel]: Any recent deployments or configuration changes that could have triggered this? I want to rule out human error first.
+
+[Priya Sharma]: I checked the change log for ses-smtp-prod-01. No deployments in the last 24 hours. No config changes either. This looks like an organic failure.
+
+[Jenny Liu]: Based on what I'm seeing in the telemetry data, I think this is related to marketing batch email job sent to 2.1m addresses instead of 50k target segment due to missing segmen. The error pattern is very consistent with that.
+
+[Nina Patel]: That makes sense given the symptoms. I've seen similar patterns before. What's our best remediation path here?
+
+[Priya Sharma]: I recommend we requested emergency ses quota increase from aws, prioritized transactional email queue over marketin. That should bring us back to a stable state.
+
+[Jenny Liu]: Agreed. Let me start executing that now. Nina, can you monitor the dashboards and confirm when metrics start recovering?
+
+[Nina Patel]: Will do. I've got the monitoring screen up. Go ahead with the fix.
+
+[Jenny Liu]: Alright, executing the remediation now. This will take a couple of minutes. Stand by.
+
+[Nina Patel]: I'm starting to see positive movement on the dashboards. Amazon SES SMTP Relay metrics are beginning to normalize.
+
+[Priya Sharma]: Confirmed on my end too. Services are recovering. Let's keep monitoring for the next fifteen minutes to make sure we're stable.
+
+[Jenny Liu]: Fix is fully applied. Everything looks green now. I'll document the resolution steps in the incident ticket.
+
+[Priya Sharma]: Great work everyone. Let's schedule a post-mortem for tomorrow. Key action items from this incident: implement separate ses accounts for transactional and marketing email, add segment size validation check before batch email sends, and set sending rate limits on marketing email pipeline.
+
+[Nina Patel]: I'll send out the post-mortem calendar invite and start drafting the incident report. Good job team, quick response on this one.
+
+[END TRANSCRIPT]
+
+========================================================================
+Action Items Captured:
+  - Implement separate SES accounts for transactional and marketing email
+  - Add segment size validation check before batch email sends
+  - Set sending rate limits on marketing email pipeline
+  - Implement SES quota usage monitoring with alerts at 70% and 90%
+
+Next Steps: Post-mortem meeting scheduled for following business day.
+========================================================================

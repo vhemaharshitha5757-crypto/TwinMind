@@ -1,0 +1,23 @@
+{
+  "filename": "config_drift_comparison.png",
+  "caption": "Configuration comparison showing 47 differences between staging and production",
+  "scene_description": "A configuration management dashboard showing a side-by-side comparison of staging and production settings. Red highlighted rows indicate differences. A drift count badge shows 47 differences. Categories show database, application, and system-level drifts.",
+  "detected_objects": [
+    "Configuration Diff View",
+    "Drift Count Badge",
+    "Category Breakdown Chart",
+    "Environment Selector",
+    "Reconciliation Status"
+  ],
+  "ocr_text": [
+    "Configuration Drifts: 47",
+    "DB Max Connections: Staging=200 Prod=50",
+    "Thread Pool Size: Staging=100 Prod=64",
+    "Cache TTL: Staging=3600 Prod=1800",
+    "Environments: staging vs production",
+    "Last Sync: 187 days ago"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "Ansible Configuration Management"
+}

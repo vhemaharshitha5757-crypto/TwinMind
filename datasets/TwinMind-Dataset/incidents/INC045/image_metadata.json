@@ -1,0 +1,23 @@
+{
+  "filename": "redis_session_desync.png",
+  "caption": "Redis session store showing replication desync and session lookup failures",
+  "scene_description": "A Redis monitoring dashboard showing replication offset divergence between two nodes. A session lookup success rate graph shows fluctuation around 50%. An error log panel shows alternating session found/not found entries.",
+  "detected_objects": [
+    "Replication Offset Graph",
+    "Session Success Rate Panel",
+    "Node Comparison View",
+    "Error Log Stream",
+    "Session Count Discrepancy"
+  ],
+  "ocr_text": [
+    "Primary Offset: 847,231,456",
+    "Replica Offset: 623,118,234",
+    "Offset Delta: 224,113,222",
+    "Session Lookup: 49.7% success",
+    "Node1 Sessions: 124,847",
+    "Node2 Sessions: 87,231"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "Redis Session Store"
+}

@@ -1,0 +1,111 @@
+{
+  "incident_id": "INC038",
+  "title": "Azure Blob Storage Permission Issue Blocking File Uploads",
+  "timestamp": "2025-09-29T09:15:00Z",
+  "severity": "P2",
+  "department": "Cloud Infrastructure",
+  "system": "Azure Blob Storage",
+  "component": "stprodeufiles01",
+  "location": "West Europe (Azure)",
+  "status": "Resolved",
+  "symptoms": [
+    "Azure Blob Storage returning AuthorizationPermissionMismatch on PUT operations",
+    "SAS token validation showing read-only permissions (missing write)",
+    "File upload API returning 403 Forbidden to all upload requests",
+    "GET operations (file downloads) still working normally",
+    "Azure Storage Explorer confirming write operations blocked with current SAS"
+  ],
+  "root_cause": "SAS token regenerated during routine key rotation with read-only permissions instead of required read-write permissions, blocking all write operations to blob storage",
+  "resolution": "Regenerated SAS token with correct read-write-list permissions, updated the upload service configuration with new token, and verified upload functionality restored",
+  "preventive_actions": [
+    "Implement SAS token permission validation in rotation automation",
+    "Use managed identity instead of SAS tokens for service authentication",
+    "Add write permission verification test after token rotation",
+    "Create SAS token rotation runbook with permission checklist",
+    "Implement automated upload smoke test after credential changes"
+  ],
+  "affected_services": [
+    "file-upload-service",
+    "document-management",
+    "profile-pictures",
+    "support-attachments"
+  ],
+  "engineers": [
+    "Lisa Park",
+    "Chris Evans",
+    "David Kim"
+  ],
+  "timeline": [
+    {
+      "time": "09:15 UTC",
+      "event": "SAS token rotation completes with incorrect permissions"
+    },
+    {
+      "time": "09:17 UTC",
+      "event": "File upload requests begin failing with permission errors"
+    },
+    {
+      "time": "09:20 UTC",
+      "event": "Upload failure alert fires"
+    },
+    {
+      "time": "09:25 UTC",
+      "event": "Lisa Park investigates, reviews recent key rotation"
+    },
+    {
+      "time": "09:30 UTC",
+      "event": "SAS token permissions identified as read-only"
+    },
+    {
+      "time": "09:35 UTC",
+      "event": "New SAS token generated with read-write-list permissions"
+    },
+    {
+      "time": "09:40 UTC",
+      "event": "Upload service configuration updated with new token"
+    },
+    {
+      "time": "09:45 UTC",
+      "event": "File uploads functioning normally, incident resolved"
+    }
+  ],
+  "ocr_entities": [
+    "Storage Account: stprodeufiles01",
+    "Error: AuthorizationPermissionMismatch",
+    "SAS Permissions: r (read-only)",
+    "Expected: rwl (read-write-list)",
+    "Failed Uploads: 1,423",
+    "Last Rotation: 30min ago"
+  ],
+  "audio_entities": [
+    "Chris Evans",
+    "Lisa Park",
+    "David Kim"
+  ],
+  "document_entities": [
+    "azure",
+    "blob-storage",
+    "permissions",
+    "sas-token",
+    "file-upload"
+  ],
+  "evidence": {
+    "document": "INC038_incident_report.pdf",
+    "image": "azure_blob_permission.png",
+    "audio": "INC038_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "Azure Blob Storage",
+    "stprodeufiles01",
+    "SAS Token",
+    "Key Rotation",
+    "Managed Identity"
+  ],
+  "knowledge_graph_relations": [
+    "SAS_rotation GENERATED read-only_token",
+    "Read-only_token BLOCKED write_operations",
+    "New_SAS_token RESTORED upload_permissions"
+  ],
+  "embedding_summary": "Azure Blob Storage file uploads blocked for 30 minutes after SAS token rotation generated read-only token instead of read-write. 1,400 upload attempts failed for EU users. Resolved by regenerating SAS token with correct permissions and updating service configuration.",
+  "confidence": 0.95
+}

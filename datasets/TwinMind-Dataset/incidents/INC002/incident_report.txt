@@ -1,0 +1,162 @@
+INCIDENT REPORT
+========================================================================
+
+Incident ID:       INC002
+Title:             Redis Cache Cluster Complete Failure in Production
+Severity:          P1
+Date/Time:         2025-01-22T14:17:00Z
+Department:        Platform Engineering
+System:            Redis Cluster
+Component:         redis-prod-cluster-01
+Location:          US-West-2 (AWS)
+Assigned Engineer: Sarah Chen
+Status:            Resolved
+
+========================================================================
+1. SUMMARY
+========================================================================
+
+The production Redis cache cluster (redis-prod-cluster-01) experienced a complete failure at 14:17 UTC on January 22, 2025. All six nodes in the cluster simultaneously ran out of memory due to an unbounded cache growth caused by a missing TTL on a high-frequency write path. The cluster entered a CLUSTERDOWN state, causing all cache-dependent services to fall back to direct database queries, overwhelming the database layer.
+
+This incident was classified as P1 severity and was assigned to
+Sarah Chen in the Platform Engineering department. The affected system was
+Redis Cluster, specifically the redis-prod-cluster-01 component located in US-West-2 (AWS).
+The incident was detected through automated monitoring and alerting systems,
+and the response team was engaged within minutes of the initial alert.
+
+========================================================================
+2. BUSINESS IMPACT
+========================================================================
+
+Application response times degraded from 200ms to 8 seconds as all cache lookups failed and traffic fell through to the database. The database connection pool was exhausted within 5 minutes, causing secondary outages across 15 microservices. Customer-facing impact lasted 32 minutes. Estimated 8,500 users experienced severe performance degradation.
+
+The incident triggered the organization's major incident response process,
+involving cross-functional coordination between engineering, operations, and
+business stakeholders. Customer support was notified and prepared to handle
+incoming queries related to the service degradation.
+
+========================================================================
+3. SYMPTOMS OBSERVED
+========================================================================
+
+The following symptoms were observed during the incident:
+
+  * Redis CLUSTERDOWN errors in all application logs
+  * All Redis nodes reporting OOM (Out of Memory) conditions
+  * Application response times spiking from 200ms to 8000ms
+  * Database connection pool exhaustion due to cache fallthrough
+  * Customer complaints about slow page loads and timeouts
+
+These symptoms were correlated across multiple monitoring systems including
+application performance monitoring, infrastructure metrics, and log
+aggregation platforms. The incident response team confirmed the symptoms
+during their initial assessment and used them to guide the investigation.
+
+========================================================================
+4. TIMELINE OF EVENTS
+========================================================================
+
+  [14:17 UTC] Redis cluster enters CLUSTERDOWN state, all nodes OOM
+  [14:19 UTC] Automated alerts fire for cache failure and response time degradation
+  [14:22 UTC] On-call engineer Sarah Chen begins investigation
+  [14:28 UTC] Root cause identified as missing TTL on session metadata keys
+  [14:32 UTC] Database read replicas scaled up to handle cache fallthrough
+  [14:38 UTC] Rolling restart of Redis cluster initiated with memory limits
+  [14:45 UTC] Hotfix deployed to add TTL on affected cache key pattern
+  [14:49 UTC] Redis cluster fully operational, response times normalizing
+
+========================================================================
+5. INVESTIGATION
+========================================================================
+
+Upon receiving the automated alert, the incident response team initiated a
+systematic investigation following established runbook procedures. The team
+began by examining the health and status of the redis-prod-cluster-01 component
+within the Redis Cluster system deployed in US-West-2 (AWS).
+
+Initial telemetry data from the monitoring stack was reviewed, including
+application logs, infrastructure metrics, and recent deployment and change
+history. The investigation revealed that the primary symptoms were consistent
+across multiple data sources and monitoring tools.
+
+Log analysis from the affected component showed error patterns that pointed
+toward missing ttl configuration on high-frequency session metadata cache keys causing unbounded memory growth across all redis cluster nodes. The team also reviewed recent change
+records, configuration modifications, and deployment history to rule out
+human-initiated causes. Cross-referencing the timeline of events with
+infrastructure metrics from the preceding 24-48 hours provided additional
+context that supported the final root cause determination.
+
+========================================================================
+6. ROOT CAUSE ANALYSIS
+========================================================================
+
+The root cause of this incident was determined to be:
+Missing TTL configuration on high-frequency session metadata cache keys causing unbounded memory growth across all Redis cluster nodes.
+
+Further analysis confirmed that this issue had been developing over time but
+was not detected by existing monitoring thresholds and alerting rules. The
+failure point was within the redis-prod-cluster-01 component of the Redis Cluster
+system. Contributing factors included insufficient monitoring coverage for
+the specific failure mode encountered and the absence of automated
+remediation procedures for this particular scenario.
+
+========================================================================
+7. RESOLUTION
+========================================================================
+
+The incident was resolved by the following actions: Performed rolling restart of Redis cluster with memory limits enforced, deployed hotfix to add TTL on the affected cache key pattern, and scaled up database read replicas temporarily.
+
+The resolution was executed by Sarah Chen with support from the incident
+response team. After applying the remediation steps, the team monitored the
+system for a stabilization period to confirm that the issue was fully
+resolved and no secondary or cascading failures had occurred. All affected
+services were verified to be operating within normal parameters before the
+incident was formally closed.
+
+========================================================================
+8. PREVENTIVE ACTIONS
+========================================================================
+
+The following preventive actions have been identified to reduce the
+likelihood and impact of similar incidents in the future:
+
+  1. Enforce mandatory TTL policy on all Redis write paths via code review checklist
+  2. Implement Redis memory usage alerting at 70% and 85% thresholds
+  3. Add automated cache eviction policies as safety net
+  4. Create runbook for Redis cluster recovery procedures
+  5. Deploy Redis memory profiling in staging environments
+
+These action items will be tracked in the engineering backlog and prioritized
+based on risk assessment and business impact analysis.
+
+========================================================================
+9. RELATED STANDARD OPERATING PROCEDURES
+========================================================================
+
+SOP-CACHE-001: Redis Cluster Recovery; SOP-CACHE-003: Cache Fallback Procedures
+
+========================================================================
+10. LESSONS LEARNED
+========================================================================
+
+This incident provided several important learnings for the organization.
+The detection of missing ttl configuration on high-frequency session metadata cache keys causing unbounded memory growth across all redis cluster nodes was delayed due to gaps in
+monitoring coverage, highlighting the need for more comprehensive
+observability across the Redis Cluster stack.
+
+The incident response process demonstrated effective team coordination and
+communication, but the overall time to resolution could be improved through
+automation of common diagnostic and remediation steps. The successful
+resolution validated existing runbooks and procedures while also identifying
+specific areas for improvement.
+
+The preventive actions identified during the post-mortem will strengthen
+organizational resilience against similar failure modes. Regular review of
+monitoring thresholds, alerting rules, and runbook procedures should be
+incorporated into the operational cadence to maintain readiness.
+
+========================================================================
+Report generated by TwinMind Incident Management System
+Date: 2025-01-22T14:17:00Z
+Classification: Internal - Confidential
+========================================================================

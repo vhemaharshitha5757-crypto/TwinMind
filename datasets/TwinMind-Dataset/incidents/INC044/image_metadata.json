@@ -1,0 +1,23 @@
+{
+  "filename": "ldap_bind_failure.png",
+  "caption": "Active Directory showing LDAP bind failures after security patch",
+  "scene_description": "Active Directory event viewer showing a stream of LDAP bind failure events with error code 8 (strongAuthRequired). A patch history panel shows the recently installed security update. Application login failure count climbing.",
+  "detected_objects": [
+    "Event Viewer Log",
+    "Patch History Panel",
+    "LDAP Bind Error Details",
+    "Application Login Failures",
+    "Domain Controller Status"
+  ],
+  "ocr_text": [
+    "Event ID: 2889",
+    "Error: strongAuthRequired (8)",
+    "Channel Binding: REQUIRED (was: WHEN_SUPPORTED)",
+    "Patch: KB5032190 (installed 04:00 UTC)",
+    "Failed Binds: 12,847",
+    "DC: ad-dc-london-02"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "Microsoft Active Directory"
+}

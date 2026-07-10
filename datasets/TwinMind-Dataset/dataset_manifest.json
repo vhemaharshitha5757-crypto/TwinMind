@@ -1,0 +1,302 @@
+[
+  {
+    "id": "INC001",
+    "title": "PostgreSQL Primary Database Crash on Production Cluster",
+    "severity": "P1",
+    "system": "PostgreSQL Cluster"
+  },
+  {
+    "id": "INC002",
+    "title": "Redis Cache Cluster Complete Failure in Production",
+    "severity": "P1",
+    "system": "Redis Cluster"
+  },
+  {
+    "id": "INC003",
+    "title": "API Gateway Timeout Cascade Affecting All External Endpoints",
+    "severity": "P1",
+    "system": "Kong API Gateway"
+  },
+  {
+    "id": "INC004",
+    "title": "Production Server Disk Full Causing Service Failures",
+    "severity": "P2",
+    "system": "EC2 Instance Fleet"
+  },
+  {
+    "id": "INC005",
+    "title": "Java Microservice Memory Leak Causing OOM Crashes",
+    "severity": "P2",
+    "system": "Order Processing Service"
+  },
+  {
+    "id": "INC006",
+    "title": "Kubernetes Pods in CrashLoopBackOff Across Payment Namespace",
+    "severity": "P1",
+    "system": "Google Kubernetes Engine"
+  },
+  {
+    "id": "INC007",
+    "title": "Docker Container OOMKilled on Analytics Processing Nodes",
+    "severity": "P2",
+    "system": "Docker Swarm Cluster"
+  },
+  {
+    "id": "INC008",
+    "title": "JWT Token Expiry Configuration Error Causing Mass User Logouts",
+    "severity": "P1",
+    "system": "Authentication Service"
+  },
+  {
+    "id": "INC009",
+    "title": "DNS Resolution Failure for Internal Service Discovery",
+    "severity": "P1",
+    "system": "Route 53 Private Hosted Zone"
+  },
+  {
+    "id": "INC010",
+    "title": "Firewall Rule Change Blocking Critical API Traffic",
+    "severity": "P2",
+    "system": "Azure Network Security Groups"
+  },
+  {
+    "id": "INC011",
+    "title": "TLS Certificate Expiry on Production Load Balancer",
+    "severity": "P1",
+    "system": "AWS Application Load Balancer"
+  },
+  {
+    "id": "INC012",
+    "title": "Cloud VM Unexpected Shutdown Due to Spot Instance Reclamation",
+    "severity": "P2",
+    "system": "AWS EC2 Spot Instances"
+  },
+  {
+    "id": "INC013",
+    "title": "Kafka Consumer Lag Spike Causing Event Processing Delays",
+    "severity": "P2",
+    "system": "Apache Kafka Cluster"
+  },
+  {
+    "id": "INC014",
+    "title": "RabbitMQ Queue Overflow Causing Message Loss",
+    "severity": "P1",
+    "system": "RabbitMQ Cluster"
+  },
+  {
+    "id": "INC015",
+    "title": "Nginx Returning 502 Bad Gateway Due to Upstream Socket Exhaustion",
+    "severity": "P2",
+    "system": "Nginx Reverse Proxy Cluster"
+  },
+  {
+    "id": "INC016",
+    "title": "Load Balancer Health Check Failure Removing Healthy Nodes",
+    "severity": "P2",
+    "system": "GCP Cloud Load Balancer"
+  },
+  {
+    "id": "INC017",
+    "title": "Microservice Dependency Cascade Failure Across Order Pipeline",
+    "severity": "P1",
+    "system": "Microservice Mesh"
+  },
+  {
+    "id": "INC018",
+    "title": "Critical CPU Utilization Spike on Application Cluster",
+    "severity": "P2",
+    "system": "ECS Fargate Cluster"
+  },
+  {
+    "id": "INC019",
+    "title": "Database Node RAM Exhaustion Causing Query Failures",
+    "severity": "P2",
+    "system": "MySQL Cluster"
+  },
+  {
+    "id": "INC020",
+    "title": "NFS Storage Mount Failure on Application Server Farm",
+    "severity": "P2",
+    "system": "NetApp NFS Cluster"
+  },
+  {
+    "id": "INC021",
+    "title": "CI/CD Pipeline Deployment Rollback After Database Migration Failure",
+    "severity": "P1",
+    "system": "Jenkins CI/CD Pipeline"
+  },
+  {
+    "id": "INC022",
+    "title": "Feature Flag Misconfiguration Exposing Unfinished Feature to All Users",
+    "severity": "P2",
+    "system": "LaunchDarkly Feature Flags"
+  },
+  {
+    "id": "INC023",
+    "title": "CDN Serving Stale Cached Content After Backend Update",
+    "severity": "P3",
+    "system": "AWS CloudFront CDN"
+  },
+  {
+    "id": "INC024",
+    "title": "Configuration Drift Between Staging and Production Environments",
+    "severity": "P3",
+    "system": "Ansible Configuration Management"
+  },
+  {
+    "id": "INC025",
+    "title": "HashiCorp Vault Secrets Engine Misconfiguration Leaking to Wrong Environment",
+    "severity": "P1",
+    "system": "HashiCorp Vault"
+  },
+  {
+    "id": "INC026",
+    "title": "Network Partition Between Availability Zones Causing Split-Brain",
+    "severity": "P1",
+    "system": "AWS VPC Networking"
+  },
+  {
+    "id": "INC027",
+    "title": "Corporate VPN Tunnel Outage Blocking Remote Access",
+    "severity": "P2",
+    "system": "Palo Alto GlobalProtect VPN"
+  },
+  {
+    "id": "INC028",
+    "title": "Prometheus Scrape Target Down Causing Monitoring Blind Spot",
+    "severity": "P3",
+    "system": "Prometheus Monitoring Stack"
+  },
+  {
+    "id": "INC029",
+    "title": "Grafana Dashboard Data Source Connection Failure",
+    "severity": "P3",
+    "system": "Grafana Monitoring Platform"
+  },
+  {
+    "id": "INC030",
+    "title": "Application Log Corruption Due to Concurrent File Access",
+    "severity": "P3",
+    "system": "Centralized Logging Pipeline"
+  },
+  {
+    "id": "INC031",
+    "title": "IAM Policy Over-Restriction Blocking Application Deployments",
+    "severity": "P2",
+    "system": "AWS IAM"
+  },
+  {
+    "id": "INC032",
+    "title": "Overnight Backup Job Failure Due to Expired Credentials",
+    "severity": "P2",
+    "system": "AWS Backup Service"
+  },
+  {
+    "id": "INC033",
+    "title": "MySQL Replication Lag Causing Data Inconsistencies",
+    "severity": "P2",
+    "system": "MySQL Replication Cluster"
+  },
+  {
+    "id": "INC034",
+    "title": "PostgreSQL Deadlock on High-Concurrency Transaction Path",
+    "severity": "P2",
+    "system": "PostgreSQL Cluster"
+  },
+  {
+    "id": "INC035",
+    "title": "MySQL Lock Wait Timeout on Reporting Queries",
+    "severity": "P3",
+    "system": "MySQL Database"
+  },
+  {
+    "id": "INC036",
+    "title": "MongoDB Connection Pool Exhaustion on User Service",
+    "severity": "P2",
+    "system": "MongoDB Atlas Cluster"
+  },
+  {
+    "id": "INC037",
+    "title": "AWS S3 Access Denied Errors After Bucket Policy Update",
+    "severity": "P2",
+    "system": "AWS S3"
+  },
+  {
+    "id": "INC038",
+    "title": "Azure Blob Storage Permission Issue Blocking File Uploads",
+    "severity": "P2",
+    "system": "Azure Blob Storage"
+  },
+  {
+    "id": "INC039",
+    "title": "Consul Service Discovery Failure Causing Routing Errors",
+    "severity": "P1",
+    "system": "HashiCorp Consul"
+  },
+  {
+    "id": "INC040",
+    "title": "HAProxy Returning 503 Errors Due to Backend Server Pool Drain",
+    "severity": "P2",
+    "system": "HAProxy Load Balancer"
+  },
+  {
+    "id": "INC041",
+    "title": "OAuth2 Token Refresh Loop Causing Authentication Service Overload",
+    "severity": "P1",
+    "system": "OAuth2 Authorization Server"
+  },
+  {
+    "id": "INC042",
+    "title": "Webhook Delivery Timeout Due to Receiver Endpoint Slowdown",
+    "severity": "P3",
+    "system": "Webhook Delivery Service"
+  },
+  {
+    "id": "INC043",
+    "title": "SMTP Relay Failure Blocking All Outgoing Email Notifications",
+    "severity": "P2",
+    "system": "Amazon SES SMTP Relay"
+  },
+  {
+    "id": "INC044",
+    "title": "LDAP Authentication Bind Failure After Directory Server Patch",
+    "severity": "P1",
+    "system": "Microsoft Active Directory"
+  },
+  {
+    "id": "INC045",
+    "title": "Session Store Redis Desynchronization Causing Random Logouts",
+    "severity": "P2",
+    "system": "Redis Session Store"
+  },
+  {
+    "id": "INC046",
+    "title": "ElasticSearch Cluster Red Status Due to Unassigned Shards",
+    "severity": "P1",
+    "system": "ElasticSearch Cluster"
+  },
+  {
+    "id": "INC047",
+    "title": "API Rate Limiting False Positives Blocking Legitimate Traffic",
+    "severity": "P2",
+    "system": "API Rate Limiter"
+  },
+  {
+    "id": "INC048",
+    "title": "Kubernetes HPA Autoscaling Failure During Traffic Surge",
+    "severity": "P1",
+    "system": "Google Kubernetes Engine"
+  },
+  {
+    "id": "INC049",
+    "title": "Kong API Gateway Plugin Crash on Request Transformation",
+    "severity": "P2",
+    "system": "Kong API Gateway"
+  },
+  {
+    "id": "INC050",
+    "title": "Terraform State Lock Conflict Blocking Infrastructure Changes",
+    "severity": "P3",
+    "system": "Terraform Cloud"
+  }
+]

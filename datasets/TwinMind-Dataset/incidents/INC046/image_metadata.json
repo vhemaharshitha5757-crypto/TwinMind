@@ -1,0 +1,23 @@
+{
+  "filename": "elasticsearch_red_cluster.png",
+  "caption": "ElasticSearch showing RED cluster status with 240 unassigned shards",
+  "scene_description": "Kibana cluster monitoring showing RED health status. A shard allocation visualization shows unassigned shards in red. Disk utilization bars for remaining nodes are all above 85%. A failed node is shown offline.",
+  "detected_objects": [
+    "Cluster Health Badge",
+    "Shard Allocation Visualization",
+    "Disk Utilization Bars",
+    "Node Status Grid",
+    "Index Health List"
+  ],
+  "ocr_text": [
+    "Cluster: es-prod-cluster-01",
+    "Status: RED",
+    "Unassigned Shards: 240",
+    "Failed Node: es-data-05 (OFFLINE)",
+    "Disk Watermark: EXCEEDED (85%+)",
+    "Affected Indices: 12"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "ElasticSearch Cluster"
+}

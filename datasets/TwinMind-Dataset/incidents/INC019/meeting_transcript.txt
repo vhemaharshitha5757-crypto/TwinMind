@@ -1,0 +1,59 @@
+MEETING TRANSCRIPT - INCIDENT INC019
+========================================================================
+Subject:      Database Node RAM Exhaustion Causing Query Failures
+Date/Time:    2025-05-19T04:40:00Z
+Participants: Rajesh Kumar, Nina Patel, Tom Williams
+Duration:     Approximately 3 minutes
+Type:         Emergency Incident Response Call
+========================================================================
+
+[BEGIN TRANSCRIPT]
+[Rajesh Kumar]: Hey team, we've got a P2 incident on MySQL Cluster. MySQL process killed by OOM killer on analytics node. I need everyone's eyes on this immediately.
+
+[Nina Patel]: I'm here. Let me pull up the mysql-analytics-node-02 dashboard. When did this start exactly?
+
+[Rajesh Kumar]: First alert came in at 04:40 UTC. MySQL process killed by OOM killer on analytics node. I've been looking at the logs since then.
+
+[Tom Williams]: I just joined the call. Give me a quick rundown. What are we seeing on the infrastructure side?
+
+[Rajesh Kumar]: Multiple symptoms. System memory at 128GB/128GB with 0 swap available. And we're also seeing Multiple concurrent queries with large temporary table allocations.
+
+[Nina Patel]: OK, I've got the metrics up. Analytics dashboard queries returning connection refused errors. This doesn't look like a normal blip.
+
+[Tom Williams]: Any recent deployments or configuration changes that could have triggered this? I want to rule out human error first.
+
+[Rajesh Kumar]: I checked the change log for mysql-analytics-node-02. No deployments in the last 24 hours. No config changes either. This looks like an organic failure.
+
+[Nina Patel]: Based on what I'm seeing in the telemetry data, I think this is related to multiple concurrent analytics queries with unbounded temporary table sizes exhausting all 128gb of r. The error pattern is very consistent with that.
+
+[Tom Williams]: That makes sense given the symptoms. I've seen similar patterns before. What's our best remediation path here?
+
+[Rajesh Kumar]: I recommend we restarted mysql process, implemented query memory limits using max_execution_time and tmp_table_size. That should bring us back to a stable state.
+
+[Nina Patel]: Agreed. Let me start executing that now. Tom, can you monitor the dashboards and confirm when metrics start recovering?
+
+[Tom Williams]: Will do. I've got the monitoring screen up. Go ahead with the fix.
+
+[Nina Patel]: Alright, executing the remediation now. This will take a couple of minutes. Stand by.
+
+[Tom Williams]: I'm starting to see positive movement on the dashboards. MySQL Cluster metrics are beginning to normalize.
+
+[Rajesh Kumar]: Confirmed on my end too. Services are recovering. Let's keep monitoring for the next fifteen minutes to make sure we're stable.
+
+[Nina Patel]: Fix is fully applied. Everything looks green now. I'll document the resolution steps in the incident ticket.
+
+[Rajesh Kumar]: Great work everyone. Let's schedule a post-mortem for tomorrow. Key action items from this incident: implement per-query memory limits for analytics workloads, stagger analytics report scheduling to prevent concurrent heavy queries, and add ram utilization monitoring with early warning at 80%.
+
+[Tom Williams]: I'll send out the post-mortem calendar invite and start drafting the incident report. Good job team, quick response on this one.
+
+[END TRANSCRIPT]
+
+========================================================================
+Action Items Captured:
+  - Implement per-query memory limits for analytics workloads
+  - Stagger analytics report scheduling to prevent concurrent heavy queries
+  - Add RAM utilization monitoring with early warning at 80%
+  - Configure swap space as safety net for temporary memory spikes
+
+Next Steps: Post-mortem meeting scheduled for following business day.
+========================================================================

@@ -1,0 +1,112 @@
+{
+  "incident_id": "INC035",
+  "title": "MySQL Lock Wait Timeout on Reporting Queries",
+  "timestamp": "2025-09-08T06:30:00Z",
+  "severity": "P3",
+  "department": "Database Engineering",
+  "system": "MySQL Database",
+  "component": "mysql-prod-primary-01",
+  "location": "US-West-2 (AWS)",
+  "status": "Resolved",
+  "symptoms": [
+    "InnoDB lock wait timeout exceeded errors across all account operations",
+    "SHOW PROCESSLIST showing 340 queries waiting for lock on accounts table",
+    "Single long-running SELECT query holding table-level lock for 15+ minutes",
+    "Application logs showing 'Lock wait timeout exceeded; try restarting transaction'",
+    "Only accounts table affected, other tables operating normally"
+  ],
+  "root_cause": "Long-running analytical reporting query executed against production primary instead of read replica, acquiring a lock that blocked all writes to the accounts table",
+  "resolution": "Killed the blocking reporting query, waiting connections automatically retried, implemented query routing to prevent analytical queries from reaching the primary",
+  "preventive_actions": [
+    "Implement query routing to automatically redirect analytical queries to read replicas",
+    "Set innodb_lock_wait_timeout to 10 seconds with application retry logic",
+    "Add long-running query detection with automatic kill after threshold",
+    "Create network-level access control limiting reporting tools to read replicas",
+    "Implement query classification and routing in the connection proxy"
+  ],
+  "affected_services": [
+    "user-registration",
+    "profile-service",
+    "account-settings",
+    "admin-panel"
+  ],
+  "engineers": [
+    "Rajesh Kumar",
+    "Nina Patel",
+    "Tom Williams"
+  ],
+  "timeline": [
+    {
+      "time": "06:30 UTC",
+      "event": "Reporting query starts executing against production primary"
+    },
+    {
+      "time": "06:35 UTC",
+      "event": "Table-level lock acquired on accounts table"
+    },
+    {
+      "time": "06:37 UTC",
+      "event": "Application writes to accounts table begin timing out"
+    },
+    {
+      "time": "06:38 UTC",
+      "event": "Lock wait timeout alerts fire"
+    },
+    {
+      "time": "06:40 UTC",
+      "event": "Rajesh Kumar investigates, identifies blocking query in processlist"
+    },
+    {
+      "time": "06:42 UTC",
+      "event": "Blocking reporting query killed"
+    },
+    {
+      "time": "06:43 UTC",
+      "event": "Blocked queries automatically retry and succeed"
+    },
+    {
+      "time": "06:45 UTC",
+      "event": "All account operations restored, incident resolved"
+    }
+  ],
+  "ocr_entities": [
+    "Blocked Queries: 340",
+    "Blocking Query Duration: 15min",
+    "Table: accounts",
+    "Lock Type: TABLE LOCK",
+    "Lock Wait Timeouts: 287",
+    "Query Source: reporting-tool (WRONG HOST)"
+  ],
+  "audio_entities": [
+    "Rajesh Kumar",
+    "Tom Williams",
+    "Nina Patel"
+  ],
+  "document_entities": [
+    "mysql",
+    "lock-wait-timeout",
+    "reporting",
+    "blocking-query",
+    "innodb"
+  ],
+  "evidence": {
+    "document": "INC035_incident_report.pdf",
+    "image": "mysql_lock_wait.png",
+    "audio": "INC035_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "MySQL",
+    "mysql-prod-primary-01",
+    "InnoDB Lock",
+    "accounts Table",
+    "Reporting Query",
+    "Read Replica"
+  ],
+  "knowledge_graph_relations": [
+    "Reporting_query ACQUIRED table_lock",
+    "Table_lock BLOCKED all_DML_operations",
+    "Query_routing PREVENTS misrouted_queries"
+  ],
+  "embedding_summary": "MySQL lock wait timeouts caused by analytical reporting query accidentally run against production primary instead of read replica. Table-level lock on accounts table blocked 340 queries for 15 minutes. 800 users unable to register or update accounts. Resolved by killing blocking query and implementing query routing.",
+  "confidence": 0.96
+}

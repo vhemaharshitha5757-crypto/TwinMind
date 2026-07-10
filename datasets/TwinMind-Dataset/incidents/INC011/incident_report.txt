@@ -1,0 +1,163 @@
+INCIDENT REPORT
+========================================================================
+
+Incident ID:       INC011
+Title:             TLS Certificate Expiry on Production Load Balancer
+Severity:          P1
+Date/Time:         2025-03-24T00:01:00Z
+Department:        Security Engineering
+System:            AWS Application Load Balancer
+Component:         alb-prod-main-01
+Location:          US-East-1 (AWS)
+Assigned Engineer: David Kim
+Status:            Resolved
+
+========================================================================
+1. SUMMARY
+========================================================================
+
+The TLS certificate on the primary production Application Load Balancer (alb-prod-main-01) expired at midnight UTC on March 24, 2025. The certificate auto-renewal process via AWS Certificate Manager had silently failed 30 days earlier due to a DNS validation record that was removed during a DNS zone migration. All HTTPS traffic to the platform received certificate errors, and modern browsers blocked access entirely.
+
+This incident was classified as P1 severity and was assigned to
+David Kim in the Security Engineering department. The affected system was
+AWS Application Load Balancer, specifically the alb-prod-main-01 component located in US-East-1 (AWS).
+The incident was detected through automated monitoring and alerting systems,
+and the response team was engaged within minutes of the initial alert.
+
+========================================================================
+2. BUSINESS IMPACT
+========================================================================
+
+Complete HTTPS access failure for all users globally for 35 minutes. All web and mobile clients received SSL certificate errors. Browser HSTS policies prevented fallback to HTTP. Approximately 52,000 users were impacted. Trust and reputation damage from users seeing security warnings.
+
+The incident triggered the organization's major incident response process,
+involving cross-functional coordination between engineering, operations, and
+business stakeholders. Customer support was notified and prepared to handle
+incoming queries related to the service degradation.
+
+========================================================================
+3. SYMPTOMS OBSERVED
+========================================================================
+
+The following symptoms were observed during the incident:
+
+  * SSL certificate error on all HTTPS connections to the platform
+  * Browser security warnings blocking user access
+  * Certificate expiry date showing March 23, 2025 in TLS handshake
+  * AWS Certificate Manager showing failed renewal status
+  * DNS validation CNAME record missing from Route 53
+
+These symptoms were correlated across multiple monitoring systems including
+application performance monitoring, infrastructure metrics, and log
+aggregation platforms. The incident response team confirmed the symptoms
+during their initial assessment and used them to guide the investigation.
+
+========================================================================
+4. TIMELINE OF EVENTS
+========================================================================
+
+  [00:01 UTC] TLS certificate expires on alb-prod-main-01
+  [00:02 UTC] All HTTPS connections begin failing with certificate errors
+  [00:05 UTC] Automated monitoring detects SSL handshake failures
+  [00:08 UTC] David Kim paged, begins investigation
+  [00:12 UTC] ACM renewal failure identified, DNS validation CNAME missing
+  [00:18 UTC] DNS validation CNAME record restored in Route 53
+  [00:25 UTC] Manual certificate renewal triggered in ACM
+  [00:32 UTC] New certificate issued and applied to ALB
+  [00:36 UTC] HTTPS access restored, incident resolved
+
+========================================================================
+5. INVESTIGATION
+========================================================================
+
+Upon receiving the automated alert, the incident response team initiated a
+systematic investigation following established runbook procedures. The team
+began by examining the health and status of the alb-prod-main-01 component
+within the AWS Application Load Balancer system deployed in US-East-1 (AWS).
+
+Initial telemetry data from the monitoring stack was reviewed, including
+application logs, infrastructure metrics, and recent deployment and change
+history. The investigation revealed that the primary symptoms were consistent
+across multiple data sources and monitoring tools.
+
+Log analysis from the affected component showed error patterns that pointed
+toward tls certificate auto-renewal failed silently because the dns validation cname record was accidentally removed during a dns zone migration 30 days prior. The team also reviewed recent change
+records, configuration modifications, and deployment history to rule out
+human-initiated causes. Cross-referencing the timeline of events with
+infrastructure metrics from the preceding 24-48 hours provided additional
+context that supported the final root cause determination.
+
+========================================================================
+6. ROOT CAUSE ANALYSIS
+========================================================================
+
+The root cause of this incident was determined to be:
+TLS certificate auto-renewal failed silently because the DNS validation CNAME record was accidentally removed during a DNS zone migration 30 days prior.
+
+Further analysis confirmed that this issue had been developing over time but
+was not detected by existing monitoring thresholds and alerting rules. The
+failure point was within the alb-prod-main-01 component of the AWS Application Load Balancer
+system. Contributing factors included insufficient monitoring coverage for
+the specific failure mode encountered and the absence of automated
+remediation procedures for this particular scenario.
+
+========================================================================
+7. RESOLUTION
+========================================================================
+
+The incident was resolved by the following actions: Restored the DNS validation CNAME record, triggered manual certificate renewal in ACM, and applied the new certificate to the ALB within 35 minutes.
+
+The resolution was executed by David Kim with support from the incident
+response team. After applying the remediation steps, the team monitored the
+system for a stabilization period to confirm that the issue was fully
+resolved and no secondary or cascading failures had occurred. All affected
+services were verified to be operating within normal parameters before the
+incident was formally closed.
+
+========================================================================
+8. PREVENTIVE ACTIONS
+========================================================================
+
+The following preventive actions have been identified to reduce the
+likelihood and impact of similar incidents in the future:
+
+  1. Implement certificate expiry monitoring with 30-day, 14-day, and 7-day alerts
+  2. Add DNS validation record protection with deletion prevention
+  3. Create automated certificate renewal verification test
+  4. Implement certificate transparency log monitoring
+  5. Add certificate expiry check to weekly operational review
+
+These action items will be tracked in the engineering backlog and prioritized
+based on risk assessment and business impact analysis.
+
+========================================================================
+9. RELATED STANDARD OPERATING PROCEDURES
+========================================================================
+
+SOP-SEC-001: TLS Certificate Management; SOP-SEC-005: Certificate Emergency Renewal
+
+========================================================================
+10. LESSONS LEARNED
+========================================================================
+
+This incident provided several important learnings for the organization.
+The detection of tls certificate auto-renewal failed silently because the dns validation cname record was accidentally removed during a dns zone migration 30 days prior was delayed due to gaps in
+monitoring coverage, highlighting the need for more comprehensive
+observability across the AWS Application Load Balancer stack.
+
+The incident response process demonstrated effective team coordination and
+communication, but the overall time to resolution could be improved through
+automation of common diagnostic and remediation steps. The successful
+resolution validated existing runbooks and procedures while also identifying
+specific areas for improvement.
+
+The preventive actions identified during the post-mortem will strengthen
+organizational resilience against similar failure modes. Regular review of
+monitoring thresholds, alerting rules, and runbook procedures should be
+incorporated into the operational cadence to maintain readiness.
+
+========================================================================
+Report generated by TwinMind Incident Management System
+Date: 2025-03-24T00:01:00Z
+Classification: Internal - Confidential
+========================================================================

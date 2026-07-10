@@ -1,0 +1,161 @@
+INCIDENT REPORT
+========================================================================
+
+Incident ID:       INC049
+Title:             Kong API Gateway Plugin Crash on Request Transformation
+Severity:          P2
+Date/Time:         2025-12-15T10:40:00Z
+Department:        API Engineering
+System:            Kong API Gateway
+Component:         kong-prod-east-01
+Location:          US-East-1 (AWS)
+Assigned Engineer: Jenny Liu
+Status:            Resolved
+
+========================================================================
+1. SUMMARY
+========================================================================
+
+The Kong API Gateway (kong-prod-east-01) experienced intermittent 500 errors starting at 10:40 UTC on December 15, 2025. A custom Lua request transformation plugin crashed when processing requests containing Unicode characters in specific header fields. The plugin did not handle multi-byte character encoding properly, causing a nil reference error in the Lua runtime. Approximately 8% of API requests contained the triggering character pattern.
+
+This incident was classified as P2 severity and was assigned to
+Jenny Liu in the API Engineering department. The affected system was
+Kong API Gateway, specifically the kong-prod-east-01 component located in US-East-1 (AWS).
+The incident was detected through automated monitoring and alerting systems,
+and the response team was engaged within minutes of the initial alert.
+
+========================================================================
+2. BUSINESS IMPACT
+========================================================================
+
+8% of API requests failing with 500 errors for 25 minutes. Affected requests were random based on content, making the issue difficult to reproduce. 2,800 API calls failed. Partners with international user bases disproportionately affected. Mobile app users entering non-ASCII characters experienced errors.
+
+The incident triggered the organization's major incident response process,
+involving cross-functional coordination between engineering, operations, and
+business stakeholders. Customer support was notified and prepared to handle
+incoming queries related to the service degradation.
+
+========================================================================
+3. SYMPTOMS OBSERVED
+========================================================================
+
+The following symptoms were observed during the incident:
+
+  * Intermittent 500 Internal Server Error from Kong gateway (8% of requests)
+  * Kong error logs showing Lua runtime nil reference error in transformation plugin
+  * Errors correlating with requests containing Unicode characters in headers
+  * Plugin execution metrics showing crashes on specific request patterns
+  * Non-ASCII header values triggering the plugin failure
+
+These symptoms were correlated across multiple monitoring systems including
+application performance monitoring, infrastructure metrics, and log
+aggregation platforms. The incident response team confirmed the symptoms
+during their initial assessment and used them to guide the investigation.
+
+========================================================================
+4. TIMELINE OF EVENTS
+========================================================================
+
+  [10:40 UTC] First 500 errors appear from Kong gateway
+  [10:45 UTC] Error pattern identified as intermittent (8% rate)
+  [10:50 UTC] Jenny Liu begins investigation
+  [10:55 UTC] Lua plugin crash error identified in Kong logs
+  [11:00 UTC] Unicode character trigger pattern discovered
+  [11:02 UTC] Plugin temporarily set to bypass mode for affected routes
+  [11:05 UTC] Patched plugin version developed with UTF-8 handling
+
+========================================================================
+5. INVESTIGATION
+========================================================================
+
+Upon receiving the automated alert, the incident response team initiated a
+systematic investigation following established runbook procedures. The team
+began by examining the health and status of the kong-prod-east-01 component
+within the Kong API Gateway system deployed in US-East-1 (AWS).
+
+Initial telemetry data from the monitoring stack was reviewed, including
+application logs, infrastructure metrics, and recent deployment and change
+history. The investigation revealed that the primary symptoms were consistent
+across multiple data sources and monitoring tools.
+
+Log analysis from the affected component showed error patterns that pointed
+toward custom lua request transformation plugin did not handle multi-byte utf-8 character encoding in http header values, causing nil reference crash when processing unicode characters. The team also reviewed recent change
+records, configuration modifications, and deployment history to rule out
+human-initiated causes. Cross-referencing the timeline of events with
+infrastructure metrics from the preceding 24-48 hours provided additional
+context that supported the final root cause determination.
+
+========================================================================
+6. ROOT CAUSE ANALYSIS
+========================================================================
+
+The root cause of this incident was determined to be:
+Custom Lua request transformation plugin did not handle multi-byte UTF-8 character encoding in HTTP header values, causing nil reference crash when processing Unicode characters.
+
+Further analysis confirmed that this issue had been developing over time but
+was not detected by existing monitoring thresholds and alerting rules. The
+failure point was within the kong-prod-east-01 component of the Kong API Gateway
+system. Contributing factors included insufficient monitoring coverage for
+the specific failure mode encountered and the absence of automated
+remediation procedures for this particular scenario.
+
+========================================================================
+7. RESOLUTION
+========================================================================
+
+The incident was resolved by the following actions: Deployed patched version of the transformation plugin with proper UTF-8 handling, enabled Unicode-safe string operations in Lua, and added input validation for header encoding.
+
+The resolution was executed by Jenny Liu with support from the incident
+response team. After applying the remediation steps, the team monitored the
+system for a stabilization period to confirm that the issue was fully
+resolved and no secondary or cascading failures had occurred. All affected
+services were verified to be operating within normal parameters before the
+incident was formally closed.
+
+========================================================================
+8. PREVENTIVE ACTIONS
+========================================================================
+
+The following preventive actions have been identified to reduce the
+likelihood and impact of similar incidents in the future:
+
+  1. Implement UTF-8 input handling testing for all custom Kong plugins
+  2. Add plugin crash monitoring with automatic fallback to bypass mode
+  3. Create internationalization test suite for API gateway plugins
+  4. Implement Lua error handling best practices in plugin development guidelines
+  5. Add canary testing with diverse character sets for plugin deployments
+
+These action items will be tracked in the engineering backlog and prioritized
+based on risk assessment and business impact analysis.
+
+========================================================================
+9. RELATED STANDARD OPERATING PROCEDURES
+========================================================================
+
+SOP-API-002: Kong Plugin Troubleshooting; SOP-API-006: Plugin Emergency Bypass
+
+========================================================================
+10. LESSONS LEARNED
+========================================================================
+
+This incident provided several important learnings for the organization.
+The detection of custom lua request transformation plugin did not handle multi-byte utf-8 character encoding in http header values, causing nil reference crash when processing unicode characters was delayed due to gaps in
+monitoring coverage, highlighting the need for more comprehensive
+observability across the Kong API Gateway stack.
+
+The incident response process demonstrated effective team coordination and
+communication, but the overall time to resolution could be improved through
+automation of common diagnostic and remediation steps. The successful
+resolution validated existing runbooks and procedures while also identifying
+specific areas for improvement.
+
+The preventive actions identified during the post-mortem will strengthen
+organizational resilience against similar failure modes. Regular review of
+monitoring thresholds, alerting rules, and runbook procedures should be
+incorporated into the operational cadence to maintain readiness.
+
+========================================================================
+Report generated by TwinMind Incident Management System
+Date: 2025-12-15T10:40:00Z
+Classification: Internal - Confidential
+========================================================================

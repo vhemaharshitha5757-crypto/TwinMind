@@ -1,0 +1,23 @@
+{
+  "filename": "cdn_stale_cache.png",
+  "caption": "CloudFront dashboard showing failed cache invalidation and stale content",
+  "scene_description": "AWS CloudFront console showing the invalidation request in FAILED status. A content comparison panel shows different prices being served from different edge locations. Cache age headers show content up to 2 hours stale.",
+  "detected_objects": [
+    "Invalidation Status Panel",
+    "Edge Location Cache Age Map",
+    "Content Comparison View",
+    "IAM Error Details",
+    "Distribution Settings"
+  ],
+  "ocr_text": [
+    "Invalidation: FAILED",
+    "Error: AccessDenied - IAM credentials expired",
+    "Cache Age: 7200s (stale)",
+    "Edge Locations Stale: 47/47",
+    "Path: /api/products/*",
+    "Distribution: cdn-dist-prod-01"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "AWS CloudFront CDN"
+}

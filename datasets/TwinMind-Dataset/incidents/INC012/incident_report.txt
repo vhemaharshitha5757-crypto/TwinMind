@@ -1,0 +1,162 @@
+INCIDENT REPORT
+========================================================================
+
+Incident ID:       INC012
+Title:             Cloud VM Unexpected Shutdown Due to Spot Instance Reclamation
+Severity:          P2
+Date/Time:         2025-03-31T16:45:00Z
+Department:        Cloud Infrastructure
+System:            AWS EC2 Spot Instances
+Component:         batch-processor-spot-12
+Location:          US-West-2 (AWS)
+Assigned Engineer: Lisa Park
+Status:            Resolved
+
+========================================================================
+1. SUMMARY
+========================================================================
+
+A critical batch processing VM (batch-processor-spot-12) was unexpectedly terminated at 16:45 UTC on March 31, 2025 due to AWS spot instance reclamation. The instance was running a 4-hour financial reconciliation batch job that was 3 hours into processing when terminated. The architecture incorrectly used spot instances for this long-running critical workload without checkpointing or fallback to on-demand instances.
+
+This incident was classified as P2 severity and was assigned to
+Lisa Park in the Cloud Infrastructure department. The affected system was
+AWS EC2 Spot Instances, specifically the batch-processor-spot-12 component located in US-West-2 (AWS).
+The incident was detected through automated monitoring and alerting systems,
+and the response team was engaged within minutes of the initial alert.
+
+========================================================================
+2. BUSINESS IMPACT
+========================================================================
+
+Financial reconciliation batch job for Q1 closing was interrupted, requiring a complete restart. The 3 hours of processing were lost. The job completion was delayed by 7 hours total, causing the Q1 financial close to miss the internal deadline by one business day. Finance team required to work overtime.
+
+The incident triggered the organization's major incident response process,
+involving cross-functional coordination between engineering, operations, and
+business stakeholders. Customer support was notified and prepared to handle
+incoming queries related to the service degradation.
+
+========================================================================
+3. SYMPTOMS OBSERVED
+========================================================================
+
+The following symptoms were observed during the incident:
+
+  * Batch processing VM terminated without application-initiated shutdown
+  * EC2 instance state changed to terminated with spot interruption notice
+  * Batch job status showing incomplete at 75% progress
+  * No checkpoint data saved for job resumption
+  * CloudWatch showing 2-minute spot interruption warning was unhandled
+
+These symptoms were correlated across multiple monitoring systems including
+application performance monitoring, infrastructure metrics, and log
+aggregation platforms. The incident response team confirmed the symptoms
+during their initial assessment and used them to guide the investigation.
+
+========================================================================
+4. TIMELINE OF EVENTS
+========================================================================
+
+  [16:43 UTC] AWS issues 2-minute spot interruption warning (unhandled)
+  [16:45 UTC] Spot instance batch-processor-spot-12 terminated
+  [16:48 UTC] Batch job monitoring detects stalled progress
+  [16:55 UTC] Lisa Park investigates, confirms spot reclamation
+  [17:10 UTC] Decision to restart job on on-demand instance
+  [17:25 UTC] On-demand instance provisioned, batch job restarted from scratch
+  [21:30 UTC] Batch job completed on on-demand instance
+  [22:00 UTC] Financial reconciliation data validated and delivered
+
+========================================================================
+5. INVESTIGATION
+========================================================================
+
+Upon receiving the automated alert, the incident response team initiated a
+systematic investigation following established runbook procedures. The team
+began by examining the health and status of the batch-processor-spot-12 component
+within the AWS EC2 Spot Instances system deployed in US-West-2 (AWS).
+
+Initial telemetry data from the monitoring stack was reviewed, including
+application logs, infrastructure metrics, and recent deployment and change
+history. The investigation revealed that the primary symptoms were consistent
+across multiple data sources and monitoring tools.
+
+Log analysis from the affected component showed error patterns that pointed
+toward critical long-running batch workload incorrectly deployed on spot instances without checkpointing, instance diversification, or fallback to on-demand capacity. The team also reviewed recent change
+records, configuration modifications, and deployment history to rule out
+human-initiated causes. Cross-referencing the timeline of events with
+infrastructure metrics from the preceding 24-48 hours provided additional
+context that supported the final root cause determination.
+
+========================================================================
+6. ROOT CAUSE ANALYSIS
+========================================================================
+
+The root cause of this incident was determined to be:
+Critical long-running batch workload incorrectly deployed on spot instances without checkpointing, instance diversification, or fallback to on-demand capacity.
+
+Further analysis confirmed that this issue had been developing over time but
+was not detected by existing monitoring thresholds and alerting rules. The
+failure point was within the batch-processor-spot-12 component of the AWS EC2 Spot Instances
+system. Contributing factors included insufficient monitoring coverage for
+the specific failure mode encountered and the absence of automated
+remediation procedures for this particular scenario.
+
+========================================================================
+7. RESOLUTION
+========================================================================
+
+The incident was resolved by the following actions: Restarted the batch job on an on-demand instance, migrated all critical batch workloads off spot instances, and implemented job checkpointing for future resilience.
+
+The resolution was executed by Lisa Park with support from the incident
+response team. After applying the remediation steps, the team monitored the
+system for a stabilization period to confirm that the issue was fully
+resolved and no secondary or cascading failures had occurred. All affected
+services were verified to be operating within normal parameters before the
+incident was formally closed.
+
+========================================================================
+8. PREVENTIVE ACTIONS
+========================================================================
+
+The following preventive actions have been identified to reduce the
+likelihood and impact of similar incidents in the future:
+
+  1. Migrate all critical batch workloads to on-demand or reserved instances
+  2. Implement job checkpointing every 15 minutes for batch processing
+  3. Add spot interruption handling with automatic migration to on-demand
+  4. Create workload classification policy for spot vs on-demand usage
+  5. Implement batch job progress monitoring with alerts for stalled jobs
+
+These action items will be tracked in the engineering backlog and prioritized
+based on risk assessment and business impact analysis.
+
+========================================================================
+9. RELATED STANDARD OPERATING PROCEDURES
+========================================================================
+
+SOP-INFRA-005: Spot Instance Management; SOP-BATCH-001: Batch Job Recovery Procedures
+
+========================================================================
+10. LESSONS LEARNED
+========================================================================
+
+This incident provided several important learnings for the organization.
+The detection of critical long-running batch workload incorrectly deployed on spot instances without checkpointing, instance diversification, or fallback to on-demand capacity was delayed due to gaps in
+monitoring coverage, highlighting the need for more comprehensive
+observability across the AWS EC2 Spot Instances stack.
+
+The incident response process demonstrated effective team coordination and
+communication, but the overall time to resolution could be improved through
+automation of common diagnostic and remediation steps. The successful
+resolution validated existing runbooks and procedures while also identifying
+specific areas for improvement.
+
+The preventive actions identified during the post-mortem will strengthen
+organizational resilience against similar failure modes. Regular review of
+monitoring thresholds, alerting rules, and runbook procedures should be
+incorporated into the operational cadence to maintain readiness.
+
+========================================================================
+Report generated by TwinMind Incident Management System
+Date: 2025-03-31T16:45:00Z
+Classification: Internal - Confidential
+========================================================================

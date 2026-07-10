@@ -1,0 +1,112 @@
+{
+  "incident_id": "INC018",
+  "title": "Critical CPU Utilization Spike on Application Cluster",
+  "timestamp": "2025-05-12T19:05:00Z",
+  "severity": "P2",
+  "department": "SRE",
+  "system": "ECS Fargate Cluster",
+  "component": "search-svc-task-08",
+  "location": "EU-West-1 (AWS)",
+  "status": "Resolved",
+  "symptoms": [
+    "CPU utilization at 98% across all search service ECS tasks",
+    "Search API response times exceeding 12 seconds (normal: 150ms)",
+    "Thread dumps showing regex engine consuming all CPU in tight loops",
+    "Specific search query patterns triggering catastrophic regex backtracking",
+    "ECS task health checks failing due to response time degradation"
+  ],
+  "root_cause": "Catastrophic regex backtracking in search query parser caused by nested quantifiers in a recently deployed regular expression pattern",
+  "resolution": "Rolled back the search service to the previous version without the problematic regex, deployed a fix with an optimized non-backtracking regex pattern, and added regex execution timeout",
+  "preventive_actions": [
+    "Add regex complexity analysis to code review checklist",
+    "Implement regex execution timeout of 100ms in search parser",
+    "Add CPU utilization alerting at 80% with automatic scaling",
+    "Include regex performance testing in search service CI pipeline",
+    "Deploy regex static analysis tool to prevent catastrophic patterns"
+  ],
+  "affected_services": [
+    "search-api",
+    "product-discovery",
+    "autocomplete-service",
+    "search-analytics"
+  ],
+  "engineers": [
+    "Nina Patel",
+    "James Wright",
+    "Jenny Liu"
+  ],
+  "timeline": [
+    {
+      "time": "19:05 UTC",
+      "event": "CPU utilization spikes to 98% on search service tasks"
+    },
+    {
+      "time": "19:07 UTC",
+      "event": "Search response time alerts fire"
+    },
+    {
+      "time": "19:10 UTC",
+      "event": "Nina Patel begins investigation, notes recent deployment"
+    },
+    {
+      "time": "19:15 UTC",
+      "event": "Thread dumps reveal regex engine consuming all CPU"
+    },
+    {
+      "time": "19:20 UTC",
+      "event": "Problematic regex pattern identified in new query parser"
+    },
+    {
+      "time": "19:25 UTC",
+      "event": "Service rolled back to previous version"
+    },
+    {
+      "time": "19:28 UTC",
+      "event": "CPU utilization drops to normal, search recovering"
+    },
+    {
+      "time": "19:35 UTC",
+      "event": "All search metrics normalized, incident resolved"
+    }
+  ],
+  "ocr_entities": [
+    "CPU Utilization: 98%",
+    "Response Time: 12,340ms",
+    "Active Threads: 256/256 (CPU-bound)",
+    "Service: search-svc",
+    "Deployment: v2.4.1 (30min ago)",
+    "Status: CRITICAL"
+  ],
+  "audio_entities": [
+    "James Wright",
+    "Jenny Liu",
+    "Nina Patel"
+  ],
+  "document_entities": [
+    "cpu",
+    "high-utilization",
+    "ecs",
+    "fargate",
+    "regex",
+    "performance"
+  ],
+  "evidence": {
+    "document": "INC018_incident_report.pdf",
+    "image": "cpu_spike_search.png",
+    "audio": "INC018_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "ECS Fargate",
+    "search-svc-task-08",
+    "Regex",
+    "Catastrophic Backtracking",
+    "Query Parser"
+  ],
+  "knowledge_graph_relations": [
+    "Nested_quantifiers CAUSED catastrophic_backtracking",
+    "Regex_backtracking CONSUMED all_CPU",
+    "Service_rollback RESTORED normal_performance"
+  ],
+  "embedding_summary": "CPU spike to 98% on search service ECS tasks caused by catastrophic regex backtracking in recently deployed query parser. Search response times degraded from 150ms to 12 seconds for 30 minutes affecting 9,000 EU users. Resolved by rolling back deployment and deploying optimized regex pattern.",
+  "confidence": 0.96
+}

@@ -1,0 +1,117 @@
+{
+  "incident_id": "INC008",
+  "title": "JWT Token Expiry Configuration Error Causing Mass User Logouts",
+  "timestamp": "2025-03-03T08:00:00Z",
+  "severity": "P1",
+  "department": "Identity Engineering",
+  "system": "Authentication Service",
+  "component": "auth-svc-prod-01",
+  "location": "US-East-1 (AWS)",
+  "status": "Resolved",
+  "symptoms": [
+    "Mass user logout events across all platforms (web, mobile, API)",
+    "Authentication service returning 429 Too Many Requests",
+    "JWT token refresh rate spiking from 200/min to 45,000/min",
+    "User session counts dropping to near zero across all regions",
+    "Customer support queue flooded with login failure reports"
+  ],
+  "root_cause": "Configuration deployment error setting JWT access token TTL to 60 seconds instead of 3600 seconds, causing rapid token expiry and overwhelming the auth service with refresh requests",
+  "resolution": "Rolled back the authentication service configuration to restore 3600-second token TTL, scaled up auth service replicas to handle the login surge, and cleared the token refresh queue",
+  "preventive_actions": [
+    "Implement configuration change validation with bounds checking for critical values",
+    "Add canary deployment for authentication configuration changes",
+    "Create automated rollback trigger for abnormal token refresh rates",
+    "Implement rate limiting on token refresh endpoint per user",
+    "Add configuration diff review requirement for auth service changes"
+  ],
+  "affected_services": [
+    "web-app",
+    "mobile-app",
+    "partner-api",
+    "admin-portal",
+    "internal-tools"
+  ],
+  "engineers": [
+    "Aisha Khan",
+    "David Kim",
+    "Sarah Chen"
+  ],
+  "timeline": [
+    {
+      "time": "08:00 UTC",
+      "event": "Configuration deployment to auth service with incorrect JWT TTL"
+    },
+    {
+      "time": "08:02 UTC",
+      "event": "First wave of token expiry events, users begin getting logged out"
+    },
+    {
+      "time": "08:05 UTC",
+      "event": "Token refresh rate spikes, auth service under heavy load"
+    },
+    {
+      "time": "08:08 UTC",
+      "event": "Auth service returns 429 errors, users unable to log in"
+    },
+    {
+      "time": "08:10 UTC",
+      "event": "P1 alert fires, Aisha Khan begins investigation"
+    },
+    {
+      "time": "08:15 UTC",
+      "event": "Configuration error identified, JWT TTL set to 60s"
+    },
+    {
+      "time": "08:18 UTC",
+      "event": "Configuration rolled back to previous version"
+    },
+    {
+      "time": "08:22 UTC",
+      "event": "Auth service scaled up, login functionality restored"
+    },
+    {
+      "time": "08:30 UTC",
+      "event": "Active sessions recovering, incident stabilized"
+    }
+  ],
+  "ocr_entities": [
+    "Active Sessions: 127 (was 45,000)",
+    "Token Refresh Rate: 45,231/min",
+    "Auth CPU: 100%",
+    "Login Failures: 38,492",
+    "JWT TTL: 60s",
+    "Config Version: v2.4.1-bad"
+  ],
+  "audio_entities": [
+    "David Kim",
+    "Sarah Chen",
+    "Aisha Khan"
+  ],
+  "document_entities": [
+    "jwt",
+    "authentication",
+    "token-expiry",
+    "mass-logout",
+    "identity"
+  ],
+  "evidence": {
+    "document": "INC008_incident_report.pdf",
+    "image": "jwt_mass_logout_dashboard.png",
+    "audio": "INC008_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "JWT",
+    "auth-svc-prod-01",
+    "Token TTL",
+    "Configuration Deployment",
+    "Token Refresh"
+  ],
+  "knowledge_graph_relations": [
+    "Config_deployment SET JWT_TTL_to_60s",
+    "Short_TTL CAUSED mass_token_expiry",
+    "Token_refresh_storm OVERLOADED auth_service",
+    "Config_rollback RESTORED normal_TTL"
+  ],
+  "embedding_summary": "JWT token expiry misconfiguration in authentication service set TTL to 60 seconds instead of 3600 seconds, causing mass logout of 45,000 users. Auth service overwhelmed by token refresh storm. 15-minute login outage. Resolved by configuration rollback and auth service scaling.",
+  "confidence": 0.97
+}

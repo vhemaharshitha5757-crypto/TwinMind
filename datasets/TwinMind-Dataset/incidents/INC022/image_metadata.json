@@ -1,0 +1,23 @@
+{
+  "filename": "feature_flag_misconfig.png",
+  "caption": "LaunchDarkly dashboard showing feature flag accidentally enabled for 100% of users",
+  "scene_description": "LaunchDarkly feature flag management interface showing the new-checkout-v2 flag with targeting set to 100% instead of 5%. An activity log shows the recent change. Conversion rate graph shows a sharp decline.",
+  "detected_objects": [
+    "Feature Flag Toggle",
+    "Targeting Rules Panel",
+    "Activity Log",
+    "Conversion Rate Graph",
+    "User Segment List"
+  ],
+  "ocr_text": [
+    "Flag: new-checkout-v2",
+    "Status: ON",
+    "Rollout: 100% (expected: 5%)",
+    "Changed By: priya.sharma",
+    "Changed At: 16:45 UTC",
+    "Conversion Rate: 2% (baseline: 12%)"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "LaunchDarkly Feature Flags"
+}

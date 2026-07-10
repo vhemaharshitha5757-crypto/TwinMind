@@ -1,0 +1,23 @@
+{
+  "filename": "kong_plugin_crash.png",
+  "caption": "Kong error logs showing Lua plugin crash on Unicode character processing",
+  "scene_description": "Kong gateway monitoring showing intermittent 500 errors at 8% rate. Error log panel displays Lua nil reference error. A request inspector shows the failing request with Unicode header values highlighted.",
+  "detected_objects": [
+    "Error Rate Graph",
+    "Lua Error Log Panel",
+    "Request Inspector",
+    "Plugin Execution Metrics",
+    "Header Value Highlight"
+  ],
+  "ocr_text": [
+    "500 Error Rate: 8%",
+    "Plugin: request-transformer-v2",
+    "Error: attempt to index nil value (header_value)",
+    "Trigger: UTF-8 multi-byte chars in headers",
+    "Affected Requests: 2,847",
+    "Kong: kong-prod-east-01"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "Kong API Gateway"
+}

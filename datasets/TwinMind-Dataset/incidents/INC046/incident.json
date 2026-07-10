@@ -1,0 +1,117 @@
+{
+  "incident_id": "INC046",
+  "title": "ElasticSearch Cluster Red Status Due to Unassigned Shards",
+  "timestamp": "2025-11-24T03:20:00Z",
+  "severity": "P1",
+  "department": "Data Engineering",
+  "system": "ElasticSearch Cluster",
+  "component": "es-prod-cluster-01",
+  "location": "US-East-1 (AWS)",
+  "status": "Resolved",
+  "symptoms": [
+    "ElasticSearch cluster health showing RED status",
+    "240 unassigned primary shards across 12 indices",
+    "Remaining data nodes showing disk utilization above 85% watermark",
+    "Search queries returning partial results with missing data",
+    "Log ingestion pipeline backing up with indexing rejections"
+  ],
+  "root_cause": "Data node disk failure combined with insufficient free disk space on remaining nodes preventing shard reallocation, caused by undersized cluster for the current data volume",
+  "resolution": "Added two new data nodes with 2TB storage each, manually triggered shard reallocation, recovered data from replicas on healthy nodes, and replaced the failed disk on es-data-05",
+  "preventive_actions": [
+    "Implement disk space capacity planning with 40% headroom for reallocation",
+    "Add disk watermark monitoring with alerts at 70% utilization",
+    "Deploy disk health monitoring (SMART) on all ElasticSearch data nodes",
+    "Implement ILM (Index Lifecycle Management) for automatic data tiering",
+    "Create cluster capacity right-sizing review quarterly"
+  ],
+  "affected_services": [
+    "search-api",
+    "log-search",
+    "security-siem",
+    "analytics-queries",
+    "log-ingestion"
+  ],
+  "engineers": [
+    "Priya Sharma",
+    "Chris Evans",
+    "Alex Johnson"
+  ],
+  "timeline": [
+    {
+      "time": "03:20 UTC",
+      "event": "es-data-05 goes offline due to disk failure"
+    },
+    {
+      "time": "03:22 UTC",
+      "event": "Cluster attempts shard reallocation, disk watermark blocks it"
+    },
+    {
+      "time": "03:24 UTC",
+      "event": "Cluster enters RED status with 240 unassigned shards"
+    },
+    {
+      "time": "03:25 UTC",
+      "event": "P1 alert fires for cluster red status"
+    },
+    {
+      "time": "03:30 UTC",
+      "event": "Priya Sharma begins investigation"
+    },
+    {
+      "time": "03:45 UTC",
+      "event": "Disk failure on es-data-05 confirmed, remaining nodes over watermark"
+    },
+    {
+      "time": "04:00 UTC",
+      "event": "Two new data nodes provisioned and joined to cluster"
+    },
+    {
+      "time": "04:15 UTC",
+      "event": "Shard reallocation initiated to new nodes"
+    },
+    {
+      "time": "04:20 UTC",
+      "event": "Cluster recovering, status changing from RED to YELLOW"
+    }
+  ],
+  "ocr_entities": [
+    "Cluster: es-prod-cluster-01",
+    "Status: RED",
+    "Unassigned Shards: 240",
+    "Failed Node: es-data-05 (OFFLINE)",
+    "Disk Watermark: EXCEEDED (85%+)",
+    "Affected Indices: 12"
+  ],
+  "audio_entities": [
+    "Alex Johnson",
+    "Priya Sharma",
+    "Chris Evans"
+  ],
+  "document_entities": [
+    "elasticsearch",
+    "cluster-red",
+    "unassigned-shards",
+    "search",
+    "indexing"
+  ],
+  "evidence": {
+    "document": "INC046_incident_report.pdf",
+    "image": "elasticsearch_red_cluster.png",
+    "audio": "INC046_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "ElasticSearch",
+    "es-prod-cluster-01",
+    "es-data-05",
+    "Unassigned Shards",
+    "Disk Watermark",
+    "ILM"
+  ],
+  "knowledge_graph_relations": [
+    "Disk_failure OFFLINED es-data-05",
+    "High_disk_utilization PREVENTED shard_reallocation",
+    "New_data_nodes ENABLED shard_recovery"
+  ],
+  "embedding_summary": "ElasticSearch cluster RED status from data node disk failure with remaining nodes unable to accept shard reallocation due to disk watermark exceeded. 240 unassigned shards across 12 indices for 1 hour. Search returning partial results. Resolved by adding data nodes and triggering shard reallocation.",
+  "confidence": 0.93
+}

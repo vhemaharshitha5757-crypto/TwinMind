@@ -1,0 +1,59 @@
+MEETING TRANSCRIPT - INCIDENT INC042
+========================================================================
+Subject:      Webhook Delivery Timeout Due to Receiver Endpoint Slowdown
+Date/Time:    2025-10-27T11:30:00Z
+Participants: Jenny Liu, Mike Torres, Sarah Chen
+Duration:     Approximately 3 minutes
+Type:         Emergency Incident Response Call
+========================================================================
+
+[BEGIN TRANSCRIPT]
+[Jenny Liu]: Hey team, we've got a P3 incident on Webhook Delivery Service. Webhook delivery queue depth growing from 0 to 580,000. I need everyone's eyes on this immediately.
+
+[Mike Torres]: I'm here. Let me pull up the webhook-dispatcher-prod-01 dashboard. When did this start exactly?
+
+[Jenny Liu]: First alert came in at 11:30 UTC. Partner endpoint response times spike to 30 seconds. I've been looking at the logs since then.
+
+[Sarah Chen]: I just joined the call. Give me a quick rundown. What are we seeing on the infrastructure side?
+
+[Jenny Liu]: Multiple symptoms. All dispatcher threads blocked waiting on slow partner endpoint. And we're also seeing Webhook delivery latency exceeding 30 seconds for all partners.
+
+[Mike Torres]: OK, I've got the metrics up. Partner webhook health dashboard showing red for all subscribers. This doesn't look like a normal blip.
+
+[Sarah Chen]: Any recent deployments or configuration changes that could have triggered this? I want to rule out human error first.
+
+[Jenny Liu]: I checked the change log for webhook-dispatcher-prod-01. No deployments in the last 24 hours. No config changes either. This looks like an organic failure.
+
+[Mike Torres]: Based on what I'm seeing in the telemetry data, I think this is related to shared thread pool architecture in webhook dispatcher allowed one slow partner endpoint to block all. The error pattern is very consistent with that.
+
+[Sarah Chen]: That makes sense given the symptoms. I've seen similar patterns before. What's our best remediation path here?
+
+[Jenny Liu]: I recommend we implemented per-partner thread pool isolation with individual timeout settings, added circuit breake. That should bring us back to a stable state.
+
+[Mike Torres]: Agreed. Let me start executing that now. Sarah, can you monitor the dashboards and confirm when metrics start recovering?
+
+[Sarah Chen]: Will do. I've got the monitoring screen up. Go ahead with the fix.
+
+[Mike Torres]: Alright, executing the remediation now. This will take a couple of minutes. Stand by.
+
+[Sarah Chen]: I'm starting to see positive movement on the dashboards. Webhook Delivery Service metrics are beginning to normalize.
+
+[Jenny Liu]: Confirmed on my end too. Services are recovering. Let's keep monitoring for the next fifteen minutes to make sure we're stable.
+
+[Mike Torres]: Fix is fully applied. Everything looks green now. I'll document the resolution steps in the incident ticket.
+
+[Jenny Liu]: Great work everyone. Let's schedule a post-mortem for tomorrow. Key action items from this incident: implement per-partner thread pool isolation (bulkhead pattern), add circuit breaker per webhook subscriber with configurable thresholds, and set aggressive connection and read timeouts for webhook delivery (5s max).
+
+[Sarah Chen]: I'll send out the post-mortem calendar invite and start drafting the incident report. Good job team, quick response on this one.
+
+[END TRANSCRIPT]
+
+========================================================================
+Action Items Captured:
+  - Implement per-partner thread pool isolation (bulkhead pattern)
+  - Add circuit breaker per webhook subscriber with configurable thresholds
+  - Set aggressive connection and read timeouts for webhook delivery (5s max)
+  - Implement webhook delivery priority queues for critical partners
+
+Next Steps: Post-mortem meeting scheduled for following business day.
+========================================================================

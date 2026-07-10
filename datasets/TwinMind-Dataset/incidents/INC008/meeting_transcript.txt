@@ -1,0 +1,59 @@
+MEETING TRANSCRIPT - INCIDENT INC008
+========================================================================
+Subject:      JWT Token Expiry Configuration Error Causing Mass User Logouts
+Date/Time:    2025-03-03T08:00:00Z
+Participants: Aisha Khan, David Kim, Sarah Chen
+Duration:     Approximately 3 minutes
+Type:         Emergency Incident Response Call
+========================================================================
+
+[BEGIN TRANSCRIPT]
+[Aisha Khan]: Hey team, we've got a P1 incident on Authentication Service. Mass user logout events across all platforms (web, mobile, API). I need everyone's eyes on this immediately.
+
+[David Kim]: I'm here. Let me pull up the auth-svc-prod-01 dashboard. When did this start exactly?
+
+[Aisha Khan]: First alert came in at 08:00 UTC. Configuration deployment to auth service with incorrect JWT TTL. I've been looking at the logs since then.
+
+[Sarah Chen]: I just joined the call. Give me a quick rundown. What are we seeing on the infrastructure side?
+
+[Aisha Khan]: Multiple symptoms. Authentication service returning 429 Too Many Requests. And we're also seeing JWT token refresh rate spiking from 200/min to 45,000/min.
+
+[David Kim]: OK, I've got the metrics up. User session counts dropping to near zero across all regions. This doesn't look like a normal blip.
+
+[Sarah Chen]: Any recent deployments or configuration changes that could have triggered this? I want to rule out human error first.
+
+[Aisha Khan]: I checked the change log for auth-svc-prod-01. No deployments in the last 24 hours. No config changes either. This looks like an organic failure.
+
+[David Kim]: Based on what I'm seeing in the telemetry data, I think this is related to configuration deployment error setting jwt access token ttl to 60 seconds instead of 3600 seconds, c. The error pattern is very consistent with that.
+
+[Sarah Chen]: That makes sense given the symptoms. I've seen similar patterns before. What's our best remediation path here?
+
+[Aisha Khan]: I recommend we rolled back the authentication service configuration to restore 3600-second token ttl, scaled up aut. That should bring us back to a stable state.
+
+[David Kim]: Agreed. Let me start executing that now. Sarah, can you monitor the dashboards and confirm when metrics start recovering?
+
+[Sarah Chen]: Will do. I've got the monitoring screen up. Go ahead with the fix.
+
+[David Kim]: Alright, executing the remediation now. This will take a couple of minutes. Stand by.
+
+[Sarah Chen]: I'm starting to see positive movement on the dashboards. Authentication Service metrics are beginning to normalize.
+
+[Aisha Khan]: Confirmed on my end too. Services are recovering. Let's keep monitoring for the next fifteen minutes to make sure we're stable.
+
+[David Kim]: Fix is fully applied. Everything looks green now. I'll document the resolution steps in the incident ticket.
+
+[Aisha Khan]: Great work everyone. Let's schedule a post-mortem for tomorrow. Key action items from this incident: implement configuration change validation with bounds checking for critical values, add canary deployment for authentication configuration changes, and create automated rollback trigger for abnormal token refresh rates.
+
+[Sarah Chen]: I'll send out the post-mortem calendar invite and start drafting the incident report. Good job team, quick response on this one.
+
+[END TRANSCRIPT]
+
+========================================================================
+Action Items Captured:
+  - Implement configuration change validation with bounds checking for critical values
+  - Add canary deployment for authentication configuration changes
+  - Create automated rollback trigger for abnormal token refresh rates
+  - Implement rate limiting on token refresh endpoint per user
+
+Next Steps: Post-mortem meeting scheduled for following business day.
+========================================================================

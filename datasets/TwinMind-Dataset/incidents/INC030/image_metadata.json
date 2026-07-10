@@ -1,0 +1,23 @@
+{
+  "filename": "log_corruption_dashboard.png",
+  "caption": "Logging pipeline dashboard showing corrupted entries and parse failures",
+  "scene_description": "A logging pipeline dashboard showing a spike in Fluentd parse errors. An ElasticSearch panel shows corrupted document count increasing. A sample of corrupted log entries is displayed with visible binary characters.",
+  "detected_objects": [
+    "Parse Error Rate Graph",
+    "Corrupted Document Counter",
+    "Sample Log Entry Panel",
+    "Pipeline Health Status",
+    "Service Breakdown Chart"
+  ],
+  "ocr_text": [
+    "Parse Errors: 24,847/min",
+    "Corrupted Documents: 187,231",
+    "Affected Services: 8",
+    "Pipeline: log-aggregator-prod-02",
+    "Fluentd Status: ERROR",
+    "Log Integrity: COMPROMISED"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "Centralized Logging Pipeline"
+}

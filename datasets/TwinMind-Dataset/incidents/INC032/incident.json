@@ -1,0 +1,110 @@
+{
+  "incident_id": "INC032",
+  "title": "Overnight Backup Job Failure Due to Expired Credentials",
+  "timestamp": "2025-08-18T02:00:00Z",
+  "severity": "P2",
+  "department": "Storage Engineering",
+  "system": "AWS Backup Service",
+  "component": "backup-vault-prod-west",
+  "location": "US-West-2 (AWS)",
+  "status": "Resolved",
+  "symptoms": [
+    "Backup job in FAILED status in AWS Backup console",
+    "Backup service account authentication failure in logs",
+    "Backup vault showing no new recovery points since previous day",
+    "Automated backup verification email not received by ops team",
+    "Service account password expiry notification sent 14 days prior but unactioned"
+  ],
+  "root_cause": "Backup service account credentials expired after 90-day rotation policy, and the password rotation notification was not actioned by the team, leaving the backup job unable to authenticate",
+  "resolution": "Rotated the backup service account credentials, updated the backup job configuration, executed a manual backup to restore the recovery point, and set up credential expiry monitoring",
+  "preventive_actions": [
+    "Implement service account credential rotation automation",
+    "Add backup job success/failure monitoring with immediate alerts",
+    "Use IAM roles instead of service account credentials where possible",
+    "Create service account credential expiry dashboard",
+    "Implement backup verification automation with immediate escalation on failure"
+  ],
+  "affected_services": [
+    "database-backups",
+    "disaster-recovery",
+    "compliance-reporting"
+  ],
+  "engineers": [
+    "Chris Evans",
+    "David Kim",
+    "Lisa Park"
+  ],
+  "timeline": [
+    {
+      "time": "02:00 UTC",
+      "event": "Overnight backup job starts and immediately fails with auth error"
+    },
+    {
+      "time": "02:01 UTC",
+      "event": "Backup job logs authentication failure, no retry configured"
+    },
+    {
+      "time": "08:00 UTC",
+      "event": "Morning backup verification check reveals missing backup"
+    },
+    {
+      "time": "08:15 UTC",
+      "event": "Chris Evans investigates, identifies credential expiry"
+    },
+    {
+      "time": "08:30 UTC",
+      "event": "Service account credentials rotated and updated"
+    },
+    {
+      "time": "08:45 UTC",
+      "event": "Manual backup initiated to restore recovery point"
+    },
+    {
+      "time": "09:30 UTC",
+      "event": "Manual backup completed successfully"
+    },
+    {
+      "time": "09:45 UTC",
+      "event": "Backup monitoring alerts configured, incident resolved"
+    }
+  ],
+  "ocr_entities": [
+    "Backup Plan: daily-prod-backup",
+    "Status: FAILED",
+    "Error: Authentication failure - credentials expired",
+    "Last Successful: 24h ago",
+    "Service Account: backup-svc-prod",
+    "Credential Expiry: 2025-08-17"
+  ],
+  "audio_entities": [
+    "Chris Evans",
+    "Lisa Park",
+    "David Kim"
+  ],
+  "document_entities": [
+    "backup",
+    "failure",
+    "credentials",
+    "aws-backup",
+    "data-protection"
+  ],
+  "evidence": {
+    "document": "INC032_incident_report.pdf",
+    "image": "backup_job_failure.png",
+    "audio": "INC032_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "AWS Backup",
+    "backup-vault-prod-west",
+    "Service Account",
+    "Credential Rotation",
+    "Recovery Point"
+  ],
+  "knowledge_graph_relations": [
+    "Credential_expiry CAUSED backup_authentication_failure",
+    "Backup_failure EXTENDED RPO_to_48_hours",
+    "Credential_automation PREVENTS future_expiry"
+  ],
+  "embedding_summary": "Overnight database backup job failed due to expired service account credentials from 90-day password rotation policy. Failure undetected for 6 hours. RPO extended to 48 hours. Resolved by rotating credentials, executing manual backup, and implementing credential expiry automation.",
+  "confidence": 0.94
+}

@@ -1,0 +1,113 @@
+{
+  "incident_id": "INC044",
+  "title": "LDAP Authentication Bind Failure After Directory Server Patch",
+  "timestamp": "2025-11-10T05:30:00Z",
+  "severity": "P1",
+  "department": "Identity Engineering",
+  "system": "Microsoft Active Directory",
+  "component": "ad-dc-london-02",
+  "location": "On-Premises DC-London",
+  "status": "Resolved",
+  "symptoms": [
+    "LDAP bind operations returning 'Strong auth required' error (LDAP error 8)",
+    "Applications using simple bind all failing authentication",
+    "Active Directory event log showing LDAP channel binding enforcement",
+    "Windows security patch KB5032190 installed at 04:00 UTC",
+    "Applications using Kerberos authentication unaffected"
+  ],
+  "root_cause": "Security patch changed LDAP channel binding policy from 'when supported' to 'always required', breaking all legacy applications using simple LDAP bind without channel binding support",
+  "resolution": "Temporarily reverted LDAP channel binding policy to 'when supported', scheduled application updates to support channel binding, and created migration plan for channel binding enforcement",
+  "preventive_actions": [
+    "Inventory all applications using LDAP simple bind for migration planning",
+    "Implement LDAP channel binding support in all application LDAP clients",
+    "Create AD patch testing environment mirroring production LDAP usage",
+    "Add pre-patch validation of LDAP binding compatibility",
+    "Schedule phased LDAP channel binding enforcement with application readiness gates"
+  ],
+  "affected_services": [
+    "vpn-authentication",
+    "internal-wiki",
+    "ticketing-system",
+    "hr-portal",
+    "email-client"
+  ],
+  "engineers": [
+    "Aisha Khan",
+    "David Kim",
+    "Maria Garcia"
+  ],
+  "timeline": [
+    {
+      "time": "04:00 UTC",
+      "event": "Security patch KB5032190 installed on ad-dc-london-02"
+    },
+    {
+      "time": "05:30 UTC",
+      "event": "EMEA business hours begin, LDAP bind failures start occurring"
+    },
+    {
+      "time": "05:35 UTC",
+      "event": "Multiple applications report authentication failures"
+    },
+    {
+      "time": "05:40 UTC",
+      "event": "IT helpdesk flooded with login failure tickets"
+    },
+    {
+      "time": "05:45 UTC",
+      "event": "Aisha Khan investigates, links failures to overnight patch"
+    },
+    {
+      "time": "05:55 UTC",
+      "event": "LDAP channel binding policy change identified"
+    },
+    {
+      "time": "06:00 UTC",
+      "event": "Channel binding policy reverted to 'when supported'"
+    },
+    {
+      "time": "06:10 UTC",
+      "event": "LDAP authentication restored, applications recovering"
+    }
+  ],
+  "ocr_entities": [
+    "Event ID: 2889",
+    "Error: strongAuthRequired (8)",
+    "Channel Binding: REQUIRED (was: WHEN_SUPPORTED)",
+    "Patch: KB5032190 (installed 04:00 UTC)",
+    "Failed Binds: 12,847",
+    "DC: ad-dc-london-02"
+  ],
+  "audio_entities": [
+    "David Kim",
+    "Aisha Khan",
+    "Maria Garcia"
+  ],
+  "document_entities": [
+    "ldap",
+    "authentication",
+    "active-directory",
+    "bind-failure",
+    "patch"
+  ],
+  "evidence": {
+    "document": "INC044_incident_report.pdf",
+    "image": "ldap_bind_failure.png",
+    "audio": "INC044_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "Active Directory",
+    "ad-dc-london-02",
+    "LDAP",
+    "Channel Binding",
+    "Security Patch",
+    "Simple Bind"
+  ],
+  "knowledge_graph_relations": [
+    "Security_patch ENFORCED LDAP_channel_binding",
+    "Channel_binding BROKE legacy_simple_bind",
+    "Policy_revert RESTORED LDAP_authentication"
+  ],
+  "embedding_summary": "LDAP authentication failure after Active Directory security patch enforced channel binding, breaking all applications using simple LDAP bind. 3,100 EMEA employees unable to authenticate for 40 minutes. Resolved by reverting channel binding policy and planning phased migration.",
+  "confidence": 0.96
+}

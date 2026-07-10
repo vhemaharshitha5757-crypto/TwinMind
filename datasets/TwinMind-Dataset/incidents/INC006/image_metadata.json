@@ -1,0 +1,24 @@
+{
+  "filename": "k8s_crashloop_pods.png",
+  "caption": "Kubernetes dashboard showing CrashLoopBackOff pods in payment namespace",
+  "scene_description": "A Kubernetes dashboard showing the payment namespace with all 12 pods in red CrashLoopBackOff state. The restart count column shows values between 15 and 23. Events panel shows repeated 'Back-off restarting failed container' messages.",
+  "detected_objects": [
+    "Pod Status Table",
+    "Restart Count Column",
+    "Events Panel",
+    "Namespace Selector",
+    "Container Logs Button",
+    "Deployment Status"
+  ],
+  "ocr_text": [
+    "Namespace: payment-prod",
+    "Pod Status: CrashLoopBackOff (12/12)",
+    "Restarts: 15-23",
+    "Event: Back-off restarting failed container",
+    "Error: FATAL password authentication failed",
+    "Secret: db-credentials-v2 NOT FOUND"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "Google Kubernetes Engine"
+}

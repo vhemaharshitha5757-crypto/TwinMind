@@ -1,0 +1,112 @@
+{
+  "incident_id": "INC003",
+  "title": "API Gateway Timeout Cascade Affecting All External Endpoints",
+  "timestamp": "2025-01-29T09:45:00Z",
+  "severity": "P1",
+  "department": "API Engineering",
+  "system": "Kong API Gateway",
+  "component": "api-gw-eu-west-01",
+  "location": "EU-West-1 (AWS)",
+  "status": "Resolved",
+  "symptoms": [
+    "504 Gateway Timeout errors on all external API routes",
+    "Kong worker processes at 100% utilization with zero free workers",
+    "API response times exceeding 30-second timeout threshold",
+    "Rate-limiting plugin logs showing synchronous DB connection timeouts",
+    "Upstream services healthy but unreachable through the gateway"
+  ],
+  "root_cause": "Misconfigured rate-limiting plugin performing synchronous database lookups instead of local in-memory counter, exhausting gateway worker pool",
+  "resolution": "Rolled back the rate-limiting plugin configuration to the previous working version, restarted Kong worker processes, and verified all API endpoints operational",
+  "preventive_actions": [
+    "Implement canary deployment for API gateway configuration changes",
+    "Add gateway worker pool utilization alerting",
+    "Create staging environment mirroring production gateway topology",
+    "Mandate load testing for all plugin configuration changes",
+    "Implement circuit breaker on rate-limiting plugin database connection"
+  ],
+  "affected_services": [
+    "partner-api-v2",
+    "public-api-v1",
+    "webhook-delivery",
+    "oauth-token-service",
+    "developer-portal"
+  ],
+  "engineers": [
+    "Jenny Liu",
+    "David Kim",
+    "James Wright"
+  ],
+  "timeline": [
+    {
+      "time": "09:45 UTC",
+      "event": "First 504 timeout errors detected on external API endpoints"
+    },
+    {
+      "time": "09:47 UTC",
+      "event": "Automated alert fires for API error rate exceeding threshold"
+    },
+    {
+      "time": "09:50 UTC",
+      "event": "Jenny Liu begins investigation, confirms all upstreams healthy"
+    },
+    {
+      "time": "09:55 UTC",
+      "event": "Worker pool exhaustion identified, rate-limiting plugin suspected"
+    },
+    {
+      "time": "10:00 UTC",
+      "event": "Root cause confirmed as misconfigured rate-limiting plugin"
+    },
+    {
+      "time": "10:05 UTC",
+      "event": "Configuration rollback initiated to previous working version"
+    },
+    {
+      "time": "10:10 UTC",
+      "event": "Kong workers restarted, API endpoints begin recovering"
+    },
+    {
+      "time": "10:13 UTC",
+      "event": "All API endpoints verified operational, incident resolved"
+    }
+  ],
+  "ocr_entities": [
+    "504 Errors: 45,231/min",
+    "Worker Utilization: 100%",
+    "Free Workers: 0/256",
+    "Upstream Health: ALL HEALTHY",
+    "Rate Limit Plugin: TIMEOUT",
+    "Region: EU-West-1"
+  ],
+  "audio_entities": [
+    "Jenny Liu",
+    "David Kim",
+    "James Wright"
+  ],
+  "document_entities": [
+    "api-gateway",
+    "timeout",
+    "kong",
+    "external-api",
+    "cascade"
+  ],
+  "evidence": {
+    "document": "INC003_incident_report.pdf",
+    "image": "kong_gateway_timeout.png",
+    "audio": "INC003_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "Kong API Gateway",
+    "api-gw-eu-west-01",
+    "Rate Limiting Plugin",
+    "Worker Pool",
+    "EU-West-1"
+  ],
+  "knowledge_graph_relations": [
+    "Rate_Limiting_Plugin MISCONFIGURED_ON api-gw-eu-west-01",
+    "Plugin_misconfiguration EXHAUSTED worker_pool",
+    "Configuration_rollback RESTORED api_gateway"
+  ],
+  "embedding_summary": "Kong API Gateway timeout cascade in EU-West-1 caused by misconfigured rate-limiting plugin performing synchronous database lookups. All external API endpoints returned 504 errors for 28 minutes, affecting 45 enterprise partners and 2.3M API calls. Resolved by rolling back plugin configuration.",
+  "confidence": 0.95
+}

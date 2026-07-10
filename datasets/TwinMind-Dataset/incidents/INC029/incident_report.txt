@@ -1,0 +1,163 @@
+INCIDENT REPORT
+========================================================================
+
+Incident ID:       INC029
+Title:             Grafana Dashboard Data Source Connection Failure
+Severity:          P3
+Date/Time:         2025-07-28T11:20:00Z
+Department:        Observability
+System:            Grafana Monitoring Platform
+Component:         grafana-prod-eu-01
+Location:          EU-West-1 (AWS)
+Assigned Engineer: Nina Patel
+Status:            Resolved
+
+========================================================================
+1. SUMMARY
+========================================================================
+
+Grafana production instance in EU (grafana-prod-eu-01) lost connection to its primary InfluxDB data source at 11:20 UTC on July 28, 2025. The InfluxDB instance had been migrated to a new host as part of a planned infrastructure change, but the Grafana data source configuration was not updated with the new connection endpoint. All dashboards using InfluxDB metrics displayed errors.
+
+This incident was classified as P3 severity and was assigned to
+Nina Patel in the Observability department. The affected system was
+Grafana Monitoring Platform, specifically the grafana-prod-eu-01 component located in EU-West-1 (AWS).
+The incident was detected through automated monitoring and alerting systems,
+and the response team was engaged within minutes of the initial alert.
+
+========================================================================
+2. BUSINESS IMPACT
+========================================================================
+
+45 production dashboards showing data source errors for 50 minutes. EU operations team lost visibility into key performance metrics. Two SLA violation alerts were missed during the blind spot. No direct customer impact but operational risk was elevated.
+
+The incident triggered the organization's major incident response process,
+involving cross-functional coordination between engineering, operations, and
+business stakeholders. Customer support was notified and prepared to handle
+incoming queries related to the service degradation.
+
+========================================================================
+3. SYMPTOMS OBSERVED
+========================================================================
+
+The following symptoms were observed during the incident:
+
+  * Grafana dashboards showing 'Data source is not available' errors
+  * InfluxDB data source health check failing in Grafana
+  * Grafana logs showing connection refused to old InfluxDB endpoint
+  * New InfluxDB host healthy and accepting queries directly
+  * Only InfluxDB-backed panels affected, Prometheus panels working
+
+These symptoms were correlated across multiple monitoring systems including
+application performance monitoring, infrastructure metrics, and log
+aggregation platforms. The incident response team confirmed the symptoms
+during their initial assessment and used them to guide the investigation.
+
+========================================================================
+4. TIMELINE OF EVENTS
+========================================================================
+
+  [11:20 UTC] Grafana data source health check begins failing for InfluxDB
+  [11:22 UTC] Dashboard panels start showing data source error messages
+  [11:30 UTC] EU operations team notices dashboard errors
+  [11:35 UTC] Nina Patel notified, begins investigating data source connectivity
+  [11:42 UTC] Old InfluxDB endpoint confirmed unreachable, migration records found
+  [11:48 UTC] New InfluxDB endpoint identified and verified accessible
+  [11:55 UTC] Grafana data source configuration updated with new endpoint
+  [12:00 UTC] All dashboards loading correctly, connection verified stable
+  [12:10 UTC] Incident resolved, missed SLA alerts reviewed
+
+========================================================================
+5. INVESTIGATION
+========================================================================
+
+Upon receiving the automated alert, the incident response team initiated a
+systematic investigation following established runbook procedures. The team
+began by examining the health and status of the grafana-prod-eu-01 component
+within the Grafana Monitoring Platform system deployed in EU-West-1 (AWS).
+
+Initial telemetry data from the monitoring stack was reviewed, including
+application logs, infrastructure metrics, and recent deployment and change
+history. The investigation revealed that the primary symptoms were consistent
+across multiple data sources and monitoring tools.
+
+Log analysis from the affected component showed error patterns that pointed
+toward infrastructure migration of influxdb to new host was completed without updating the grafana data source configuration to point to the new endpoint. The team also reviewed recent change
+records, configuration modifications, and deployment history to rule out
+human-initiated causes. Cross-referencing the timeline of events with
+infrastructure metrics from the preceding 24-48 hours provided additional
+context that supported the final root cause determination.
+
+========================================================================
+6. ROOT CAUSE ANALYSIS
+========================================================================
+
+The root cause of this incident was determined to be:
+Infrastructure migration of InfluxDB to new host was completed without updating the Grafana data source configuration to point to the new endpoint.
+
+Further analysis confirmed that this issue had been developing over time but
+was not detected by existing monitoring thresholds and alerting rules. The
+failure point was within the grafana-prod-eu-01 component of the Grafana Monitoring Platform
+system. Contributing factors included insufficient monitoring coverage for
+the specific failure mode encountered and the absence of automated
+remediation procedures for this particular scenario.
+
+========================================================================
+7. RESOLUTION
+========================================================================
+
+The incident was resolved by the following actions: Updated Grafana data source configuration with the new InfluxDB endpoint, verified all dashboard panels loading correctly, and implemented data source health monitoring.
+
+The resolution was executed by Nina Patel with support from the incident
+response team. After applying the remediation steps, the team monitored the
+system for a stabilization period to confirm that the issue was fully
+resolved and no secondary or cascading failures had occurred. All affected
+services were verified to be operating within normal parameters before the
+incident was formally closed.
+
+========================================================================
+8. PREVENTIVE ACTIONS
+========================================================================
+
+The following preventive actions have been identified to reduce the
+likelihood and impact of similar incidents in the future:
+
+  1. Create infrastructure migration checklist including all downstream consumer updates
+  2. Implement Grafana data source health monitoring with alerts
+  3. Use DNS-based service endpoints instead of IP addresses for data sources
+  4. Add data source connectivity verification to infrastructure migration playbooks
+  5. Implement automated data source configuration testing
+
+These action items will be tracked in the engineering backlog and prioritized
+based on risk assessment and business impact analysis.
+
+========================================================================
+9. RELATED STANDARD OPERATING PROCEDURES
+========================================================================
+
+SOP-MON-002: Grafana Data Source Management; SOP-MON-005: Dashboard Recovery
+
+========================================================================
+10. LESSONS LEARNED
+========================================================================
+
+This incident provided several important learnings for the organization.
+The detection of infrastructure migration of influxdb to new host was completed without updating the grafana data source configuration to point to the new endpoint was delayed due to gaps in
+monitoring coverage, highlighting the need for more comprehensive
+observability across the Grafana Monitoring Platform stack.
+
+The incident response process demonstrated effective team coordination and
+communication, but the overall time to resolution could be improved through
+automation of common diagnostic and remediation steps. The successful
+resolution validated existing runbooks and procedures while also identifying
+specific areas for improvement.
+
+The preventive actions identified during the post-mortem will strengthen
+organizational resilience against similar failure modes. Regular review of
+monitoring thresholds, alerting rules, and runbook procedures should be
+incorporated into the operational cadence to maintain readiness.
+
+========================================================================
+Report generated by TwinMind Incident Management System
+Date: 2025-07-28T11:20:00Z
+Classification: Internal - Confidential
+========================================================================

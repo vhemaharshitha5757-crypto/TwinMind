@@ -1,0 +1,112 @@
+{
+  "incident_id": "INC045",
+  "title": "Session Store Redis Desynchronization Causing Random Logouts",
+  "timestamp": "2025-11-17T14:00:00Z",
+  "severity": "P2",
+  "department": "Backend Engineering",
+  "system": "Redis Session Store",
+  "component": "redis-session-prod-01",
+  "location": "US-East-1 (AWS)",
+  "status": "Resolved",
+  "symptoms": [
+    "Users reporting being randomly logged out every few minutes",
+    "Session lookup success rate at approximately 50% (should be 100%)",
+    "Redis cluster showing replication offset mismatch between nodes",
+    "Application logs showing alternating session-found and session-not-found for same user",
+    "Health check showing both Redis nodes as healthy individually"
+  ],
+  "root_cause": "Redis replication failure caused session data split between two nodes with inconsistent state, leading to random session lookup failures depending on which node served the request",
+  "resolution": "Forced full resync of Redis replica from primary, restarted the session proxy to clear routing inconsistencies, and implemented session data verification on lookup",
+  "preventive_actions": [
+    "Implement Redis replication monitoring with offset difference alerting",
+    "Add session lookup consistency check with automatic fallback to primary",
+    "Deploy Redis Sentinel for automatic failover and replication health",
+    "Implement session backup in application-side encrypted cookies as fallback",
+    "Add session store health endpoint checking replication consistency"
+  ],
+  "affected_services": [
+    "user-sessions",
+    "authentication-flow",
+    "shopping-cart-state",
+    "user-preferences"
+  ],
+  "engineers": [
+    "James Wright",
+    "Sarah Chen",
+    "Aisha Khan"
+  ],
+  "timeline": [
+    {
+      "time": "14:00 UTC",
+      "event": "Redis replication failure occurs, nodes become desynchronized"
+    },
+    {
+      "time": "14:05 UTC",
+      "event": "Users begin reporting random logouts"
+    },
+    {
+      "time": "14:10 UTC",
+      "event": "Support tickets accumulate, pattern of intermittent access identified"
+    },
+    {
+      "time": "14:15 UTC",
+      "event": "James Wright investigates session store, discovers replication offset mismatch"
+    },
+    {
+      "time": "14:20 UTC",
+      "event": "Redis replication desync confirmed as root cause"
+    },
+    {
+      "time": "14:25 UTC",
+      "event": "Full resync initiated from primary to replica"
+    },
+    {
+      "time": "14:30 UTC",
+      "event": "Session proxy restarted to clear routing inconsistencies"
+    },
+    {
+      "time": "14:35 UTC",
+      "event": "Session lookups returning to 100% success rate, incident resolved"
+    }
+  ],
+  "ocr_entities": [
+    "Primary Offset: 847,231,456",
+    "Replica Offset: 623,118,234",
+    "Offset Delta: 224,113,222",
+    "Session Lookup: 49.7% success",
+    "Node1 Sessions: 124,847",
+    "Node2 Sessions: 87,231"
+  ],
+  "audio_entities": [
+    "James Wright",
+    "Aisha Khan",
+    "Sarah Chen"
+  ],
+  "document_entities": [
+    "session",
+    "redis",
+    "desync",
+    "logout",
+    "consistency"
+  ],
+  "evidence": {
+    "document": "INC045_incident_report.pdf",
+    "image": "redis_session_desync.png",
+    "audio": "INC045_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "Redis",
+    "redis-session-prod-01",
+    "Session Store",
+    "Replication",
+    "Redis Sentinel",
+    "Session Consistency"
+  ],
+  "knowledge_graph_relations": [
+    "Replication_failure CAUSED session_data_split",
+    "Data_split LED_TO random_session_failures",
+    "Full_resync RESTORED session_consistency"
+  ],
+  "embedding_summary": "Redis session store desynchronization from failed replication event caused random logouts for 50% of user sessions. 8,400 users affected for 35 minutes with intermittent authentication failures. Resolved by forcing full replication resync and implementing replication health monitoring.",
+  "confidence": 0.94
+}

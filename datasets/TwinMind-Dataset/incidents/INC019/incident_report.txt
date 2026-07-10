@@ -1,0 +1,162 @@
+INCIDENT REPORT
+========================================================================
+
+Incident ID:       INC019
+Title:             Database Node RAM Exhaustion Causing Query Failures
+Severity:          P2
+Date/Time:         2025-05-19T04:40:00Z
+Department:        Database Engineering
+System:            MySQL Cluster
+Component:         mysql-analytics-node-02
+Location:          US-West-2 (AWS)
+Assigned Engineer: Rajesh Kumar
+Status:            Resolved
+
+========================================================================
+1. SUMMARY
+========================================================================
+
+The MySQL analytics read replica (mysql-analytics-node-02) exhausted all 128GB of available RAM at 04:40 UTC on May 19, 2025. A scheduled analytics report job was executing multiple complex queries with large temporary table operations simultaneously. The queries consumed all available memory for sort buffers and temporary tables, causing the MySQL process to be killed by the OS OOM killer.
+
+This incident was classified as P2 severity and was assigned to
+Rajesh Kumar in the Database Engineering department. The affected system was
+MySQL Cluster, specifically the mysql-analytics-node-02 component located in US-West-2 (AWS).
+The incident was detected through automated monitoring and alerting systems,
+and the response team was engaged within minutes of the initial alert.
+
+========================================================================
+2. BUSINESS IMPACT
+========================================================================
+
+Analytics read replica unavailable for 40 minutes. All analytics queries and dashboard data refreshes failed. BI team morning reports delayed by 2 hours. Executive dashboard showed stale data. No impact on production write traffic as the affected node was a read replica.
+
+The incident triggered the organization's major incident response process,
+involving cross-functional coordination between engineering, operations, and
+business stakeholders. Customer support was notified and prepared to handle
+incoming queries related to the service degradation.
+
+========================================================================
+3. SYMPTOMS OBSERVED
+========================================================================
+
+The following symptoms were observed during the incident:
+
+  * MySQL process killed by OOM killer on analytics node
+  * System memory at 128GB/128GB with 0 swap available
+  * Multiple concurrent queries with large temporary table allocations
+  * Analytics dashboard queries returning connection refused errors
+  * InnoDB buffer pool consuming 96GB plus 30GB in temporary tables
+
+These symptoms were correlated across multiple monitoring systems including
+application performance monitoring, infrastructure metrics, and log
+aggregation platforms. The incident response team confirmed the symptoms
+during their initial assessment and used them to guide the investigation.
+
+========================================================================
+4. TIMELINE OF EVENTS
+========================================================================
+
+  [04:40 UTC] MySQL process killed by OOM killer on analytics node
+  [04:42 UTC] Analytics dashboard alerts fire for query failures
+  [04:48 UTC] Rajesh Kumar investigates, confirms OOM kill event
+  [04:55 UTC] Memory profiling reveals 23 concurrent heavy queries
+  [05:05 UTC] MySQL process restarted with reduced buffer pool
+  [05:10 UTC] Temporary table size limits configured
+  [05:15 UTC] Analytics report schedule staggered
+  [05:20 UTC] Analytics node stable, dashboards refreshing
+
+========================================================================
+5. INVESTIGATION
+========================================================================
+
+Upon receiving the automated alert, the incident response team initiated a
+systematic investigation following established runbook procedures. The team
+began by examining the health and status of the mysql-analytics-node-02 component
+within the MySQL Cluster system deployed in US-West-2 (AWS).
+
+Initial telemetry data from the monitoring stack was reviewed, including
+application logs, infrastructure metrics, and recent deployment and change
+history. The investigation revealed that the primary symptoms were consistent
+across multiple data sources and monitoring tools.
+
+Log analysis from the affected component showed error patterns that pointed
+toward multiple concurrent analytics queries with unbounded temporary table sizes exhausting all 128gb of ram on the analytics read replica, triggering oom killer. The team also reviewed recent change
+records, configuration modifications, and deployment history to rule out
+human-initiated causes. Cross-referencing the timeline of events with
+infrastructure metrics from the preceding 24-48 hours provided additional
+context that supported the final root cause determination.
+
+========================================================================
+6. ROOT CAUSE ANALYSIS
+========================================================================
+
+The root cause of this incident was determined to be:
+Multiple concurrent analytics queries with unbounded temporary table sizes exhausting all 128GB of RAM on the analytics read replica, triggering OOM killer.
+
+Further analysis confirmed that this issue had been developing over time but
+was not detected by existing monitoring thresholds and alerting rules. The
+failure point was within the mysql-analytics-node-02 component of the MySQL Cluster
+system. Contributing factors included insufficient monitoring coverage for
+the specific failure mode encountered and the absence of automated
+remediation procedures for this particular scenario.
+
+========================================================================
+7. RESOLUTION
+========================================================================
+
+The incident was resolved by the following actions: Restarted MySQL process, implemented query memory limits using MAX_EXECUTION_TIME and tmp_table_size configurations, and staggered analytics report scheduling.
+
+The resolution was executed by Rajesh Kumar with support from the incident
+response team. After applying the remediation steps, the team monitored the
+system for a stabilization period to confirm that the issue was fully
+resolved and no secondary or cascading failures had occurred. All affected
+services were verified to be operating within normal parameters before the
+incident was formally closed.
+
+========================================================================
+8. PREVENTIVE ACTIONS
+========================================================================
+
+The following preventive actions have been identified to reduce the
+likelihood and impact of similar incidents in the future:
+
+  1. Implement per-query memory limits for analytics workloads
+  2. Stagger analytics report scheduling to prevent concurrent heavy queries
+  3. Add RAM utilization monitoring with early warning at 80%
+  4. Configure swap space as safety net for temporary memory spikes
+  5. Implement query admission control limiting concurrent analytical queries to 5
+
+These action items will be tracked in the engineering backlog and prioritized
+based on risk assessment and business impact analysis.
+
+========================================================================
+9. RELATED STANDARD OPERATING PROCEDURES
+========================================================================
+
+SOP-DB-003: MySQL Memory Management; SOP-DB-008: Analytics Node Recovery
+
+========================================================================
+10. LESSONS LEARNED
+========================================================================
+
+This incident provided several important learnings for the organization.
+The detection of multiple concurrent analytics queries with unbounded temporary table sizes exhausting all 128gb of ram on the analytics read replica, triggering oom killer was delayed due to gaps in
+monitoring coverage, highlighting the need for more comprehensive
+observability across the MySQL Cluster stack.
+
+The incident response process demonstrated effective team coordination and
+communication, but the overall time to resolution could be improved through
+automation of common diagnostic and remediation steps. The successful
+resolution validated existing runbooks and procedures while also identifying
+specific areas for improvement.
+
+The preventive actions identified during the post-mortem will strengthen
+organizational resilience against similar failure modes. Regular review of
+monitoring thresholds, alerting rules, and runbook procedures should be
+incorporated into the operational cadence to maintain readiness.
+
+========================================================================
+Report generated by TwinMind Incident Management System
+Date: 2025-05-19T04:40:00Z
+Classification: Internal - Confidential
+========================================================================

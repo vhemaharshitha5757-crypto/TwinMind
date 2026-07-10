@@ -1,0 +1,112 @@
+{
+  "incident_id": "INC028",
+  "title": "Prometheus Scrape Target Down Causing Monitoring Blind Spot",
+  "timestamp": "2025-07-21T09:30:00Z",
+  "severity": "P3",
+  "department": "Observability",
+  "system": "Prometheus Monitoring Stack",
+  "component": "prometheus-prod-01",
+  "location": "US-East-1 (AWS)",
+  "status": "Resolved",
+  "symptoms": [
+    "Grafana dashboards showing 'No Data' for 23 service panels",
+    "Prometheus targets page showing 23 targets as DOWN",
+    "Prometheus configuration reload log showing parse warning (non-fatal)",
+    "AlertManager not receiving any alerts for affected services",
+    "Metric gaps in long-term storage (Thanos) for the affected period"
+  ],
+  "root_cause": "Malformed Prometheus scrape configuration introduced during service discovery update caused the scrape manager to silently skip an entire target group without raising a fatal error",
+  "resolution": "Fixed the malformed scrape configuration, triggered a Prometheus reload, verified all 23 targets scraping successfully, and backfilled critical metric gaps where possible",
+  "preventive_actions": [
+    "Implement Prometheus configuration validation in CI before deployment",
+    "Add meta-monitoring to alert when scrape targets go down",
+    "Create canary scrape target that alerts if Prometheus stops collecting",
+    "Implement scrape target count monitoring with change detection",
+    "Add Prometheus config reload verification step with target validation"
+  ],
+  "affected_services": [
+    "monitoring-coverage",
+    "alerting-pipeline",
+    "dashboards",
+    "sla-reporting"
+  ],
+  "engineers": [
+    "Nina Patel",
+    "Alex Johnson",
+    "Sarah Chen"
+  ],
+  "timeline": [
+    {
+      "time": "09:30 UTC",
+      "event": "Prometheus config reload with malformed scrape configuration"
+    },
+    {
+      "time": "09:31 UTC",
+      "event": "23 targets silently dropped from scrape schedule"
+    },
+    {
+      "time": "09:32 UTC",
+      "event": "Grafana dashboards begin showing No Data for affected services"
+    },
+    {
+      "time": "13:30 UTC",
+      "event": "Engineer investigating unrelated issue notices missing metrics"
+    },
+    {
+      "time": "13:35 UTC",
+      "event": "Nina Patel alerted to monitoring gap, begins investigation"
+    },
+    {
+      "time": "13:45 UTC",
+      "event": "Malformed scrape config identified in Prometheus configuration"
+    },
+    {
+      "time": "13:50 UTC",
+      "event": "Configuration fixed, Prometheus reloaded"
+    },
+    {
+      "time": "13:55 UTC",
+      "event": "All 23 targets scraping successfully, incident resolved"
+    }
+  ],
+  "ocr_entities": [
+    "Targets DOWN: 23/156",
+    "Target Group: production-services-east",
+    "Last Scrape: 4h ago",
+    "Scrape Error: context deadline exceeded",
+    "Config: MALFORMED (line 247)",
+    "Status: SILENT FAILURE"
+  ],
+  "audio_entities": [
+    "Alex Johnson",
+    "Sarah Chen",
+    "Nina Patel"
+  ],
+  "document_entities": [
+    "prometheus",
+    "monitoring",
+    "scrape-target",
+    "blind-spot",
+    "observability"
+  ],
+  "evidence": {
+    "document": "INC028_incident_report.pdf",
+    "image": "prometheus_targets_down.png",
+    "audio": "INC028_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "Prometheus",
+    "prometheus-prod-01",
+    "Scrape Config",
+    "Target Group",
+    "Service Discovery",
+    "AlertManager"
+  ],
+  "knowledge_graph_relations": [
+    "Malformed_config CAUSED target_group_skip",
+    "Missing_scrapes CREATED monitoring_blind_spot",
+    "Config_fix RESTORED scrape_targets"
+  ],
+  "embedding_summary": "Prometheus silently stopped scraping 23 critical targets for 4 hours due to malformed scrape configuration introduced during service discovery update. No alerting was possible for affected services. Resolved by fixing configuration and implementing meta-monitoring for scrape target health.",
+  "confidence": 0.93
+}

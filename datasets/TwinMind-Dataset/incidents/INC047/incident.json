@@ -1,0 +1,112 @@
+{
+  "incident_id": "INC047",
+  "title": "API Rate Limiting False Positives Blocking Legitimate Traffic",
+  "timestamp": "2025-12-01T13:15:00Z",
+  "severity": "P2",
+  "department": "API Engineering",
+  "system": "API Rate Limiter",
+  "component": "rate-limiter-prod-01",
+  "location": "US-East-1 (AWS)",
+  "status": "Resolved",
+  "symptoms": [
+    "429 Too Many Requests responses for API consumers well below their rate limits",
+    "Rate limiter Redis counters showing inflated request counts",
+    "Redis node clock showing 3-minute drift after restart",
+    "Sliding window algorithm producing incorrect calculations due to time skew",
+    "Only requests processed by the restarted Redis node affected"
+  ],
+  "root_cause": "Redis node clock drift of 3 minutes after restart caused the sliding window rate limiting algorithm to miscalculate, counting requests from overlapping time windows and inflating rate counts",
+  "resolution": "Synchronized Redis node clock via NTP, reset all rate limiting counters, and implemented time-independent rate limiting algorithm using token bucket instead of sliding window",
+  "preventive_actions": [
+    "Implement NTP synchronization monitoring for all Redis nodes",
+    "Migrate rate limiting from sliding window to token bucket algorithm",
+    "Add rate limiter accuracy monitoring comparing actual vs measured rates",
+    "Implement rate limiter bypass for known partners during clock drift events",
+    "Create automated rate counter reset procedure for clock drift detection"
+  ],
+  "affected_services": [
+    "partner-api-v2",
+    "public-api-v1",
+    "mobile-api-gateway",
+    "webhook-api"
+  ],
+  "engineers": [
+    "Jenny Liu",
+    "Mike Torres",
+    "Sarah Chen"
+  ],
+  "timeline": [
+    {
+      "time": "13:15 UTC",
+      "event": "Redis rate limiter node restarts with clock drift"
+    },
+    {
+      "time": "13:18 UTC",
+      "event": "Rate limiting counters begin showing inflated values"
+    },
+    {
+      "time": "13:20 UTC",
+      "event": "First partner reports receiving unexpected 429 errors"
+    },
+    {
+      "time": "13:25 UTC",
+      "event": "Multiple partners escalate, pattern identified"
+    },
+    {
+      "time": "13:30 UTC",
+      "event": "Jenny Liu investigates, discovers clock drift on Redis node"
+    },
+    {
+      "time": "13:35 UTC",
+      "event": "Clock synchronized, rate counters reset"
+    },
+    {
+      "time": "13:40 UTC",
+      "event": "429 false positives stop, traffic flowing normally"
+    },
+    {
+      "time": "13:45 UTC",
+      "event": "All partners notified, incident resolved"
+    }
+  ],
+  "ocr_entities": [
+    "429 Error Rate: 25% of traffic",
+    "Client Actual Rate: 50 req/min",
+    "Measured Rate: 847 req/min (inflated)",
+    "Clock Drift: +180 seconds",
+    "Affected Partners: 35",
+    "Redis Node: redis-rl-03 (drifted)"
+  ],
+  "audio_entities": [
+    "Jenny Liu",
+    "Sarah Chen",
+    "Mike Torres"
+  ],
+  "document_entities": [
+    "rate-limiting",
+    "false-positive",
+    "api",
+    "redis-counter",
+    "traffic"
+  ],
+  "evidence": {
+    "document": "INC047_incident_report.pdf",
+    "image": "rate_limit_false_positive.png",
+    "audio": "INC047_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "Rate Limiter",
+    "rate-limiter-prod-01",
+    "Redis",
+    "Clock Drift",
+    "Sliding Window",
+    "Token Bucket"
+  ],
+  "knowledge_graph_relations": [
+    "Clock_drift INFLATED rate_counters",
+    "Inflated_counters CAUSED false_positive_429s",
+    "Token_bucket REPLACES sliding_window"
+  ],
+  "embedding_summary": "API rate limiter false positives from Redis clock drift causing sliding window algorithm to inflate request counts. 25% of legitimate traffic blocked with 429 errors for 30 minutes. 35 partners affected. Resolved by clock sync, counter reset, and migration to token bucket algorithm.",
+  "confidence": 0.94
+}

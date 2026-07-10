@@ -1,0 +1,112 @@
+{
+  "incident_id": "INC034",
+  "title": "PostgreSQL Deadlock on High-Concurrency Transaction Path",
+  "timestamp": "2025-09-01T14:20:00Z",
+  "severity": "P2",
+  "department": "Database Engineering",
+  "system": "PostgreSQL Cluster",
+  "component": "db-prod-primary-02",
+  "location": "US-East-1 (AWS)",
+  "status": "Resolved",
+  "symptoms": [
+    "PostgreSQL logs showing deadlock detected errors at 150/hour",
+    "Order processing service returning intermittent 500 errors",
+    "Database lock wait queue growing during peak concurrent transactions",
+    "pg_stat_activity showing blocked queries waiting for conflicting locks",
+    "Automatic retries consuming additional database capacity"
+  ],
+  "root_cause": "Order processing and inventory update services acquiring row-level locks on order_items and inventory tables in opposite order, creating a classic deadlock cycle under high concurrency",
+  "resolution": "Refactored both services to acquire locks in consistent alphabetical table order (inventory first, then order_items), added advisory locks for critical sections, and implemented optimistic concurrency control for inventory updates",
+  "preventive_actions": [
+    "Establish and enforce consistent lock ordering convention across all services",
+    "Implement deadlock detection monitoring with frequency-based alerting",
+    "Add advisory locks for multi-table transaction critical sections",
+    "Create load testing scenario simulating flash sale concurrency levels",
+    "Implement circuit breaker on order processing to handle deadlock storms"
+  ],
+  "affected_services": [
+    "order-processing",
+    "inventory-service",
+    "checkout-service",
+    "flash-sale-engine"
+  ],
+  "engineers": [
+    "Rajesh Kumar",
+    "James Wright",
+    "Priya Sharma"
+  ],
+  "timeline": [
+    {
+      "time": "14:20 UTC",
+      "event": "Flash sale begins, transaction concurrency spikes"
+    },
+    {
+      "time": "14:25 UTC",
+      "event": "Deadlock frequency increases from 2/hour to 50/hour"
+    },
+    {
+      "time": "14:30 UTC",
+      "event": "Order error rate exceeds 5%, alerting triggers"
+    },
+    {
+      "time": "14:35 UTC",
+      "event": "Rajesh Kumar investigates, identifies deadlock pattern"
+    },
+    {
+      "time": "14:45 UTC",
+      "event": "Lock ordering conflict between services confirmed"
+    },
+    {
+      "time": "15:00 UTC",
+      "event": "Emergency code fix prepared for consistent lock ordering"
+    },
+    {
+      "time": "15:20 UTC",
+      "event": "Fix deployed, deadlock frequency drops immediately"
+    },
+    {
+      "time": "15:30 UTC",
+      "event": "Deadlock rate back to baseline, order processing stable"
+    }
+  ],
+  "ocr_entities": [
+    "Deadlocks/Hour: 150 (baseline: 2)",
+    "Blocked Sessions: 47",
+    "Lock Wait: order_items <-> inventory",
+    "Transaction Volume: 45K/hour",
+    "Error Rate: 8%",
+    "Database: db-prod-primary-02"
+  ],
+  "audio_entities": [
+    "Rajesh Kumar",
+    "Priya Sharma",
+    "James Wright"
+  ],
+  "document_entities": [
+    "postgresql",
+    "deadlock",
+    "transaction",
+    "concurrency",
+    "locking"
+  ],
+  "evidence": {
+    "document": "INC034_incident_report.pdf",
+    "image": "postgres_deadlock.png",
+    "audio": "INC034_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "PostgreSQL",
+    "db-prod-primary-02",
+    "Deadlock",
+    "order_items Table",
+    "inventory Table",
+    "Lock Ordering"
+  ],
+  "knowledge_graph_relations": [
+    "Opposite_lock_order CAUSED deadlock_cycle",
+    "High_concurrency AMPLIFIED deadlock_frequency",
+    "Consistent_lock_ordering PREVENTS deadlocks"
+  ],
+  "embedding_summary": "PostgreSQL deadlocks spiking to 150/hour during flash sale due to order processing and inventory services acquiring locks in opposite order. 8% order failure rate, 1,200 failed orders. Resolved by enforcing consistent lock ordering and implementing advisory locks.",
+  "confidence": 0.95
+}

@@ -1,0 +1,115 @@
+{
+  "incident_id": "INC048",
+  "title": "Kubernetes HPA Autoscaling Failure During Traffic Surge",
+  "timestamp": "2025-12-08T18:00:00Z",
+  "severity": "P1",
+  "department": "Platform Engineering",
+  "system": "Google Kubernetes Engine",
+  "component": "hpa-frontend-prod",
+  "location": "GCP us-central1",
+  "status": "Resolved",
+  "symptoms": [
+    "Frontend pod CPU at 95% across all 3 replicas (HPA minimum)",
+    "HPA showing 'unable to fetch metrics' in describe output",
+    "metrics-server pod in CrashLoopBackOff from earlier OOM",
+    "Request timeout rate at 65% on frontend endpoints",
+    "Kubernetes Events showing HPA unable to compute desired replicas"
+  ],
+  "root_cause": "Metrics-server pod OOMKilled 2 hours prior, leaving HPA without CPU metrics to trigger autoscaling during the traffic surge from a marketing campaign launch",
+  "resolution": "Restarted metrics-server with increased memory allocation, manually scaled frontend to 20 replicas while HPA recovered, and implemented metrics-server monitoring",
+  "preventive_actions": [
+    "Implement metrics-server health monitoring with immediate alerting",
+    "Increase metrics-server memory allocation with proper resource requests",
+    "Add HPA fallback using custom metrics from Prometheus as secondary source",
+    "Implement manual scaling alerts when HPA is unable to function",
+    "Create pre-campaign scaling runbook with manual scale-up checklist"
+  ],
+  "affected_services": [
+    "frontend-service",
+    "marketing-campaign",
+    "user-experience",
+    "checkout-flow"
+  ],
+  "engineers": [
+    "Alex Johnson",
+    "Mike Torres",
+    "Nina Patel"
+  ],
+  "timeline": [
+    {
+      "time": "16:00 UTC",
+      "event": "Metrics-server pod OOMKilled (unnoticed)"
+    },
+    {
+      "time": "18:00 UTC",
+      "event": "Marketing campaign launches, traffic surges 10x"
+    },
+    {
+      "time": "18:05 UTC",
+      "event": "Frontend pods at 95% CPU, HPA not scaling"
+    },
+    {
+      "time": "18:08 UTC",
+      "event": "Request timeout rate climbs to 65%"
+    },
+    {
+      "time": "18:10 UTC",
+      "event": "P1 alert fires, Alex Johnson investigates"
+    },
+    {
+      "time": "18:15 UTC",
+      "event": "HPA unable to fetch metrics, metrics-server down discovered"
+    },
+    {
+      "time": "18:18 UTC",
+      "event": "Frontend manually scaled to 20 replicas"
+    },
+    {
+      "time": "18:20 UTC",
+      "event": "Metrics-server restarted with increased memory"
+    },
+    {
+      "time": "18:25 UTC",
+      "event": "Frontend traffic stabilized, timeouts resolved"
+    }
+  ],
+  "ocr_entities": [
+    "HPA: frontend-hpa",
+    "Current Replicas: 3 (min: 3, max: 50)",
+    "Target CPU: 70% (Actual: 95%)",
+    "Metrics-Server: CrashLoopBackOff",
+    "Error: unable to fetch metrics",
+    "Timeout Rate: 65%"
+  ],
+  "audio_entities": [
+    "Alex Johnson",
+    "Mike Torres",
+    "Nina Patel"
+  ],
+  "document_entities": [
+    "kubernetes",
+    "hpa",
+    "autoscaling",
+    "traffic-surge",
+    "metrics-server"
+  ],
+  "evidence": {
+    "document": "INC048_incident_report.pdf",
+    "image": "k8s_hpa_failure.png",
+    "audio": "INC048_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "Kubernetes HPA",
+    "hpa-frontend-prod",
+    "Metrics-Server",
+    "Pod Autoscaler",
+    "GKE"
+  ],
+  "knowledge_graph_relations": [
+    "Metrics-server_OOM DISABLED HPA_scaling",
+    "Missing_metrics KEPT pods_at_minimum",
+    "Manual_scaling HANDLED traffic_surge"
+  ],
+  "embedding_summary": "Kubernetes HPA autoscaling failure during marketing campaign traffic surge due to metrics-server being OOMKilled 2 hours earlier. Frontend stuck at 3 pods instead of scaling to 20+. 42,000 users impacted with 65% timeout rate. Resolved by restarting metrics-server and manual scaling.",
+  "confidence": 0.94
+}

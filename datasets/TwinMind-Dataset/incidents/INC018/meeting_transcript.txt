@@ -1,0 +1,59 @@
+MEETING TRANSCRIPT - INCIDENT INC018
+========================================================================
+Subject:      Critical CPU Utilization Spike on Application Cluster
+Date/Time:    2025-05-12T19:05:00Z
+Participants: Nina Patel, James Wright, Jenny Liu
+Duration:     Approximately 3 minutes
+Type:         Emergency Incident Response Call
+========================================================================
+
+[BEGIN TRANSCRIPT]
+[Nina Patel]: Hey team, we've got a P2 incident on ECS Fargate Cluster. CPU utilization at 98% across all search service ECS tasks. I need everyone's eyes on this immediately.
+
+[James Wright]: I'm here. Let me pull up the search-svc-task-08 dashboard. When did this start exactly?
+
+[Nina Patel]: First alert came in at 19:05 UTC. CPU utilization spikes to 98% on search service tasks. I've been looking at the logs since then.
+
+[Jenny Liu]: I just joined the call. Give me a quick rundown. What are we seeing on the infrastructure side?
+
+[Nina Patel]: Multiple symptoms. Search API response times exceeding 12 seconds (normal: 150ms). And we're also seeing Thread dumps showing regex engine consuming all CPU in tight loops.
+
+[James Wright]: OK, I've got the metrics up. Specific search query patterns triggering catastrophic regex backtracking. This doesn't look like a normal blip.
+
+[Jenny Liu]: Any recent deployments or configuration changes that could have triggered this? I want to rule out human error first.
+
+[Nina Patel]: I checked the change log for search-svc-task-08. No deployments in the last 24 hours. No config changes either. This looks like an organic failure.
+
+[James Wright]: Based on what I'm seeing in the telemetry data, I think this is related to catastrophic regex backtracking in search query parser caused by nested quantifiers in a recently de. The error pattern is very consistent with that.
+
+[Jenny Liu]: That makes sense given the symptoms. I've seen similar patterns before. What's our best remediation path here?
+
+[Nina Patel]: I recommend we rolled back the search service to the previous version without the problematic regex, deployed a fix. That should bring us back to a stable state.
+
+[James Wright]: Agreed. Let me start executing that now. Jenny, can you monitor the dashboards and confirm when metrics start recovering?
+
+[Jenny Liu]: Will do. I've got the monitoring screen up. Go ahead with the fix.
+
+[James Wright]: Alright, executing the remediation now. This will take a couple of minutes. Stand by.
+
+[Jenny Liu]: I'm starting to see positive movement on the dashboards. ECS Fargate Cluster metrics are beginning to normalize.
+
+[Nina Patel]: Confirmed on my end too. Services are recovering. Let's keep monitoring for the next fifteen minutes to make sure we're stable.
+
+[James Wright]: Fix is fully applied. Everything looks green now. I'll document the resolution steps in the incident ticket.
+
+[Nina Patel]: Great work everyone. Let's schedule a post-mortem for tomorrow. Key action items from this incident: add regex complexity analysis to code review checklist, implement regex execution timeout of 100ms in search parser, and add cpu utilization alerting at 80% with automatic scaling.
+
+[Jenny Liu]: I'll send out the post-mortem calendar invite and start drafting the incident report. Good job team, quick response on this one.
+
+[END TRANSCRIPT]
+
+========================================================================
+Action Items Captured:
+  - Add regex complexity analysis to code review checklist
+  - Implement regex execution timeout of 100ms in search parser
+  - Add CPU utilization alerting at 80% with automatic scaling
+  - Include regex performance testing in search service CI pipeline
+
+Next Steps: Post-mortem meeting scheduled for following business day.
+========================================================================

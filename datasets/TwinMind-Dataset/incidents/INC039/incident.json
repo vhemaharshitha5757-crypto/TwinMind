@@ -1,0 +1,112 @@
+{
+  "incident_id": "INC039",
+  "title": "Consul Service Discovery Failure Causing Routing Errors",
+  "timestamp": "2025-10-06T12:40:00Z",
+  "severity": "P1",
+  "department": "Platform Engineering",
+  "system": "HashiCorp Consul",
+  "component": "consul-prod-cluster-01",
+  "location": "US-East-1 (AWS)",
+  "status": "Resolved",
+  "symptoms": [
+    "Consul cluster showing no elected leader",
+    "Service catalog returning stale registrations for deregistered instances",
+    "Inter-service requests failing with connection refused on stale endpoints",
+    "Consul server logs showing repeated leader election failures",
+    "GC pause logs showing 15+ second pauses on 2 of 3 Consul servers"
+  ],
+  "root_cause": "Simultaneous JVM garbage collection pauses on 2 of 3 Consul server nodes exceeded the leader election timeout, causing quorum loss and service discovery failure",
+  "resolution": "Restarted Consul agents with tuned JVM garbage collection parameters, restored quorum, forced re-registration of all services, and expanded the cluster to 5 nodes for improved fault tolerance",
+  "preventive_actions": [
+    "Expand Consul cluster from 3 to 5 server nodes for better fault tolerance",
+    "Tune JVM GC parameters on Consul servers to minimize pause times",
+    "Increase leader election timeout to accommodate worst-case GC scenarios",
+    "Implement Consul health monitoring with quorum loss detection",
+    "Deploy Consul on dedicated instances without co-located workloads"
+  ],
+  "affected_services": [
+    "all-microservices",
+    "api-gateway",
+    "service-mesh",
+    "deployment-pipeline"
+  ],
+  "engineers": [
+    "Mike Torres",
+    "Alex Johnson",
+    "James Wright"
+  ],
+  "timeline": [
+    {
+      "time": "12:40 UTC",
+      "event": "Consul cluster loses quorum due to GC pauses on 2 servers"
+    },
+    {
+      "time": "12:42 UTC",
+      "event": "Service discovery stops updating, catalog becomes stale"
+    },
+    {
+      "time": "12:44 UTC",
+      "event": "Inter-service routing errors begin appearing"
+    },
+    {
+      "time": "12:46 UTC",
+      "event": "P1 alert fires for service mesh failures"
+    },
+    {
+      "time": "12:50 UTC",
+      "event": "Mike Torres identifies Consul quorum loss"
+    },
+    {
+      "time": "12:55 UTC",
+      "event": "Consul servers restarted with tuned GC parameters"
+    },
+    {
+      "time": "12:58 UTC",
+      "event": "Quorum restored, leader elected"
+    },
+    {
+      "time": "13:00 UTC",
+      "event": "Services re-registering, routing normalizing"
+    }
+  ],
+  "ocr_entities": [
+    "Cluster Leader: NONE",
+    "Healthy Servers: 1/3",
+    "Service Entries: 847 (STALE)",
+    "Last Health Check: 20min ago",
+    "Election Timeout: exceeded",
+    "Status: QUORUM LOST"
+  ],
+  "audio_entities": [
+    "Alex Johnson",
+    "Mike Torres",
+    "James Wright"
+  ],
+  "document_entities": [
+    "consul",
+    "service-discovery",
+    "routing",
+    "health-check",
+    "dns"
+  ],
+  "evidence": {
+    "document": "INC039_incident_report.pdf",
+    "image": "consul_quorum_loss.png",
+    "audio": "INC039_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "Consul",
+    "consul-prod-cluster-01",
+    "Quorum",
+    "Leader Election",
+    "Service Discovery",
+    "GC Pause"
+  ],
+  "knowledge_graph_relations": [
+    "GC_pauses CAUSED leader_election_failure",
+    "Quorum_loss STALED service_catalog",
+    "Cluster_expansion IMPROVES fault_tolerance"
+  ],
+  "embedding_summary": "Consul service discovery cluster quorum loss from simultaneous GC pauses on 2 of 3 server nodes. Stale routing information directed 30% of traffic to non-existent endpoints for 20 minutes. 22,000 users affected. Resolved by restarting with tuned GC and expanding cluster to 5 nodes.",
+  "confidence": 0.93
+}

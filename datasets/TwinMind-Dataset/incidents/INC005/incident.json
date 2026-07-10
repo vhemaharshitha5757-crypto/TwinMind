@@ -1,0 +1,112 @@
+{
+  "incident_id": "INC005",
+  "title": "Java Microservice Memory Leak Causing OOM Crashes",
+  "timestamp": "2025-02-10T11:05:00Z",
+  "severity": "P2",
+  "department": "Backend Engineering",
+  "system": "Order Processing Service",
+  "component": "order-svc-prod-03",
+  "location": "US-West-2 (AWS)",
+  "status": "Resolved",
+  "symptoms": [
+    "Java heap usage growing linearly from 2GB to 8GB over 6-hour cycles",
+    "OOM killer terminating the Java process repeatedly",
+    "HTTP connection pool showing 4,000+ active connections (expected max: 200)",
+    "Increasing garbage collection pause times reaching 30+ seconds",
+    "Order processing latency spikes during GC pauses and restarts"
+  ],
+  "root_cause": "HTTP connection pool leak in Apache HttpClient where connections were not released back to the pool when upstream service returned timeout exceptions",
+  "resolution": "Deployed hotfix to properly close HTTP connections in the finally block of the upstream call handler, added connection pool idle timeout configuration, and increased heap dump collection for future diagnosis",
+  "preventive_actions": [
+    "Add JVM heap usage trend alerting with 6-hour moving average",
+    "Implement HTTP connection pool monitoring with dashboards",
+    "Add automated heap dump capture when heap exceeds 80%",
+    "Schedule quarterly code review of connection management patterns",
+    "Add connection leak detection in integration test suite"
+  ],
+  "affected_services": [
+    "order-processing",
+    "inventory-service",
+    "shipping-service",
+    "notification-service"
+  ],
+  "engineers": [
+    "James Wright",
+    "Priya Sharma",
+    "Rajesh Kumar"
+  ],
+  "timeline": [
+    {
+      "time": "11:05 UTC",
+      "event": "First OOM kill event on order-svc-prod-03"
+    },
+    {
+      "time": "11:06 UTC",
+      "event": "Service auto-restarts, automated alert fires"
+    },
+    {
+      "time": "11:15 UTC",
+      "event": "James Wright begins investigation, notices recurring OOM pattern"
+    },
+    {
+      "time": "11:30 UTC",
+      "event": "Heap dump analysis reveals HTTP connection objects consuming 70% of heap"
+    },
+    {
+      "time": "11:45 UTC",
+      "event": "Root cause identified as connection leak in timeout handling path"
+    },
+    {
+      "time": "12:00 UTC",
+      "event": "Hotfix developed and tested in staging environment"
+    },
+    {
+      "time": "12:20 UTC",
+      "event": "Hotfix deployed to production, connection pool stabilizes"
+    },
+    {
+      "time": "12:35 UTC",
+      "event": "Monitoring confirms heap usage stable at 2.5GB, incident resolved"
+    }
+  ],
+  "ocr_entities": [
+    "Heap Used: 7.8GB / 8GB",
+    "GC Pause: 34.2s",
+    "HTTP Connections: 4,127",
+    "Active Threads: 892",
+    "OOM Kills (24h): 4",
+    "Service: order-svc-prod-03"
+  ],
+  "audio_entities": [
+    "James Wright",
+    "Priya Sharma",
+    "Rajesh Kumar"
+  ],
+  "document_entities": [
+    "memory-leak",
+    "java",
+    "oom",
+    "microservice",
+    "heap"
+  ],
+  "evidence": {
+    "document": "INC005_incident_report.pdf",
+    "image": "java_heap_memory_leak.png",
+    "audio": "INC005_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "Java JVM",
+    "order-svc-prod-03",
+    "Apache HttpClient",
+    "Connection Pool",
+    "OOM Killer",
+    "Heap Memory"
+  ],
+  "knowledge_graph_relations": [
+    "HttpClient_connection_leak CAUSED heap_memory_growth",
+    "OOM_killer TERMINATED order-svc-prod-03",
+    "Hotfix FIXED connection_release_in_finally_block"
+  ],
+  "embedding_summary": "Java microservice memory leak in the Order Processing service caused by HTTP connection pool leak in Apache HttpClient. Connections were not released on upstream timeouts, causing heap growth from 2GB to 8GB over 6-hour cycles. Resolved by deploying hotfix to properly close connections in finally blocks.",
+  "confidence": 0.93
+}

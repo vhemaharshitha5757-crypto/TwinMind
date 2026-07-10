@@ -1,0 +1,23 @@
+{
+  "filename": "terraform_state_lock.png",
+  "caption": "Terraform Cloud showing locked state file from crashed pipeline",
+  "scene_description": "Terraform Cloud workspace UI showing a locked state file. The lock details show the owning pipeline job is terminated. A DynamoDB table view shows the stale lock entry. Multiple queued operations are shown as blocked.",
+  "detected_objects": [
+    "Workspace Lock Status",
+    "Lock Owner Details",
+    "DynamoDB Lock Entry",
+    "Queued Operations List",
+    "Pipeline Status Indicator"
+  ],
+  "ocr_text": [
+    "Workspace: prod-infra",
+    "State: LOCKED",
+    "Lock ID: ci-job-84721 (TERMINATED)",
+    "Lock Duration: 1h 30min",
+    "Blocked Operations: 5",
+    "DynamoDB: terraform-locks"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "Terraform Cloud"
+}

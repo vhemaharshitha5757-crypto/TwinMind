@@ -1,0 +1,59 @@
+MEETING TRANSCRIPT - INCIDENT INC025
+========================================================================
+Subject:      HashiCorp Vault Secrets Engine Misconfiguration Leaking to Wrong Environment
+Date/Time:    2025-06-30T22:15:00Z
+Participants: David Kim, Aisha Khan, Rajesh Kumar
+Duration:     Approximately 3 minutes
+Type:         Emergency Incident Response Call
+========================================================================
+
+[BEGIN TRANSCRIPT]
+[David Kim]: Hey team, we've got a P1 incident on HashiCorp Vault. Production services connecting to staging database successfully but with wrong data. I need everyone's eyes on this immediately.
+
+[Aisha Khan]: I'm here. Let me pull up the vault-prod-cluster-01 dashboard. When did this start exactly?
+
+[David Kim]: First alert came in at 22:15 UTC. Vault policy migration deployed with incorrect path mapping. I've been looking at the logs since then.
+
+[Rajesh Kumar]: I just joined the call. Give me a quick rundown. What are we seeing on the infrastructure side?
+
+[David Kim]: Multiple symptoms. Staging database showing unexpected write traffic and performance degradation. And we're also seeing Vault audit logs showing production services reading staging secrets path.
+
+[Aisha Khan]: OK, I've got the metrics up. Data inconsistencies reported by QA team testing in staging. This doesn't look like a normal blip.
+
+[Rajesh Kumar]: Any recent deployments or configuration changes that could have triggered this? I want to rule out human error first.
+
+[David Kim]: I checked the change log for vault-prod-cluster-01. No deployments in the last 24 hours. No config changes either. This looks like an organic failure.
+
+[Aisha Khan]: Based on what I'm seeing in the telemetry data, I think this is related to vault secrets path mapping error during policy migration pointed production applications to the stag. The error pattern is very consistent with that.
+
+[Rajesh Kumar]: That makes sense given the symptoms. I've seen similar patterns before. What's our best remediation path here?
+
+[David Kim]: I recommend we corrected vault secrets path mapping, rotated all database credentials for both environments, remove. That should bring us back to a stable state.
+
+[Aisha Khan]: Agreed. Let me start executing that now. Rajesh, can you monitor the dashboards and confirm when metrics start recovering?
+
+[Rajesh Kumar]: Will do. I've got the monitoring screen up. Go ahead with the fix.
+
+[Aisha Khan]: Alright, executing the remediation now. This will take a couple of minutes. Stand by.
+
+[Rajesh Kumar]: I'm starting to see positive movement on the dashboards. HashiCorp Vault metrics are beginning to normalize.
+
+[David Kim]: Confirmed on my end too. Services are recovering. Let's keep monitoring for the next fifteen minutes to make sure we're stable.
+
+[Aisha Khan]: Fix is fully applied. Everything looks green now. I'll document the resolution steps in the incident ticket.
+
+[David Kim]: Great work everyone. Let's schedule a post-mortem for tomorrow. Key action items from this incident: implement vault policy change validation with environment isolation checks, add secrets path verification in application startup health checks, and create automated environment isolation testing for vault configurations.
+
+[Rajesh Kumar]: I'll send out the post-mortem calendar invite and start drafting the incident report. Good job team, quick response on this one.
+
+[END TRANSCRIPT]
+
+========================================================================
+Action Items Captured:
+  - Implement Vault policy change validation with environment isolation checks
+  - Add secrets path verification in application startup health checks
+  - Create automated environment isolation testing for Vault configurations
+  - Implement Vault policy review requiring dual approval
+
+Next Steps: Post-mortem meeting scheduled for following business day.
+========================================================================

@@ -1,0 +1,59 @@
+MEETING TRANSCRIPT - INCIDENT INC034
+========================================================================
+Subject:      PostgreSQL Deadlock on High-Concurrency Transaction Path
+Date/Time:    2025-09-01T14:20:00Z
+Participants: Rajesh Kumar, James Wright, Priya Sharma
+Duration:     Approximately 3 minutes
+Type:         Emergency Incident Response Call
+========================================================================
+
+[BEGIN TRANSCRIPT]
+[Rajesh Kumar]: Hey team, we've got a P2 incident on PostgreSQL Cluster. PostgreSQL logs showing deadlock detected errors at 150/hour. I need everyone's eyes on this immediately.
+
+[James Wright]: I'm here. Let me pull up the db-prod-primary-02 dashboard. When did this start exactly?
+
+[Rajesh Kumar]: First alert came in at 14:20 UTC. Flash sale begins, transaction concurrency spikes. I've been looking at the logs since then.
+
+[Priya Sharma]: I just joined the call. Give me a quick rundown. What are we seeing on the infrastructure side?
+
+[Rajesh Kumar]: Multiple symptoms. Order processing service returning intermittent 500 errors. And we're also seeing Database lock wait queue growing during peak concurrent transactions.
+
+[James Wright]: OK, I've got the metrics up. pg_stat_activity showing blocked queries waiting for conflicting locks. This doesn't look like a normal blip.
+
+[Priya Sharma]: Any recent deployments or configuration changes that could have triggered this? I want to rule out human error first.
+
+[Rajesh Kumar]: I checked the change log for db-prod-primary-02. No deployments in the last 24 hours. No config changes either. This looks like an organic failure.
+
+[James Wright]: Based on what I'm seeing in the telemetry data, I think this is related to order processing and inventory update services acquiring row-level locks on order_items and inventor. The error pattern is very consistent with that.
+
+[Priya Sharma]: That makes sense given the symptoms. I've seen similar patterns before. What's our best remediation path here?
+
+[Rajesh Kumar]: I recommend we refactored both services to acquire locks in consistent alphabetical table order (inventory first, t. That should bring us back to a stable state.
+
+[James Wright]: Agreed. Let me start executing that now. Priya, can you monitor the dashboards and confirm when metrics start recovering?
+
+[Priya Sharma]: Will do. I've got the monitoring screen up. Go ahead with the fix.
+
+[James Wright]: Alright, executing the remediation now. This will take a couple of minutes. Stand by.
+
+[Priya Sharma]: I'm starting to see positive movement on the dashboards. PostgreSQL Cluster metrics are beginning to normalize.
+
+[Rajesh Kumar]: Confirmed on my end too. Services are recovering. Let's keep monitoring for the next fifteen minutes to make sure we're stable.
+
+[James Wright]: Fix is fully applied. Everything looks green now. I'll document the resolution steps in the incident ticket.
+
+[Rajesh Kumar]: Great work everyone. Let's schedule a post-mortem for tomorrow. Key action items from this incident: establish and enforce consistent lock ordering convention across all services, implement deadlock detection monitoring with frequency-based alerting, and add advisory locks for multi-table transaction critical sections.
+
+[Priya Sharma]: I'll send out the post-mortem calendar invite and start drafting the incident report. Good job team, quick response on this one.
+
+[END TRANSCRIPT]
+
+========================================================================
+Action Items Captured:
+  - Establish and enforce consistent lock ordering convention across all services
+  - Implement deadlock detection monitoring with frequency-based alerting
+  - Add advisory locks for multi-table transaction critical sections
+  - Create load testing scenario simulating flash sale concurrency levels
+
+Next Steps: Post-mortem meeting scheduled for following business day.
+========================================================================

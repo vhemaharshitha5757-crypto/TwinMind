@@ -1,0 +1,59 @@
+MEETING TRANSCRIPT - INCIDENT INC039
+========================================================================
+Subject:      Consul Service Discovery Failure Causing Routing Errors
+Date/Time:    2025-10-06T12:40:00Z
+Participants: Mike Torres, Alex Johnson, James Wright
+Duration:     Approximately 3 minutes
+Type:         Emergency Incident Response Call
+========================================================================
+
+[BEGIN TRANSCRIPT]
+[Mike Torres]: Hey team, we've got a P1 incident on HashiCorp Consul. Consul cluster showing no elected leader. I need everyone's eyes on this immediately.
+
+[Alex Johnson]: I'm here. Let me pull up the consul-prod-cluster-01 dashboard. When did this start exactly?
+
+[Mike Torres]: First alert came in at 12:40 UTC. Consul cluster loses quorum due to GC pauses on 2 servers. I've been looking at the logs since then.
+
+[James Wright]: I just joined the call. Give me a quick rundown. What are we seeing on the infrastructure side?
+
+[Mike Torres]: Multiple symptoms. Service catalog returning stale registrations for deregistered instances. And we're also seeing Inter-service requests failing with connection refused on stale endpoints.
+
+[Alex Johnson]: OK, I've got the metrics up. Consul server logs showing repeated leader election failures. This doesn't look like a normal blip.
+
+[James Wright]: Any recent deployments or configuration changes that could have triggered this? I want to rule out human error first.
+
+[Mike Torres]: I checked the change log for consul-prod-cluster-01. No deployments in the last 24 hours. No config changes either. This looks like an organic failure.
+
+[Alex Johnson]: Based on what I'm seeing in the telemetry data, I think this is related to simultaneous jvm garbage collection pauses on 2 of 3 consul server nodes exceeded the leader electio. The error pattern is very consistent with that.
+
+[James Wright]: That makes sense given the symptoms. I've seen similar patterns before. What's our best remediation path here?
+
+[Mike Torres]: I recommend we restarted consul agents with tuned jvm garbage collection parameters, restored quorum, forced re-reg. That should bring us back to a stable state.
+
+[Alex Johnson]: Agreed. Let me start executing that now. James, can you monitor the dashboards and confirm when metrics start recovering?
+
+[James Wright]: Will do. I've got the monitoring screen up. Go ahead with the fix.
+
+[Alex Johnson]: Alright, executing the remediation now. This will take a couple of minutes. Stand by.
+
+[James Wright]: I'm starting to see positive movement on the dashboards. HashiCorp Consul metrics are beginning to normalize.
+
+[Mike Torres]: Confirmed on my end too. Services are recovering. Let's keep monitoring for the next fifteen minutes to make sure we're stable.
+
+[Alex Johnson]: Fix is fully applied. Everything looks green now. I'll document the resolution steps in the incident ticket.
+
+[Mike Torres]: Great work everyone. Let's schedule a post-mortem for tomorrow. Key action items from this incident: expand consul cluster from 3 to 5 server nodes for better fault tolerance, tune jvm gc parameters on consul servers to minimize pause times, and increase leader election timeout to accommodate worst-case gc scenarios.
+
+[James Wright]: I'll send out the post-mortem calendar invite and start drafting the incident report. Good job team, quick response on this one.
+
+[END TRANSCRIPT]
+
+========================================================================
+Action Items Captured:
+  - Expand Consul cluster from 3 to 5 server nodes for better fault tolerance
+  - Tune JVM GC parameters on Consul servers to minimize pause times
+  - Increase leader election timeout to accommodate worst-case GC scenarios
+  - Implement Consul health monitoring with quorum loss detection
+
+Next Steps: Post-mortem meeting scheduled for following business day.
+========================================================================

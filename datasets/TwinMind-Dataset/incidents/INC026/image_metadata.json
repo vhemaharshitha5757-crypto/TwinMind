@@ -1,0 +1,23 @@
+{
+  "filename": "network_partition_azs.png",
+  "caption": "Network topology showing partition between Availability Zones",
+  "scene_description": "A network topology diagram showing two AZs separated by a red partition line. AZ-a shows the original primary database, AZ-b shows a newly promoted primary. Conflicting write indicators are shown on both sides.",
+  "detected_objects": [
+    "AZ Topology Diagram",
+    "Partition Line Indicator",
+    "Dual Primary Warning",
+    "Write Conflict Markers",
+    "Network Path Status"
+  ],
+  "ocr_text": [
+    "AZ-a: db-primary-01 (ACTIVE)",
+    "AZ-b: db-replica-02 (PROMOTED TO PRIMARY)",
+    "Partition Duration: 12 min",
+    "Conflicting Records: 847",
+    "Network Status: PARTITIONED",
+    "Alert: SPLIT-BRAIN DETECTED"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "AWS VPC Networking"
+}

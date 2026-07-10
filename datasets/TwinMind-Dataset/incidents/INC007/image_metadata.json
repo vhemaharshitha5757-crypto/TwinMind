@@ -1,0 +1,23 @@
+{
+  "filename": "docker_oom_analytics.png",
+  "caption": "Docker container metrics showing OOMKill events on analytics workers",
+  "scene_description": "A Docker monitoring dashboard showing container memory usage hitting the 4GB ceiling repeatedly. Each spike is followed by a sharp drop to zero indicating container termination. A job queue depth graph shows steadily increasing pending jobs.",
+  "detected_objects": [
+    "Container Memory Graph",
+    "OOMKill Event Markers",
+    "Job Queue Depth Chart",
+    "Container Restart Counter",
+    "Node Resource Panel"
+  ],
+  "ocr_text": [
+    "Container Memory: 4096MB / 4096MB",
+    "Exit Code: 137 (OOMKilled)",
+    "Restarts: 14",
+    "Queue Depth: 2,847 jobs",
+    "Node: analytics-worker-04",
+    "Status: OOMKilled"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "Docker Swarm Cluster"
+}

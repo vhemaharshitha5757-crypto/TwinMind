@@ -1,0 +1,117 @@
+{
+  "incident_id": "INC043",
+  "title": "SMTP Relay Failure Blocking All Outgoing Email Notifications",
+  "timestamp": "2025-11-03T06:00:00Z",
+  "severity": "P2",
+  "department": "Application Engineering",
+  "system": "Amazon SES SMTP Relay",
+  "component": "ses-smtp-prod-01",
+  "location": "US-East-1 (AWS)",
+  "status": "Resolved",
+  "symptoms": [
+    "SES returning 'Daily sending quota exceeded' errors",
+    "Email delivery queue growing with no outbound processing",
+    "SES dashboard showing 2.1M emails sent (daily quota: 2M)",
+    "Marketing batch job log showing incorrect segment filter",
+    "All transactional email channels blocked (password reset, 2FA, order confirmation)"
+  ],
+  "root_cause": "Marketing batch email job sent to 2.1M addresses instead of 50K target segment due to missing segment filter, exhausting the daily SES sending quota and blocking transactional email",
+  "resolution": "Requested emergency SES quota increase from AWS, prioritized transactional email queue over marketing, implemented separate SES configurations for transactional vs marketing email",
+  "preventive_actions": [
+    "Implement separate SES accounts for transactional and marketing email",
+    "Add segment size validation check before batch email sends",
+    "Set sending rate limits on marketing email pipeline",
+    "Implement SES quota usage monitoring with alerts at 70% and 90%",
+    "Create batch email approval workflow requiring segment verification"
+  ],
+  "affected_services": [
+    "password-reset",
+    "2fa-delivery",
+    "order-confirmation",
+    "shipping-notifications",
+    "welcome-emails"
+  ],
+  "engineers": [
+    "Priya Sharma",
+    "Jenny Liu",
+    "Nina Patel"
+  ],
+  "timeline": [
+    {
+      "time": "06:00 UTC",
+      "event": "Marketing batch email job starts with incorrect segment filter"
+    },
+    {
+      "time": "07:30 UTC",
+      "event": "SES daily sending quota exhausted at 2.1M emails"
+    },
+    {
+      "time": "07:31 UTC",
+      "event": "Transactional email delivery begins failing"
+    },
+    {
+      "time": "08:00 UTC",
+      "event": "Operations team notices missing transactional email reports"
+    },
+    {
+      "time": "08:15 UTC",
+      "event": "Priya Sharma investigates, discovers quota exhaustion"
+    },
+    {
+      "time": "08:30 UTC",
+      "event": "Marketing batch job identified as root cause"
+    },
+    {
+      "time": "08:45 UTC",
+      "event": "Emergency SES quota increase requested"
+    },
+    {
+      "time": "09:00 UTC",
+      "event": "Quota increased, transactional email queue draining"
+    },
+    {
+      "time": "09:30 UTC",
+      "event": "All transactional emails delivered, incident resolved"
+    }
+  ],
+  "ocr_entities": [
+    "Emails Sent: 2,100,847 / 2,000,000 quota",
+    "Status: QUOTA EXCEEDED",
+    "Queued Transactional: 45,231",
+    "Marketing Batch: 2.1M (intended: 50K)",
+    "Bounce Rate: 12.3%",
+    "SES Account: ses-smtp-prod-01"
+  ],
+  "audio_entities": [
+    "Jenny Liu",
+    "Priya Sharma",
+    "Nina Patel"
+  ],
+  "document_entities": [
+    "smtp",
+    "email",
+    "ses",
+    "relay-failure",
+    "notifications"
+  ],
+  "evidence": {
+    "document": "INC043_incident_report.pdf",
+    "image": "smtp_quota_exhausted.png",
+    "audio": "INC043_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "Amazon SES",
+    "ses-smtp-prod-01",
+    "SMTP Relay",
+    "Sending Quota",
+    "Marketing Batch",
+    "Transactional Email"
+  ],
+  "knowledge_graph_relations": [
+    "Marketing_batch EXHAUSTED SES_quota",
+    "Quota_exhaustion BLOCKED transactional_email",
+    "Separate_accounts ISOLATE marketing_from_transactional"
+  ],
+  "embedding_summary": "SMTP relay failure after marketing batch email job accidentally sent to 2.1M addresses instead of 50K segment, exhausting SES daily sending quota. All transactional emails blocked for 3 hours including password resets and 2FA. Resolved by emergency quota increase and separating email accounts.",
+  "confidence": 0.94
+}

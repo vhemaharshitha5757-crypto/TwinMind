@@ -1,0 +1,162 @@
+INCIDENT REPORT
+========================================================================
+
+Incident ID:       INC003
+Title:             API Gateway Timeout Cascade Affecting All External Endpoints
+Severity:          P1
+Date/Time:         2025-01-29T09:45:00Z
+Department:        API Engineering
+System:            Kong API Gateway
+Component:         api-gw-eu-west-01
+Location:          EU-West-1 (AWS)
+Assigned Engineer: Jenny Liu
+Status:            Resolved
+
+========================================================================
+1. SUMMARY
+========================================================================
+
+The Kong API Gateway cluster serving EU traffic (api-gw-eu-west-01) began returning 504 Gateway Timeout errors on all external API endpoints at 09:45 UTC on January 29, 2025. The issue was caused by a rate-limiting plugin misconfiguration that was deployed as part of a routine policy update. The misconfigured plugin caused request processing to hang on a synchronous database lookup for each request, exhausting the gateway worker pool within minutes.
+
+This incident was classified as P1 severity and was assigned to
+Jenny Liu in the API Engineering department. The affected system was
+Kong API Gateway, specifically the api-gw-eu-west-01 component located in EU-West-1 (AWS).
+The incident was detected through automated monitoring and alerting systems,
+and the response team was engaged within minutes of the initial alert.
+
+========================================================================
+2. BUSINESS IMPACT
+========================================================================
+
+All external API consumers in the EU region were unable to reach backend services for 28 minutes. This affected 45 enterprise API partners and approximately 2.3 million API calls failed during the outage window. SLA breach notifications were triggered for 12 premium-tier API partners. Estimated revenue impact of $120,000 from failed API transactions.
+
+The incident triggered the organization's major incident response process,
+involving cross-functional coordination between engineering, operations, and
+business stakeholders. Customer support was notified and prepared to handle
+incoming queries related to the service degradation.
+
+========================================================================
+3. SYMPTOMS OBSERVED
+========================================================================
+
+The following symptoms were observed during the incident:
+
+  * 504 Gateway Timeout errors on all external API routes
+  * Kong worker processes at 100% utilization with zero free workers
+  * API response times exceeding 30-second timeout threshold
+  * Rate-limiting plugin logs showing synchronous DB connection timeouts
+  * Upstream services healthy but unreachable through the gateway
+
+These symptoms were correlated across multiple monitoring systems including
+application performance monitoring, infrastructure metrics, and log
+aggregation platforms. The incident response team confirmed the symptoms
+during their initial assessment and used them to guide the investigation.
+
+========================================================================
+4. TIMELINE OF EVENTS
+========================================================================
+
+  [09:45 UTC] First 504 timeout errors detected on external API endpoints
+  [09:47 UTC] Automated alert fires for API error rate exceeding threshold
+  [09:50 UTC] Jenny Liu begins investigation, confirms all upstreams healthy
+  [09:55 UTC] Worker pool exhaustion identified, rate-limiting plugin suspected
+  [10:00 UTC] Root cause confirmed as misconfigured rate-limiting plugin
+  [10:05 UTC] Configuration rollback initiated to previous working version
+  [10:10 UTC] Kong workers restarted, API endpoints begin recovering
+  [10:13 UTC] All API endpoints verified operational, incident resolved
+
+========================================================================
+5. INVESTIGATION
+========================================================================
+
+Upon receiving the automated alert, the incident response team initiated a
+systematic investigation following established runbook procedures. The team
+began by examining the health and status of the api-gw-eu-west-01 component
+within the Kong API Gateway system deployed in EU-West-1 (AWS).
+
+Initial telemetry data from the monitoring stack was reviewed, including
+application logs, infrastructure metrics, and recent deployment and change
+history. The investigation revealed that the primary symptoms were consistent
+across multiple data sources and monitoring tools.
+
+Log analysis from the affected component showed error patterns that pointed
+toward misconfigured rate-limiting plugin performing synchronous database lookups instead of local in-memory counter, exhausting gateway worker pool. The team also reviewed recent change
+records, configuration modifications, and deployment history to rule out
+human-initiated causes. Cross-referencing the timeline of events with
+infrastructure metrics from the preceding 24-48 hours provided additional
+context that supported the final root cause determination.
+
+========================================================================
+6. ROOT CAUSE ANALYSIS
+========================================================================
+
+The root cause of this incident was determined to be:
+Misconfigured rate-limiting plugin performing synchronous database lookups instead of local in-memory counter, exhausting gateway worker pool.
+
+Further analysis confirmed that this issue had been developing over time but
+was not detected by existing monitoring thresholds and alerting rules. The
+failure point was within the api-gw-eu-west-01 component of the Kong API Gateway
+system. Contributing factors included insufficient monitoring coverage for
+the specific failure mode encountered and the absence of automated
+remediation procedures for this particular scenario.
+
+========================================================================
+7. RESOLUTION
+========================================================================
+
+The incident was resolved by the following actions: Rolled back the rate-limiting plugin configuration to the previous working version, restarted Kong worker processes, and verified all API endpoints operational.
+
+The resolution was executed by Jenny Liu with support from the incident
+response team. After applying the remediation steps, the team monitored the
+system for a stabilization period to confirm that the issue was fully
+resolved and no secondary or cascading failures had occurred. All affected
+services were verified to be operating within normal parameters before the
+incident was formally closed.
+
+========================================================================
+8. PREVENTIVE ACTIONS
+========================================================================
+
+The following preventive actions have been identified to reduce the
+likelihood and impact of similar incidents in the future:
+
+  1. Implement canary deployment for API gateway configuration changes
+  2. Add gateway worker pool utilization alerting
+  3. Create staging environment mirroring production gateway topology
+  4. Mandate load testing for all plugin configuration changes
+  5. Implement circuit breaker on rate-limiting plugin database connection
+
+These action items will be tracked in the engineering backlog and prioritized
+based on risk assessment and business impact analysis.
+
+========================================================================
+9. RELATED STANDARD OPERATING PROCEDURES
+========================================================================
+
+SOP-API-001: API Gateway Incident Response; SOP-API-005: Configuration Rollback Procedures
+
+========================================================================
+10. LESSONS LEARNED
+========================================================================
+
+This incident provided several important learnings for the organization.
+The detection of misconfigured rate-limiting plugin performing synchronous database lookups instead of local in-memory counter, exhausting gateway worker pool was delayed due to gaps in
+monitoring coverage, highlighting the need for more comprehensive
+observability across the Kong API Gateway stack.
+
+The incident response process demonstrated effective team coordination and
+communication, but the overall time to resolution could be improved through
+automation of common diagnostic and remediation steps. The successful
+resolution validated existing runbooks and procedures while also identifying
+specific areas for improvement.
+
+The preventive actions identified during the post-mortem will strengthen
+organizational resilience against similar failure modes. Regular review of
+monitoring thresholds, alerting rules, and runbook procedures should be
+incorporated into the operational cadence to maintain readiness.
+
+========================================================================
+Report generated by TwinMind Incident Management System
+Date: 2025-01-29T09:45:00Z
+Classification: Internal - Confidential
+========================================================================

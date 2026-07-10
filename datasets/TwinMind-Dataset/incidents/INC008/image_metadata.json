@@ -1,0 +1,23 @@
+{
+  "filename": "jwt_mass_logout_dashboard.png",
+  "caption": "Authentication dashboard showing mass logout event and token refresh spike",
+  "scene_description": "An authentication monitoring dashboard showing active sessions dropping from 45,000 to near zero within minutes. Token refresh rate graph shows an enormous spike. The auth service CPU and memory panels show resource exhaustion.",
+  "detected_objects": [
+    "Active Sessions Counter",
+    "Token Refresh Rate Graph",
+    "Auth Service CPU Panel",
+    "Login Error Rate Chart",
+    "Configuration Version Label"
+  ],
+  "ocr_text": [
+    "Active Sessions: 127 (was 45,000)",
+    "Token Refresh Rate: 45,231/min",
+    "Auth CPU: 100%",
+    "Login Failures: 38,492",
+    "JWT TTL: 60s",
+    "Config Version: v2.4.1-bad"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "Authentication Service"
+}

@@ -1,0 +1,164 @@
+INCIDENT REPORT
+========================================================================
+
+Incident ID:       INC021
+Title:             CI/CD Pipeline Deployment Rollback After Database Migration Failure
+Severity:          P1
+Date/Time:         2025-06-02T14:30:00Z
+Department:        CI/CD Engineering
+System:            Jenkins CI/CD Pipeline
+Component:         deploy-pipeline-prod-01
+Location:          US-East-1 (AWS)
+Assigned Engineer: Tom Williams
+Status:            Resolved
+
+========================================================================
+1. SUMMARY
+========================================================================
+
+A production deployment via Jenkins pipeline (deploy-pipeline-prod-01) at 14:30 UTC on June 2, 2025 included a database migration that dropped a column still referenced by the previous application version. During the rolling deployment, instances running the old code began failing when querying the dropped column. The deployment was rolled back, but the database migration could not be simply reversed, requiring manual schema repair.
+
+This incident was classified as P1 severity and was assigned to
+Tom Williams in the CI/CD Engineering department. The affected system was
+Jenkins CI/CD Pipeline, specifically the deploy-pipeline-prod-01 component located in US-East-1 (AWS).
+The incident was detected through automated monitoring and alerting systems,
+and the response team was engaged within minutes of the initial alert.
+
+========================================================================
+2. BUSINESS IMPACT
+========================================================================
+
+Production application partially down for 55 minutes during rollback and schema repair. 40% of application instances failed immediately after the migration ran. Approximately 15,000 users experienced errors. Data integrity was maintained but the incident exposed gaps in the deployment safety process.
+
+The incident triggered the organization's major incident response process,
+involving cross-functional coordination between engineering, operations, and
+business stakeholders. Customer support was notified and prepared to handle
+incoming queries related to the service degradation.
+
+========================================================================
+3. SYMPTOMS OBSERVED
+========================================================================
+
+The following symptoms were observed during the incident:
+
+  * Application instances throwing SQL errors for undefined column references
+  * Rolling deployment showing 40% of instances in failed health checks
+  * Database migration log showing column drop completed successfully
+  * Old application version instances unable to query the modified table
+  * Deployment pipeline stuck in partial rollback state
+
+These symptoms were correlated across multiple monitoring systems including
+application performance monitoring, infrastructure metrics, and log
+aggregation platforms. The incident response team confirmed the symptoms
+during their initial assessment and used them to guide the investigation.
+
+========================================================================
+4. TIMELINE OF EVENTS
+========================================================================
+
+  [14:30 UTC] Production deployment pipeline initiated in Jenkins
+  [14:35 UTC] Database migration executes, drops user_legacy_id column
+  [14:38 UTC] Rolling deployment begins, new instances starting
+  [14:42 UTC] Old instances begin failing with SQL column not found errors
+  [14:45 UTC] P1 alert fires, 40% of instances in failed state
+  [14:50 UTC] Tom Williams initiates pipeline rollback
+  [14:55 UTC] Rollback blocked by irreversible migration, manual intervention needed
+  [15:10 UTC] Dropped column manually re-added to database
+  [15:20 UTC] Application rollback completed, all instances healthy
+  [15:25 UTC] Incident resolved, post-mortem scheduled
+
+========================================================================
+5. INVESTIGATION
+========================================================================
+
+Upon receiving the automated alert, the incident response team initiated a
+systematic investigation following established runbook procedures. The team
+began by examining the health and status of the deploy-pipeline-prod-01 component
+within the Jenkins CI/CD Pipeline system deployed in US-East-1 (AWS).
+
+Initial telemetry data from the monitoring stack was reviewed, including
+application logs, infrastructure metrics, and recent deployment and change
+history. The investigation revealed that the primary symptoms were consistent
+across multiple data sources and monitoring tools.
+
+Log analysis from the affected component showed error patterns that pointed
+toward database migration dropped a column before all application instances were updated to the new version that no longer references it, violating the expand-and-contract migration pattern. The team also reviewed recent change
+records, configuration modifications, and deployment history to rule out
+human-initiated causes. Cross-referencing the timeline of events with
+infrastructure metrics from the preceding 24-48 hours provided additional
+context that supported the final root cause determination.
+
+========================================================================
+6. ROOT CAUSE ANALYSIS
+========================================================================
+
+The root cause of this incident was determined to be:
+Database migration dropped a column before all application instances were updated to the new version that no longer references it, violating the expand-and-contract migration pattern.
+
+Further analysis confirmed that this issue had been developing over time but
+was not detected by existing monitoring thresholds and alerting rules. The
+failure point was within the deploy-pipeline-prod-01 component of the Jenkins CI/CD Pipeline
+system. Contributing factors included insufficient monitoring coverage for
+the specific failure mode encountered and the absence of automated
+remediation procedures for this particular scenario.
+
+========================================================================
+7. RESOLUTION
+========================================================================
+
+The incident was resolved by the following actions: Manually re-added the dropped column to the database, completed the application rollback, re-planned the migration using expand-and-contract pattern with separate deploy phases.
+
+The resolution was executed by Tom Williams with support from the incident
+response team. After applying the remediation steps, the team monitored the
+system for a stabilization period to confirm that the issue was fully
+resolved and no secondary or cascading failures had occurred. All affected
+services were verified to be operating within normal parameters before the
+incident was formally closed.
+
+========================================================================
+8. PREVENTIVE ACTIONS
+========================================================================
+
+The following preventive actions have been identified to reduce the
+likelihood and impact of similar incidents in the future:
+
+  1. Enforce expand-and-contract pattern for all breaking schema changes
+  2. Implement database migration pre-check against running application versions
+  3. Add deployment canary phase with automatic rollback triggers
+  4. Create database migration rollback scripts for every migration
+  5. Implement blue-green deployment for breaking changes
+
+These action items will be tracked in the engineering backlog and prioritized
+based on risk assessment and business impact analysis.
+
+========================================================================
+9. RELATED STANDARD OPERATING PROCEDURES
+========================================================================
+
+SOP-CICD-001: Production Deployment Procedures; SOP-DB-005: Migration Rollback
+
+========================================================================
+10. LESSONS LEARNED
+========================================================================
+
+This incident provided several important learnings for the organization.
+The detection of database migration dropped a column before all application instances were updated to the new version that no longer references it, violating the expand-and-contract migration pattern was delayed due to gaps in
+monitoring coverage, highlighting the need for more comprehensive
+observability across the Jenkins CI/CD Pipeline stack.
+
+The incident response process demonstrated effective team coordination and
+communication, but the overall time to resolution could be improved through
+automation of common diagnostic and remediation steps. The successful
+resolution validated existing runbooks and procedures while also identifying
+specific areas for improvement.
+
+The preventive actions identified during the post-mortem will strengthen
+organizational resilience against similar failure modes. Regular review of
+monitoring thresholds, alerting rules, and runbook procedures should be
+incorporated into the operational cadence to maintain readiness.
+
+========================================================================
+Report generated by TwinMind Incident Management System
+Date: 2025-06-02T14:30:00Z
+Classification: Internal - Confidential
+========================================================================

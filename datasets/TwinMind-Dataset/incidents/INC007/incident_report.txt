@@ -1,0 +1,162 @@
+INCIDENT REPORT
+========================================================================
+
+Incident ID:       INC007
+Title:             Docker Container OOMKilled on Analytics Processing Nodes
+Severity:          P2
+Date/Time:         2025-02-24T20:33:00Z
+Department:        Data Engineering
+System:            Docker Swarm Cluster
+Component:         analytics-worker-04
+Location:          EU-West-1 (AWS)
+Assigned Engineer: Tom Williams
+Status:            Resolved
+
+========================================================================
+1. SUMMARY
+========================================================================
+
+Docker containers running the analytics batch processing workload on node analytics-worker-04 were repeatedly OOMKilled starting at 20:33 UTC on February 24, 2025. The container memory limit was set to 4GB but a recent code change introduced a data aggregation step that loaded entire result sets into memory instead of streaming them. Processing of large customer datasets triggered memory allocation beyond the container limit.
+
+This incident was classified as P2 severity and was assigned to
+Tom Williams in the Data Engineering department. The affected system was
+Docker Swarm Cluster, specifically the analytics-worker-04 component located in EU-West-1 (AWS).
+The incident was detected through automated monitoring and alerting systems,
+and the response team was engaged within minutes of the initial alert.
+
+========================================================================
+2. BUSINESS IMPACT
+========================================================================
+
+Analytics batch processing pipeline stalled for 2.5 hours. Daily analytics reports for 350 enterprise customers were delayed. Real-time dashboard data became stale. No data loss occurred as the batch queue preserved unprocessed jobs. Business intelligence team unable to generate morning reports for EMEA leadership.
+
+The incident triggered the organization's major incident response process,
+involving cross-functional coordination between engineering, operations, and
+business stakeholders. Customer support was notified and prepared to handle
+incoming queries related to the service degradation.
+
+========================================================================
+3. SYMPTOMS OBSERVED
+========================================================================
+
+The following symptoms were observed during the incident:
+
+  * Docker containers exiting with OOMKilled status code 137
+  * Container memory usage spiking to 4GB limit before termination
+  * Analytics job queue depth increasing with no active consumers
+  * Docker events showing repeated container restarts
+  * Stale data on customer-facing analytics dashboards
+
+These symptoms were correlated across multiple monitoring systems including
+application performance monitoring, infrastructure metrics, and log
+aggregation platforms. The incident response team confirmed the symptoms
+during their initial assessment and used them to guide the investigation.
+
+========================================================================
+4. TIMELINE OF EVENTS
+========================================================================
+
+  [20:33 UTC] First OOMKill event on analytics-worker-04 containers
+  [20:38 UTC] Alert fires for analytics pipeline stall
+  [20:45 UTC] Tom Williams investigates, identifies OOMKill pattern
+  [21:00 UTC] Memory profiling reveals full result set loading in aggregation module
+  [21:15 UTC] Interim fix: container memory limit increased to 8GB
+  [21:30 UTC] Code fix developed for cursor-based streaming
+  [22:00 UTC] Fix deployed, analytics jobs resuming
+  [23:00 UTC] All stalled jobs reprocessed, pipeline fully recovered
+
+========================================================================
+5. INVESTIGATION
+========================================================================
+
+Upon receiving the automated alert, the incident response team initiated a
+systematic investigation following established runbook procedures. The team
+began by examining the health and status of the analytics-worker-04 component
+within the Docker Swarm Cluster system deployed in EU-West-1 (AWS).
+
+Initial telemetry data from the monitoring stack was reviewed, including
+application logs, infrastructure metrics, and recent deployment and change
+history. The investigation revealed that the primary symptoms were consistent
+across multiple data sources and monitoring tools.
+
+Log analysis from the affected component showed error patterns that pointed
+toward recent code change in analytics aggregation module loading entire sql result sets into memory instead of using cursor-based streaming for large datasets. The team also reviewed recent change
+records, configuration modifications, and deployment history to rule out
+human-initiated causes. Cross-referencing the timeline of events with
+infrastructure metrics from the preceding 24-48 hours provided additional
+context that supported the final root cause determination.
+
+========================================================================
+6. ROOT CAUSE ANALYSIS
+========================================================================
+
+The root cause of this incident was determined to be:
+Recent code change in analytics aggregation module loading entire SQL result sets into memory instead of using cursor-based streaming for large datasets.
+
+Further analysis confirmed that this issue had been developing over time but
+was not detected by existing monitoring thresholds and alerting rules. The
+failure point was within the analytics-worker-04 component of the Docker Swarm Cluster
+system. Contributing factors included insufficient monitoring coverage for
+the specific failure mode encountered and the absence of automated
+remediation procedures for this particular scenario.
+
+========================================================================
+7. RESOLUTION
+========================================================================
+
+The incident was resolved by the following actions: Deployed code fix to implement cursor-based streaming for large datasets, increased container memory limit to 8GB as interim measure, and reprocessed stalled analytics jobs.
+
+The resolution was executed by Tom Williams with support from the incident
+response team. After applying the remediation steps, the team monitored the
+system for a stabilization period to confirm that the issue was fully
+resolved and no secondary or cascading failures had occurred. All affected
+services were verified to be operating within normal parameters before the
+incident was formally closed.
+
+========================================================================
+8. PREVENTIVE ACTIONS
+========================================================================
+
+The following preventive actions have been identified to reduce the
+likelihood and impact of similar incidents in the future:
+
+  1. Implement memory profiling in CI pipeline for data processing services
+  2. Add container memory usage alerting at 75% of limit
+  3. Mandate cursor-based streaming for all database queries returning over 10K rows
+  4. Create load testing with production-scale datasets in staging
+  5. Implement progressive memory limit increases with validation
+
+These action items will be tracked in the engineering backlog and prioritized
+based on risk assessment and business impact analysis.
+
+========================================================================
+9. RELATED STANDARD OPERATING PROCEDURES
+========================================================================
+
+SOP-DOCKER-002: Container OOMKill Recovery; SOP-DATA-001: Batch Processing Failure Handling
+
+========================================================================
+10. LESSONS LEARNED
+========================================================================
+
+This incident provided several important learnings for the organization.
+The detection of recent code change in analytics aggregation module loading entire sql result sets into memory instead of using cursor-based streaming for large datasets was delayed due to gaps in
+monitoring coverage, highlighting the need for more comprehensive
+observability across the Docker Swarm Cluster stack.
+
+The incident response process demonstrated effective team coordination and
+communication, but the overall time to resolution could be improved through
+automation of common diagnostic and remediation steps. The successful
+resolution validated existing runbooks and procedures while also identifying
+specific areas for improvement.
+
+The preventive actions identified during the post-mortem will strengthen
+organizational resilience against similar failure modes. Regular review of
+monitoring thresholds, alerting rules, and runbook procedures should be
+incorporated into the operational cadence to maintain readiness.
+
+========================================================================
+Report generated by TwinMind Incident Management System
+Date: 2025-02-24T20:33:00Z
+Classification: Internal - Confidential
+========================================================================

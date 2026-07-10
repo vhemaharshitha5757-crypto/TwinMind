@@ -1,0 +1,59 @@
+MEETING TRANSCRIPT - INCIDENT INC005
+========================================================================
+Subject:      Java Microservice Memory Leak Causing OOM Crashes
+Date/Time:    2025-02-10T11:05:00Z
+Participants: James Wright, Priya Sharma, Rajesh Kumar
+Duration:     Approximately 3 minutes
+Type:         Emergency Incident Response Call
+========================================================================
+
+[BEGIN TRANSCRIPT]
+[James Wright]: Hey team, we've got a P2 incident on Order Processing Service. Java heap usage growing linearly from 2GB to 8GB over 6-hour cycles. I need everyone's eyes on this immediately.
+
+[Priya Sharma]: I'm here. Let me pull up the order-svc-prod-03 dashboard. When did this start exactly?
+
+[James Wright]: First alert came in at 11:05 UTC. First OOM kill event on order-svc-prod-03. I've been looking at the logs since then.
+
+[Rajesh Kumar]: I just joined the call. Give me a quick rundown. What are we seeing on the infrastructure side?
+
+[James Wright]: Multiple symptoms. OOM killer terminating the Java process repeatedly. And we're also seeing HTTP connection pool showing 4,000+ active connections (expected max: 200).
+
+[Priya Sharma]: OK, I've got the metrics up. Increasing garbage collection pause times reaching 30+ seconds. This doesn't look like a normal blip.
+
+[Rajesh Kumar]: Any recent deployments or configuration changes that could have triggered this? I want to rule out human error first.
+
+[James Wright]: I checked the change log for order-svc-prod-03. No deployments in the last 24 hours. No config changes either. This looks like an organic failure.
+
+[Priya Sharma]: Based on what I'm seeing in the telemetry data, I think this is related to http connection pool leak in apache httpclient where connections were not released back to the pool . The error pattern is very consistent with that.
+
+[Rajesh Kumar]: That makes sense given the symptoms. I've seen similar patterns before. What's our best remediation path here?
+
+[James Wright]: I recommend we deployed hotfix to properly close http connections in the finally block of the upstream call handler. That should bring us back to a stable state.
+
+[Priya Sharma]: Agreed. Let me start executing that now. Rajesh, can you monitor the dashboards and confirm when metrics start recovering?
+
+[Rajesh Kumar]: Will do. I've got the monitoring screen up. Go ahead with the fix.
+
+[Priya Sharma]: Alright, executing the remediation now. This will take a couple of minutes. Stand by.
+
+[Rajesh Kumar]: I'm starting to see positive movement on the dashboards. Order Processing Service metrics are beginning to normalize.
+
+[James Wright]: Confirmed on my end too. Services are recovering. Let's keep monitoring for the next fifteen minutes to make sure we're stable.
+
+[Priya Sharma]: Fix is fully applied. Everything looks green now. I'll document the resolution steps in the incident ticket.
+
+[James Wright]: Great work everyone. Let's schedule a post-mortem for tomorrow. Key action items from this incident: add jvm heap usage trend alerting with 6-hour moving average, implement http connection pool monitoring with dashboards, and add automated heap dump capture when heap exceeds 80%.
+
+[Rajesh Kumar]: I'll send out the post-mortem calendar invite and start drafting the incident report. Good job team, quick response on this one.
+
+[END TRANSCRIPT]
+
+========================================================================
+Action Items Captured:
+  - Add JVM heap usage trend alerting with 6-hour moving average
+  - Implement HTTP connection pool monitoring with dashboards
+  - Add automated heap dump capture when heap exceeds 80%
+  - Schedule quarterly code review of connection management patterns
+
+Next Steps: Post-mortem meeting scheduled for following business day.
+========================================================================

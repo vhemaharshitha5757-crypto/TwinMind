@@ -1,0 +1,23 @@
+{
+  "filename": "tls_cert_expired.png",
+  "caption": "Certificate monitoring showing expired TLS cert on production ALB",
+  "scene_description": "A certificate monitoring dashboard showing the production certificate with a red EXPIRED badge. An expiry timeline shows the certificate crossed the expiry date. A renewal status panel shows FAILED with DNS validation error.",
+  "detected_objects": [
+    "Certificate Details Panel",
+    "Expiry Timeline",
+    "Renewal Status Indicator",
+    "DNS Validation Status",
+    "ALB Association List"
+  ],
+  "ocr_text": [
+    "Certificate: *.company.com",
+    "Status: EXPIRED",
+    "Expiry: 2025-03-23T23:59:59Z",
+    "Renewal: FAILED",
+    "Reason: DNS validation record not found",
+    "ALB: alb-prod-main-01"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "AWS Application Load Balancer"
+}

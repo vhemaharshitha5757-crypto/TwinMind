@@ -1,0 +1,119 @@
+{
+  "incident_id": "INC021",
+  "title": "CI/CD Pipeline Deployment Rollback After Database Migration Failure",
+  "timestamp": "2025-06-02T14:30:00Z",
+  "severity": "P1",
+  "department": "CI/CD Engineering",
+  "system": "Jenkins CI/CD Pipeline",
+  "component": "deploy-pipeline-prod-01",
+  "location": "US-East-1 (AWS)",
+  "status": "Resolved",
+  "symptoms": [
+    "Application instances throwing SQL errors for undefined column references",
+    "Rolling deployment showing 40% of instances in failed health checks",
+    "Database migration log showing column drop completed successfully",
+    "Old application version instances unable to query the modified table",
+    "Deployment pipeline stuck in partial rollback state"
+  ],
+  "root_cause": "Database migration dropped a column before all application instances were updated to the new version that no longer references it, violating the expand-and-contract migration pattern",
+  "resolution": "Manually re-added the dropped column to the database, completed the application rollback, re-planned the migration using expand-and-contract pattern with separate deploy phases",
+  "preventive_actions": [
+    "Enforce expand-and-contract pattern for all breaking schema changes",
+    "Implement database migration pre-check against running application versions",
+    "Add deployment canary phase with automatic rollback triggers",
+    "Create database migration rollback scripts for every migration",
+    "Implement blue-green deployment for breaking changes"
+  ],
+  "affected_services": [
+    "user-service",
+    "profile-service",
+    "admin-panel",
+    "reporting-service"
+  ],
+  "engineers": [
+    "Tom Williams",
+    "Rajesh Kumar",
+    "James Wright"
+  ],
+  "timeline": [
+    {
+      "time": "14:30 UTC",
+      "event": "Production deployment pipeline initiated in Jenkins"
+    },
+    {
+      "time": "14:35 UTC",
+      "event": "Database migration executes, drops user_legacy_id column"
+    },
+    {
+      "time": "14:38 UTC",
+      "event": "Rolling deployment begins, new instances starting"
+    },
+    {
+      "time": "14:42 UTC",
+      "event": "Old instances begin failing with SQL column not found errors"
+    },
+    {
+      "time": "14:45 UTC",
+      "event": "P1 alert fires, 40% of instances in failed state"
+    },
+    {
+      "time": "14:50 UTC",
+      "event": "Tom Williams initiates pipeline rollback"
+    },
+    {
+      "time": "14:55 UTC",
+      "event": "Rollback blocked by irreversible migration, manual intervention needed"
+    },
+    {
+      "time": "15:10 UTC",
+      "event": "Dropped column manually re-added to database"
+    },
+    {
+      "time": "15:20 UTC",
+      "event": "Application rollback completed, all instances healthy"
+    },
+    {
+      "time": "15:25 UTC",
+      "event": "Incident resolved, post-mortem scheduled"
+    }
+  ],
+  "ocr_entities": [
+    "Pipeline: prod-deploy-v3.2.0",
+    "Stage: Application Deploy - FAILED",
+    "Migration: column_drop - COMPLETED",
+    "Healthy Instances: 6/10",
+    "Rollback Status: PARTIAL",
+    "Error: column 'user_legacy_id' does not exist"
+  ],
+  "audio_entities": [
+    "Rajesh Kumar",
+    "Tom Williams",
+    "James Wright"
+  ],
+  "document_entities": [
+    "cicd",
+    "deployment",
+    "rollback",
+    "database-migration",
+    "jenkins"
+  ],
+  "evidence": {
+    "document": "INC021_incident_report.pdf",
+    "image": "cicd_rollback_pipeline.png",
+    "audio": "INC021_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "Jenkins",
+    "deploy-pipeline-prod-01",
+    "Database Migration",
+    "Rolling Deployment",
+    "Expand-Contract Pattern"
+  ],
+  "knowledge_graph_relations": [
+    "Column_drop BROKE old_application_version",
+    "Rolling_deployment EXPOSED schema_incompatibility",
+    "Manual_column_restore ENABLED rollback"
+  ],
+  "embedding_summary": "CI/CD deployment rollback after database migration dropped a column still referenced by the previous application version. 40% of instances failed during rolling deployment. 55-minute partial outage affecting 15,000 users. Resolved by manually restoring the column and completing rollback.",
+  "confidence": 0.94
+}

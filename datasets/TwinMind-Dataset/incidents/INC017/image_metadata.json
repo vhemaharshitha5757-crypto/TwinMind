@@ -1,0 +1,23 @@
+{
+  "filename": "cascade_failure_map.png",
+  "caption": "Service dependency map showing cascade failure propagation from inventory service",
+  "scene_description": "A service mesh visualization showing the order pipeline with inventory service in red, and failure propagating through order service, payment service, and up to the API gateway. Each service node shows its error rate and connection pool status.",
+  "detected_objects": [
+    "Service Dependency Graph",
+    "Error Rate Badges",
+    "Connection Pool Indicators",
+    "API Gateway Status",
+    "Circuit Breaker States"
+  ],
+  "ocr_text": [
+    "inventory-svc: DOWN (conn pool: 0 free)",
+    "order-svc: DEGRADED (threads: 100% blocked)",
+    "payment-svc: DEGRADED (conn pool: exhausted)",
+    "api-gateway: 85% timeouts",
+    "Circuit Breakers: NONE CONFIGURED",
+    "Pipeline: ORDER FLOW"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "Microservice Mesh"
+}

@@ -1,0 +1,23 @@
+{
+  "filename": "mysql_ram_exhaustion.png",
+  "caption": "MySQL analytics node showing RAM exhaustion and OOM kill event",
+  "scene_description": "A monitoring dashboard showing system memory climbing to 128GB. InnoDB buffer pool panel shows 96GB allocated. Temporary table allocation graph shows 30GB spike from concurrent queries. OOM kill event marked on timeline.",
+  "detected_objects": [
+    "System Memory Graph",
+    "InnoDB Buffer Pool Panel",
+    "Temporary Table Allocation",
+    "OOM Kill Event Marker",
+    "Query Count Timeline"
+  ],
+  "ocr_text": [
+    "System RAM: 128GB / 128GB",
+    "InnoDB Buffer Pool: 96GB",
+    "Tmp Tables: 30.4GB",
+    "Concurrent Queries: 23",
+    "OOM Score: 998",
+    "Node: mysql-analytics-node-02"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "MySQL Cluster"
+}

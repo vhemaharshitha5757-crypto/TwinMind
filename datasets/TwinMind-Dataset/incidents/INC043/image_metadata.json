@@ -1,0 +1,23 @@
+{
+  "filename": "smtp_quota_exhausted.png",
+  "caption": "Amazon SES dashboard showing daily sending quota exhausted by marketing batch",
+  "scene_description": "Amazon SES sending statistics dashboard showing daily quota at 2.1M out of 2M (exceeded). A sending rate graph shows a massive spike from the marketing batch. Bounce rate and complaint metrics are highlighted.",
+  "detected_objects": [
+    "Quota Usage Gauge",
+    "Sending Rate Graph",
+    "Bounce Rate Panel",
+    "Email Queue Counter",
+    "SES Configuration Details"
+  ],
+  "ocr_text": [
+    "Emails Sent: 2,100,847 / 2,000,000 quota",
+    "Status: QUOTA EXCEEDED",
+    "Queued Transactional: 45,231",
+    "Marketing Batch: 2.1M (intended: 50K)",
+    "Bounce Rate: 12.3%",
+    "SES Account: ses-smtp-prod-01"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "Amazon SES SMTP Relay"
+}

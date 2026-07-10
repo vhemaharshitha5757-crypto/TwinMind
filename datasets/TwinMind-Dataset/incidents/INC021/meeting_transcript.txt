@@ -1,0 +1,59 @@
+MEETING TRANSCRIPT - INCIDENT INC021
+========================================================================
+Subject:      CI/CD Pipeline Deployment Rollback After Database Migration Failure
+Date/Time:    2025-06-02T14:30:00Z
+Participants: Tom Williams, Rajesh Kumar, James Wright
+Duration:     Approximately 3 minutes
+Type:         Emergency Incident Response Call
+========================================================================
+
+[BEGIN TRANSCRIPT]
+[Tom Williams]: Hey team, we've got a P1 incident on Jenkins CI/CD Pipeline. Application instances throwing SQL errors for undefined column references. I need everyone's eyes on this immediately.
+
+[Rajesh Kumar]: I'm here. Let me pull up the deploy-pipeline-prod-01 dashboard. When did this start exactly?
+
+[Tom Williams]: First alert came in at 14:30 UTC. Production deployment pipeline initiated in Jenkins. I've been looking at the logs since then.
+
+[James Wright]: I just joined the call. Give me a quick rundown. What are we seeing on the infrastructure side?
+
+[Tom Williams]: Multiple symptoms. Rolling deployment showing 40% of instances in failed health checks. And we're also seeing Database migration log showing column drop completed successfully.
+
+[Rajesh Kumar]: OK, I've got the metrics up. Old application version instances unable to query the modified table. This doesn't look like a normal blip.
+
+[James Wright]: Any recent deployments or configuration changes that could have triggered this? I want to rule out human error first.
+
+[Tom Williams]: I checked the change log for deploy-pipeline-prod-01. No deployments in the last 24 hours. No config changes either. This looks like an organic failure.
+
+[Rajesh Kumar]: Based on what I'm seeing in the telemetry data, I think this is related to database migration dropped a column before all application instances were updated to the new version. The error pattern is very consistent with that.
+
+[James Wright]: That makes sense given the symptoms. I've seen similar patterns before. What's our best remediation path here?
+
+[Tom Williams]: I recommend we manually re-added the dropped column to the database, completed the application rollback, re-planned. That should bring us back to a stable state.
+
+[Rajesh Kumar]: Agreed. Let me start executing that now. James, can you monitor the dashboards and confirm when metrics start recovering?
+
+[James Wright]: Will do. I've got the monitoring screen up. Go ahead with the fix.
+
+[Rajesh Kumar]: Alright, executing the remediation now. This will take a couple of minutes. Stand by.
+
+[James Wright]: I'm starting to see positive movement on the dashboards. Jenkins CI/CD Pipeline metrics are beginning to normalize.
+
+[Tom Williams]: Confirmed on my end too. Services are recovering. Let's keep monitoring for the next fifteen minutes to make sure we're stable.
+
+[Rajesh Kumar]: Fix is fully applied. Everything looks green now. I'll document the resolution steps in the incident ticket.
+
+[Tom Williams]: Great work everyone. Let's schedule a post-mortem for tomorrow. Key action items from this incident: enforce expand-and-contract pattern for all breaking schema changes, implement database migration pre-check against running application versions, and add deployment canary phase with automatic rollback triggers.
+
+[James Wright]: I'll send out the post-mortem calendar invite and start drafting the incident report. Good job team, quick response on this one.
+
+[END TRANSCRIPT]
+
+========================================================================
+Action Items Captured:
+  - Enforce expand-and-contract pattern for all breaking schema changes
+  - Implement database migration pre-check against running application versions
+  - Add deployment canary phase with automatic rollback triggers
+  - Create database migration rollback scripts for every migration
+
+Next Steps: Post-mortem meeting scheduled for following business day.
+========================================================================

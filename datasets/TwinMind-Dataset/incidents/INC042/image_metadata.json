@@ -1,0 +1,23 @@
+{
+  "filename": "webhook_delivery_timeout.png",
+  "caption": "Webhook delivery dashboard showing queue buildup from slow partner endpoint",
+  "scene_description": "A webhook delivery monitoring dashboard showing queue depth climbing to 580,000. Thread pool utilization at 100%. A partner breakdown shows one partner consuming all threads with 30-second response times while others queue up.",
+  "detected_objects": [
+    "Queue Depth Graph",
+    "Thread Pool Utilization",
+    "Partner Latency Breakdown",
+    "Delivery Success Rate",
+    "Circuit Breaker Status"
+  ],
+  "ocr_text": [
+    "Queue Depth: 580,213",
+    "Threads: 50/50 (blocked)",
+    "Slow Partner: partner-xyz (30,000ms)",
+    "Other Partners: QUEUED",
+    "Delivery Rate: 0/min",
+    "Status: CONGESTED"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "Webhook Delivery Service"
+}

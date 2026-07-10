@@ -1,0 +1,59 @@
+MEETING TRANSCRIPT - INCIDENT INC049
+========================================================================
+Subject:      Kong API Gateway Plugin Crash on Request Transformation
+Date/Time:    2025-12-15T10:40:00Z
+Participants: Jenny Liu, James Wright, Priya Sharma
+Duration:     Approximately 3 minutes
+Type:         Emergency Incident Response Call
+========================================================================
+
+[BEGIN TRANSCRIPT]
+[Jenny Liu]: Hey team, we've got a P2 incident on Kong API Gateway. Intermittent 500 Internal Server Error from Kong gateway (8% of requests). I need everyone's eyes on this immediately.
+
+[James Wright]: I'm here. Let me pull up the kong-prod-east-01 dashboard. When did this start exactly?
+
+[Jenny Liu]: First alert came in at 10:40 UTC. First 500 errors appear from Kong gateway. I've been looking at the logs since then.
+
+[Priya Sharma]: I just joined the call. Give me a quick rundown. What are we seeing on the infrastructure side?
+
+[Jenny Liu]: Multiple symptoms. Kong error logs showing Lua runtime nil reference error in transformation plugin. And we're also seeing Errors correlating with requests containing Unicode characters in headers.
+
+[James Wright]: OK, I've got the metrics up. Plugin execution metrics showing crashes on specific request patterns. This doesn't look like a normal blip.
+
+[Priya Sharma]: Any recent deployments or configuration changes that could have triggered this? I want to rule out human error first.
+
+[Jenny Liu]: I checked the change log for kong-prod-east-01. No deployments in the last 24 hours. No config changes either. This looks like an organic failure.
+
+[James Wright]: Based on what I'm seeing in the telemetry data, I think this is related to custom lua request transformation plugin did not handle multi-byte utf-8 character encoding in http . The error pattern is very consistent with that.
+
+[Priya Sharma]: That makes sense given the symptoms. I've seen similar patterns before. What's our best remediation path here?
+
+[Jenny Liu]: I recommend we deployed patched version of the transformation plugin with proper utf-8 handling, enabled unicode-sa. That should bring us back to a stable state.
+
+[James Wright]: Agreed. Let me start executing that now. Priya, can you monitor the dashboards and confirm when metrics start recovering?
+
+[Priya Sharma]: Will do. I've got the monitoring screen up. Go ahead with the fix.
+
+[James Wright]: Alright, executing the remediation now. This will take a couple of minutes. Stand by.
+
+[Priya Sharma]: I'm starting to see positive movement on the dashboards. Kong API Gateway metrics are beginning to normalize.
+
+[Jenny Liu]: Confirmed on my end too. Services are recovering. Let's keep monitoring for the next fifteen minutes to make sure we're stable.
+
+[James Wright]: Fix is fully applied. Everything looks green now. I'll document the resolution steps in the incident ticket.
+
+[Jenny Liu]: Great work everyone. Let's schedule a post-mortem for tomorrow. Key action items from this incident: implement utf-8 input handling testing for all custom kong plugins, add plugin crash monitoring with automatic fallback to bypass mode, and create internationalization test suite for api gateway plugins.
+
+[Priya Sharma]: I'll send out the post-mortem calendar invite and start drafting the incident report. Good job team, quick response on this one.
+
+[END TRANSCRIPT]
+
+========================================================================
+Action Items Captured:
+  - Implement UTF-8 input handling testing for all custom Kong plugins
+  - Add plugin crash monitoring with automatic fallback to bypass mode
+  - Create internationalization test suite for API gateway plugins
+  - Implement Lua error handling best practices in plugin development guidelines
+
+Next Steps: Post-mortem meeting scheduled for following business day.
+========================================================================

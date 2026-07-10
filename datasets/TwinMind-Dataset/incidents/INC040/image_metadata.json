@@ -1,0 +1,23 @@
+{
+  "filename": "haproxy_503_drain.png",
+  "caption": "HAProxy stats page showing all backend servers in DRAIN state",
+  "scene_description": "HAProxy statistics page showing a backend pool with all 8 servers in DRAIN (yellow) status. The active sessions counter shows zero. Request queue shows 2,400 pending requests with no available backends.",
+  "detected_objects": [
+    "Backend Server Table",
+    "Server Status Indicators",
+    "Active Sessions Counter",
+    "Request Queue Depth",
+    "HAProxy Stats Header"
+  ],
+  "ocr_text": [
+    "Backend: app-backend-pool",
+    "Active Servers: 0/8",
+    "Server Status: DRAIN (all)",
+    "Queued Requests: 2,418",
+    "503 Responses: 12,847",
+    "Maintenance Script: RUNNING"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "HAProxy Load Balancer"
+}

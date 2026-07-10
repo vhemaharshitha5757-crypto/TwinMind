@@ -1,0 +1,23 @@
+{
+  "filename": "azure_blob_permission.png",
+  "caption": "Azure portal showing permission mismatch error on blob storage uploads",
+  "scene_description": "Azure Storage Account portal showing a stream of failed PUT operations with AuthorizationPermissionMismatch. SAS token properties panel shows the permissions as 'r' (read only) instead of 'rwl' (read, write, list).",
+  "detected_objects": [
+    "Storage Account Activity Log",
+    "SAS Token Properties",
+    "Permission Error Details",
+    "Upload Failure Counter",
+    "Access Policy Panel"
+  ],
+  "ocr_text": [
+    "Storage Account: stprodeufiles01",
+    "Error: AuthorizationPermissionMismatch",
+    "SAS Permissions: r (read-only)",
+    "Expected: rwl (read-write-list)",
+    "Failed Uploads: 1,423",
+    "Last Rotation: 30min ago"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "Azure Blob Storage"
+}

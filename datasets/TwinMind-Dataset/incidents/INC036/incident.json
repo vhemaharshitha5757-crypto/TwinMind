@@ -1,0 +1,111 @@
+{
+  "incident_id": "INC036",
+  "title": "MongoDB Connection Pool Exhaustion on User Service",
+  "timestamp": "2025-09-15T20:10:00Z",
+  "severity": "P2",
+  "department": "Backend Engineering",
+  "system": "MongoDB Atlas Cluster",
+  "component": "mongo-user-prod-cluster",
+  "location": "US-East-1 (AWS)",
+  "status": "Resolved",
+  "symptoms": [
+    "MongoDB connection pool at 500/500 connections with all marked as in-use",
+    "User service returning 503 errors on all user-related endpoints",
+    "MongoDB Atlas showing connection count at cluster maximum",
+    "Application logs showing MongoTimeoutException on connection acquisition",
+    "Connection pool metrics showing zero available connections for 20+ minutes"
+  ],
+  "root_cause": "Code path in new feature deployment opened MongoDB connections in a try block but failed to close them in the catch/error handler, causing connection leaks under error conditions",
+  "resolution": "Deployed hotfix to properly close connections in error handlers using try-with-resources pattern, restarted user service instances to release leaked connections, and verified pool recovery",
+  "preventive_actions": [
+    "Enforce try-with-resources pattern for all database connection usage via static analysis",
+    "Add connection pool utilization monitoring with alerts at 70% capacity",
+    "Implement connection pool leak detection in integration tests",
+    "Set connection pool max lifetime to force recycling of stale connections",
+    "Add connection leak detection logging in the MongoDB driver configuration"
+  ],
+  "affected_services": [
+    "user-authentication",
+    "user-profile",
+    "user-preferences",
+    "session-management"
+  ],
+  "engineers": [
+    "James Wright",
+    "Aisha Khan",
+    "Priya Sharma"
+  ],
+  "timeline": [
+    {
+      "time": "20:10 UTC",
+      "event": "MongoDB connection pool reaches maximum capacity"
+    },
+    {
+      "time": "20:12 UTC",
+      "event": "User service begins returning 503 errors"
+    },
+    {
+      "time": "20:15 UTC",
+      "event": "Alert fires for user service endpoint failures"
+    },
+    {
+      "time": "20:20 UTC",
+      "event": "James Wright investigates, identifies connection pool exhaustion"
+    },
+    {
+      "time": "20:25 UTC",
+      "event": "Recent deployment identified, connection leak found in error handler"
+    },
+    {
+      "time": "20:30 UTC",
+      "event": "Hotfix prepared with proper connection closing"
+    },
+    {
+      "time": "20:32 UTC",
+      "event": "User service instances restarted to release leaked connections"
+    },
+    {
+      "time": "20:35 UTC",
+      "event": "Hotfix deployed, connection pool recovering, incident resolved"
+    }
+  ],
+  "ocr_entities": [
+    "Connections: 500/500 (MAX)",
+    "Available: 0",
+    "Leaked (est): 347",
+    "Cluster: mongo-user-prod-cluster",
+    "Error: MongoTimeoutException",
+    "Service: user-service-v3.2"
+  ],
+  "audio_entities": [
+    "James Wright",
+    "Priya Sharma",
+    "Aisha Khan"
+  ],
+  "document_entities": [
+    "mongodb",
+    "connection-pool",
+    "exhaustion",
+    "user-service",
+    "atlas"
+  ],
+  "evidence": {
+    "document": "INC036_incident_report.pdf",
+    "image": "mongo_connection_pool.png",
+    "audio": "INC036_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "MongoDB Atlas",
+    "mongo-user-prod-cluster",
+    "Connection Pool",
+    "Connection Leak",
+    "try-with-resources"
+  ],
+  "knowledge_graph_relations": [
+    "Missing_connection_close CAUSED pool_exhaustion",
+    "Pool_exhaustion BLOCKED new_requests",
+    "Hotfix_with_try-with-resources FIXED connection_leak"
+  ],
+  "embedding_summary": "MongoDB connection pool exhaustion on user service due to connection leak in error handling path of new feature deployment. 500/500 connections in use with zero available. 7,200 users unable to authenticate for 25 minutes. Resolved by deploying hotfix with proper connection closing in error handlers.",
+  "confidence": 0.95
+}

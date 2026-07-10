@@ -1,0 +1,59 @@
+MEETING TRANSCRIPT - INCIDENT INC015
+========================================================================
+Subject:      Nginx Returning 502 Bad Gateway Due to Upstream Socket Exhaustion
+Date/Time:    2025-04-21T10:55:00Z
+Participants: Alex Johnson, Jenny Liu, Mike Torres
+Duration:     Approximately 3 minutes
+Type:         Emergency Incident Response Call
+========================================================================
+
+[BEGIN TRANSCRIPT]
+[Alex Johnson]: Hey team, we've got a P2 incident on Nginx Reverse Proxy Cluster. Intermittent 502 Bad Gateway errors from nginx-prod-web-02. I need everyone's eyes on this immediately.
+
+[Jenny Liu]: I'm here. Let me pull up the nginx-prod-web-02 dashboard. When did this start exactly?
+
+[Alex Johnson]: First alert came in at 10:55 UTC. 502 error rate spikes on nginx-prod-web-02. I've been looking at the logs since then.
+
+[Mike Torres]: I just joined the call. Give me a quick rundown. What are we seeing on the infrastructure side?
+
+[Alex Johnson]: Multiple symptoms. Nginx error log showing 'connect() failed: Cannot assign requested address'. And we're also seeing Ephemeral port range exhausted (all 28,000 ports in TIME_WAIT).
+
+[Jenny Liu]: OK, I've got the metrics up. Upstream servers healthy and responding normally to direct requests. This doesn't look like a normal blip.
+
+[Mike Torres]: Any recent deployments or configuration changes that could have triggered this? I want to rule out human error first.
+
+[Alex Johnson]: I checked the change log for nginx-prod-web-02. No deployments in the last 24 hours. No config changes either. This looks like an organic failure.
+
+[Jenny Liu]: Based on what I'm seeing in the telemetry data, I think this is related to nginx keepalive configuration set to 0, disabling connection reuse to upstream servers, causing ephe. The error pattern is very consistent with that.
+
+[Mike Torres]: That makes sense given the symptoms. I've seen similar patterns before. What's our best remediation path here?
+
+[Alex Johnson]: I recommend we corrected nginx keepalive configuration to maintain 256 persistent connections per upstream, restart. That should bring us back to a stable state.
+
+[Jenny Liu]: Agreed. Let me start executing that now. Mike, can you monitor the dashboards and confirm when metrics start recovering?
+
+[Mike Torres]: Will do. I've got the monitoring screen up. Go ahead with the fix.
+
+[Jenny Liu]: Alright, executing the remediation now. This will take a couple of minutes. Stand by.
+
+[Mike Torres]: I'm starting to see positive movement on the dashboards. Nginx Reverse Proxy Cluster metrics are beginning to normalize.
+
+[Alex Johnson]: Confirmed on my end too. Services are recovering. Let's keep monitoring for the next fifteen minutes to make sure we're stable.
+
+[Jenny Liu]: Fix is fully applied. Everything looks green now. I'll document the resolution steps in the incident ticket.
+
+[Alex Johnson]: Great work everyone. Let's schedule a post-mortem for tomorrow. Key action items from this incident: audit nginx keepalive configuration across all proxy nodes, add ephemeral port utilization monitoring with alerts, and implement nginx config validation in deployment pipeline.
+
+[Mike Torres]: I'll send out the post-mortem calendar invite and start drafting the incident report. Good job team, quick response on this one.
+
+[END TRANSCRIPT]
+
+========================================================================
+Action Items Captured:
+  - Audit nginx keepalive configuration across all proxy nodes
+  - Add ephemeral port utilization monitoring with alerts
+  - Implement nginx config validation in deployment pipeline
+  - Create performance testing baseline for nginx connection handling
+
+Next Steps: Post-mortem meeting scheduled for following business day.
+========================================================================

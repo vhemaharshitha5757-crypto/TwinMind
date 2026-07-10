@@ -1,0 +1,59 @@
+MEETING TRANSCRIPT - INCIDENT INC029
+========================================================================
+Subject:      Grafana Dashboard Data Source Connection Failure
+Date/Time:    2025-07-28T11:20:00Z
+Participants: Nina Patel, Chris Evans, Tom Williams
+Duration:     Approximately 3 minutes
+Type:         Emergency Incident Response Call
+========================================================================
+
+[BEGIN TRANSCRIPT]
+[Nina Patel]: Hey team, we've got a P3 incident on Grafana Monitoring Platform. Grafana dashboards showing 'Data source is not available' errors. I need everyone's eyes on this immediately.
+
+[Chris Evans]: I'm here. Let me pull up the grafana-prod-eu-01 dashboard. When did this start exactly?
+
+[Nina Patel]: First alert came in at 11:20 UTC. Grafana data source health check begins failing for InfluxDB. I've been looking at the logs since then.
+
+[Tom Williams]: I just joined the call. Give me a quick rundown. What are we seeing on the infrastructure side?
+
+[Nina Patel]: Multiple symptoms. InfluxDB data source health check failing in Grafana. And we're also seeing Grafana logs showing connection refused to old InfluxDB endpoint.
+
+[Chris Evans]: OK, I've got the metrics up. New InfluxDB host healthy and accepting queries directly. This doesn't look like a normal blip.
+
+[Tom Williams]: Any recent deployments or configuration changes that could have triggered this? I want to rule out human error first.
+
+[Nina Patel]: I checked the change log for grafana-prod-eu-01. No deployments in the last 24 hours. No config changes either. This looks like an organic failure.
+
+[Chris Evans]: Based on what I'm seeing in the telemetry data, I think this is related to infrastructure migration of influxdb to new host was completed without updating the grafana data sou. The error pattern is very consistent with that.
+
+[Tom Williams]: That makes sense given the symptoms. I've seen similar patterns before. What's our best remediation path here?
+
+[Nina Patel]: I recommend we updated grafana data source configuration with the new influxdb endpoint, verified all dashboard pan. That should bring us back to a stable state.
+
+[Chris Evans]: Agreed. Let me start executing that now. Tom, can you monitor the dashboards and confirm when metrics start recovering?
+
+[Tom Williams]: Will do. I've got the monitoring screen up. Go ahead with the fix.
+
+[Chris Evans]: Alright, executing the remediation now. This will take a couple of minutes. Stand by.
+
+[Tom Williams]: I'm starting to see positive movement on the dashboards. Grafana Monitoring Platform metrics are beginning to normalize.
+
+[Nina Patel]: Confirmed on my end too. Services are recovering. Let's keep monitoring for the next fifteen minutes to make sure we're stable.
+
+[Chris Evans]: Fix is fully applied. Everything looks green now. I'll document the resolution steps in the incident ticket.
+
+[Nina Patel]: Great work everyone. Let's schedule a post-mortem for tomorrow. Key action items from this incident: create infrastructure migration checklist including all downstream consumer updates, implement grafana data source health monitoring with alerts, and use dns-based service endpoints instead of ip addresses for data sources.
+
+[Tom Williams]: I'll send out the post-mortem calendar invite and start drafting the incident report. Good job team, quick response on this one.
+
+[END TRANSCRIPT]
+
+========================================================================
+Action Items Captured:
+  - Create infrastructure migration checklist including all downstream consumer updates
+  - Implement Grafana data source health monitoring with alerts
+  - Use DNS-based service endpoints instead of IP addresses for data sources
+  - Add data source connectivity verification to infrastructure migration playbooks
+
+Next Steps: Post-mortem meeting scheduled for following business day.
+========================================================================

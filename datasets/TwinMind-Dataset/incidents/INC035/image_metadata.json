@@ -1,0 +1,23 @@
+{
+  "filename": "mysql_lock_wait.png",
+  "caption": "MySQL monitoring showing lock wait timeouts from blocking reporting query",
+  "scene_description": "A MySQL monitoring dashboard showing 340 blocked queries waiting for the accounts table lock. A processlist view highlights the blocking reporting query running for 15 minutes. Lock wait timeout error counter is climbing rapidly.",
+  "detected_objects": [
+    "Blocked Queries Counter",
+    "Processlist View",
+    "Lock Wait Timeout Graph",
+    "Table Lock Status",
+    "Blocking Query Highlight"
+  ],
+  "ocr_text": [
+    "Blocked Queries: 340",
+    "Blocking Query Duration: 15min",
+    "Table: accounts",
+    "Lock Type: TABLE LOCK",
+    "Lock Wait Timeouts: 287",
+    "Query Source: reporting-tool (WRONG HOST)"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "MySQL Database"
+}

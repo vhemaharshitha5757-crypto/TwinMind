@@ -1,0 +1,59 @@
+MEETING TRANSCRIPT - INCIDENT INC032
+========================================================================
+Subject:      Overnight Backup Job Failure Due to Expired Credentials
+Date/Time:    2025-08-18T02:00:00Z
+Participants: Chris Evans, David Kim, Lisa Park
+Duration:     Approximately 3 minutes
+Type:         Emergency Incident Response Call
+========================================================================
+
+[BEGIN TRANSCRIPT]
+[Chris Evans]: Hey team, we've got a P2 incident on AWS Backup Service. Backup job in FAILED status in AWS Backup console. I need everyone's eyes on this immediately.
+
+[David Kim]: I'm here. Let me pull up the backup-vault-prod-west dashboard. When did this start exactly?
+
+[Chris Evans]: First alert came in at 02:00 UTC. Overnight backup job starts and immediately fails with auth error. I've been looking at the logs since then.
+
+[Lisa Park]: I just joined the call. Give me a quick rundown. What are we seeing on the infrastructure side?
+
+[Chris Evans]: Multiple symptoms. Backup service account authentication failure in logs. And we're also seeing Backup vault showing no new recovery points since previous day.
+
+[David Kim]: OK, I've got the metrics up. Automated backup verification email not received by ops team. This doesn't look like a normal blip.
+
+[Lisa Park]: Any recent deployments or configuration changes that could have triggered this? I want to rule out human error first.
+
+[Chris Evans]: I checked the change log for backup-vault-prod-west. No deployments in the last 24 hours. No config changes either. This looks like an organic failure.
+
+[David Kim]: Based on what I'm seeing in the telemetry data, I think this is related to backup service account credentials expired after 90-day rotation policy, and the password rotation n. The error pattern is very consistent with that.
+
+[Lisa Park]: That makes sense given the symptoms. I've seen similar patterns before. What's our best remediation path here?
+
+[Chris Evans]: I recommend we rotated the backup service account credentials, updated the backup job configuration, executed a man. That should bring us back to a stable state.
+
+[David Kim]: Agreed. Let me start executing that now. Lisa, can you monitor the dashboards and confirm when metrics start recovering?
+
+[Lisa Park]: Will do. I've got the monitoring screen up. Go ahead with the fix.
+
+[David Kim]: Alright, executing the remediation now. This will take a couple of minutes. Stand by.
+
+[Lisa Park]: I'm starting to see positive movement on the dashboards. AWS Backup Service metrics are beginning to normalize.
+
+[Chris Evans]: Confirmed on my end too. Services are recovering. Let's keep monitoring for the next fifteen minutes to make sure we're stable.
+
+[David Kim]: Fix is fully applied. Everything looks green now. I'll document the resolution steps in the incident ticket.
+
+[Chris Evans]: Great work everyone. Let's schedule a post-mortem for tomorrow. Key action items from this incident: implement service account credential rotation automation, add backup job success/failure monitoring with immediate alerts, and use iam roles instead of service account credentials where possible.
+
+[Lisa Park]: I'll send out the post-mortem calendar invite and start drafting the incident report. Good job team, quick response on this one.
+
+[END TRANSCRIPT]
+
+========================================================================
+Action Items Captured:
+  - Implement service account credential rotation automation
+  - Add backup job success/failure monitoring with immediate alerts
+  - Use IAM roles instead of service account credentials where possible
+  - Create service account credential expiry dashboard
+
+Next Steps: Post-mortem meeting scheduled for following business day.
+========================================================================

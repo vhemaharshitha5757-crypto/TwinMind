@@ -1,0 +1,112 @@
+{
+  "incident_id": "INC013",
+  "title": "Kafka Consumer Lag Spike Causing Event Processing Delays",
+  "timestamp": "2025-04-07T03:18:00Z",
+  "severity": "P2",
+  "department": "Data Engineering",
+  "system": "Apache Kafka Cluster",
+  "component": "kafka-prod-broker-03",
+  "location": "US-East-1 (AWS)",
+  "status": "Resolved",
+  "symptoms": [
+    "Consumer lag on order-events topic exceeding 2.4 million messages",
+    "Consumer group showing repeated rebalance events every 30 seconds",
+    "Individual consumer instances showing long GC pauses over 45 seconds",
+    "Order processing throughput dropped from 15K/min to near zero",
+    "Burr consumer lag monitoring alerts firing continuously"
+  ],
+  "root_cause": "Consumer group rebalance storm triggered by GC pauses exceeding the session timeout (30s) on one consumer instance, causing repeated group coordinator disruptions",
+  "resolution": "Increased consumer session timeout to 120 seconds, tuned JVM garbage collection parameters, added a dedicated consumer instance, and manually reset consumer offsets to drain the lag",
+  "preventive_actions": [
+    "Tune JVM GC parameters for all Kafka consumer services",
+    "Increase session timeout to accommodate worst-case GC pauses",
+    "Implement consumer lag alerting at 100K and 500K message thresholds",
+    "Add consumer group stability monitoring for rebalance frequency",
+    "Deploy Kafka consumer auto-scaling based on lag metrics"
+  ],
+  "affected_services": [
+    "order-processing",
+    "order-tracking",
+    "warehouse-fulfillment",
+    "email-notification"
+  ],
+  "engineers": [
+    "Priya Sharma",
+    "James Wright",
+    "Alex Johnson"
+  ],
+  "timeline": [
+    {
+      "time": "03:18 UTC",
+      "event": "Consumer lag begins climbing on order-events topic"
+    },
+    {
+      "time": "03:22 UTC",
+      "event": "Consumer group rebalance detected by monitoring"
+    },
+    {
+      "time": "03:30 UTC",
+      "event": "Lag alert fires at 100K message threshold"
+    },
+    {
+      "time": "03:40 UTC",
+      "event": "Priya Sharma begins investigation, identifies rebalance storm"
+    },
+    {
+      "time": "03:55 UTC",
+      "event": "GC pauses exceeding session timeout confirmed as trigger"
+    },
+    {
+      "time": "04:10 UTC",
+      "event": "Session timeout increased, GC parameters tuned"
+    },
+    {
+      "time": "04:20 UTC",
+      "event": "Consumer group stabilizes, lag begins draining"
+    },
+    {
+      "time": "04:45 UTC",
+      "event": "Lag fully drained, order processing current"
+    }
+  ],
+  "ocr_entities": [
+    "Consumer Lag: 2,412,847",
+    "Topic: order-events",
+    "Rebalances (1h): 47",
+    "GC Pause Max: 48.3s",
+    "Session Timeout: 30s",
+    "Consumer Group: order-processor"
+  ],
+  "audio_entities": [
+    "James Wright",
+    "Alex Johnson",
+    "Priya Sharma"
+  ],
+  "document_entities": [
+    "kafka",
+    "consumer-lag",
+    "event-processing",
+    "messaging",
+    "throughput"
+  ],
+  "evidence": {
+    "document": "INC013_incident_report.pdf",
+    "image": "kafka_consumer_lag.png",
+    "audio": "INC013_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "Kafka",
+    "kafka-prod-broker-03",
+    "Consumer Group",
+    "GC Pause",
+    "Session Timeout",
+    "Rebalance"
+  ],
+  "knowledge_graph_relations": [
+    "GC_pause EXCEEDED session_timeout",
+    "Session_timeout TRIGGERED consumer_rebalance",
+    "Rebalance_storm CAUSED consumer_lag_spike"
+  ],
+  "embedding_summary": "Kafka consumer lag spiked to 2.4 million messages on order-events topic due to consumer group rebalance storm triggered by GC pauses exceeding session timeout. Order processing delayed up to 45 minutes. Resolved by increasing session timeout, tuning GC, and adding consumer capacity.",
+  "confidence": 0.94
+}

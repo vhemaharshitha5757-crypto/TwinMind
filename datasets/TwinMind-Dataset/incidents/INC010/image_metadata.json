@@ -1,0 +1,24 @@
+{
+  "filename": "firewall_blocked_traffic.png",
+  "caption": "Azure NSG flow logs showing blocked API traffic after rule change",
+  "scene_description": "An Azure Network Watcher flow log visualization showing a sudden wall of red DENY entries after the rule change time. Before the change, all entries are green ALLOW. A pie chart shows the breakdown of denied vs allowed traffic.",
+  "detected_objects": [
+    "Flow Log Timeline",
+    "DENY/ALLOW Pie Chart",
+    "NSG Rule Table",
+    "Source IP Distribution",
+    "Port Traffic Graph"
+  ],
+  "ocr_text": [
+    "NSG: nsg-prod-api-tier",
+    "Action: DENY",
+    "Source: 10.0.4.0/24",
+    "Dest Port: 443",
+    "Denied Flows: 75,600",
+    "Rule: SecurityHardening-v2",
+    "Status: ALERT"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "Azure Network Security Groups"
+}

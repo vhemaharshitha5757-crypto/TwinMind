@@ -1,0 +1,23 @@
+{
+  "filename": "postgres_deadlock.png",
+  "caption": "PostgreSQL monitoring showing deadlock frequency spike during flash sale",
+  "scene_description": "A database monitoring dashboard showing deadlock count spiking from 2/hour to 150/hour correlating with a transaction volume spike. A lock wait graph shows circular dependencies between order_items and inventory tables.",
+  "detected_objects": [
+    "Deadlock Frequency Graph",
+    "Transaction Volume Panel",
+    "Lock Wait Dependency Diagram",
+    "Table Lock Status",
+    "Active Sessions Counter"
+  ],
+  "ocr_text": [
+    "Deadlocks/Hour: 150 (baseline: 2)",
+    "Blocked Sessions: 47",
+    "Lock Wait: order_items <-> inventory",
+    "Transaction Volume: 45K/hour",
+    "Error Rate: 8%",
+    "Database: db-prod-primary-02"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "PostgreSQL Cluster"
+}

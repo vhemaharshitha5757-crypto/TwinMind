@@ -1,0 +1,162 @@
+INCIDENT REPORT
+========================================================================
+
+Incident ID:       INC018
+Title:             Critical CPU Utilization Spike on Application Cluster
+Severity:          P2
+Date/Time:         2025-05-12T19:05:00Z
+Department:        SRE
+System:            ECS Fargate Cluster
+Component:         search-svc-task-08
+Location:          EU-West-1 (AWS)
+Assigned Engineer: Nina Patel
+Status:            Resolved
+
+========================================================================
+1. SUMMARY
+========================================================================
+
+CPU utilization on the search service ECS tasks spiked to 98% at 19:05 UTC on May 12, 2025. A recently deployed search query parser included an inefficient regular expression that caused catastrophic backtracking on certain user input patterns. The regex engine consumed all available CPU cycles when processing these specific queries, starving other request processing threads.
+
+This incident was classified as P2 severity and was assigned to
+Nina Patel in the SRE department. The affected system was
+ECS Fargate Cluster, specifically the search-svc-task-08 component located in EU-West-1 (AWS).
+The incident was detected through automated monitoring and alerting systems,
+and the response team was engaged within minutes of the initial alert.
+
+========================================================================
+2. BUSINESS IMPACT
+========================================================================
+
+Search functionality degraded for all EU users for 30 minutes. Search response times increased from 150ms to 12 seconds. Approximately 9,000 users experienced slow or failed search queries. Product discovery was severely impacted, leading to an estimated 15% drop in conversion rate during the incident window.
+
+The incident triggered the organization's major incident response process,
+involving cross-functional coordination between engineering, operations, and
+business stakeholders. Customer support was notified and prepared to handle
+incoming queries related to the service degradation.
+
+========================================================================
+3. SYMPTOMS OBSERVED
+========================================================================
+
+The following symptoms were observed during the incident:
+
+  * CPU utilization at 98% across all search service ECS tasks
+  * Search API response times exceeding 12 seconds (normal: 150ms)
+  * Thread dumps showing regex engine consuming all CPU in tight loops
+  * Specific search query patterns triggering catastrophic regex backtracking
+  * ECS task health checks failing due to response time degradation
+
+These symptoms were correlated across multiple monitoring systems including
+application performance monitoring, infrastructure metrics, and log
+aggregation platforms. The incident response team confirmed the symptoms
+during their initial assessment and used them to guide the investigation.
+
+========================================================================
+4. TIMELINE OF EVENTS
+========================================================================
+
+  [19:05 UTC] CPU utilization spikes to 98% on search service tasks
+  [19:07 UTC] Search response time alerts fire
+  [19:10 UTC] Nina Patel begins investigation, notes recent deployment
+  [19:15 UTC] Thread dumps reveal regex engine consuming all CPU
+  [19:20 UTC] Problematic regex pattern identified in new query parser
+  [19:25 UTC] Service rolled back to previous version
+  [19:28 UTC] CPU utilization drops to normal, search recovering
+  [19:35 UTC] All search metrics normalized, incident resolved
+
+========================================================================
+5. INVESTIGATION
+========================================================================
+
+Upon receiving the automated alert, the incident response team initiated a
+systematic investigation following established runbook procedures. The team
+began by examining the health and status of the search-svc-task-08 component
+within the ECS Fargate Cluster system deployed in EU-West-1 (AWS).
+
+Initial telemetry data from the monitoring stack was reviewed, including
+application logs, infrastructure metrics, and recent deployment and change
+history. The investigation revealed that the primary symptoms were consistent
+across multiple data sources and monitoring tools.
+
+Log analysis from the affected component showed error patterns that pointed
+toward catastrophic regex backtracking in search query parser caused by nested quantifiers in a recently deployed regular expression pattern. The team also reviewed recent change
+records, configuration modifications, and deployment history to rule out
+human-initiated causes. Cross-referencing the timeline of events with
+infrastructure metrics from the preceding 24-48 hours provided additional
+context that supported the final root cause determination.
+
+========================================================================
+6. ROOT CAUSE ANALYSIS
+========================================================================
+
+The root cause of this incident was determined to be:
+Catastrophic regex backtracking in search query parser caused by nested quantifiers in a recently deployed regular expression pattern.
+
+Further analysis confirmed that this issue had been developing over time but
+was not detected by existing monitoring thresholds and alerting rules. The
+failure point was within the search-svc-task-08 component of the ECS Fargate Cluster
+system. Contributing factors included insufficient monitoring coverage for
+the specific failure mode encountered and the absence of automated
+remediation procedures for this particular scenario.
+
+========================================================================
+7. RESOLUTION
+========================================================================
+
+The incident was resolved by the following actions: Rolled back the search service to the previous version without the problematic regex, deployed a fix with an optimized non-backtracking regex pattern, and added regex execution timeout.
+
+The resolution was executed by Nina Patel with support from the incident
+response team. After applying the remediation steps, the team monitored the
+system for a stabilization period to confirm that the issue was fully
+resolved and no secondary or cascading failures had occurred. All affected
+services were verified to be operating within normal parameters before the
+incident was formally closed.
+
+========================================================================
+8. PREVENTIVE ACTIONS
+========================================================================
+
+The following preventive actions have been identified to reduce the
+likelihood and impact of similar incidents in the future:
+
+  1. Add regex complexity analysis to code review checklist
+  2. Implement regex execution timeout of 100ms in search parser
+  3. Add CPU utilization alerting at 80% with automatic scaling
+  4. Include regex performance testing in search service CI pipeline
+  5. Deploy regex static analysis tool to prevent catastrophic patterns
+
+These action items will be tracked in the engineering backlog and prioritized
+based on risk assessment and business impact analysis.
+
+========================================================================
+9. RELATED STANDARD OPERATING PROCEDURES
+========================================================================
+
+SOP-APP-003: CPU Spike Investigation; SOP-APP-010: Search Service Rollback
+
+========================================================================
+10. LESSONS LEARNED
+========================================================================
+
+This incident provided several important learnings for the organization.
+The detection of catastrophic regex backtracking in search query parser caused by nested quantifiers in a recently deployed regular expression pattern was delayed due to gaps in
+monitoring coverage, highlighting the need for more comprehensive
+observability across the ECS Fargate Cluster stack.
+
+The incident response process demonstrated effective team coordination and
+communication, but the overall time to resolution could be improved through
+automation of common diagnostic and remediation steps. The successful
+resolution validated existing runbooks and procedures while also identifying
+specific areas for improvement.
+
+The preventive actions identified during the post-mortem will strengthen
+organizational resilience against similar failure modes. Regular review of
+monitoring thresholds, alerting rules, and runbook procedures should be
+incorporated into the operational cadence to maintain readiness.
+
+========================================================================
+Report generated by TwinMind Incident Management System
+Date: 2025-05-12T19:05:00Z
+Classification: Internal - Confidential
+========================================================================

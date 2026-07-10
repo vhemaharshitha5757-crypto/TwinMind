@@ -1,0 +1,110 @@
+{
+  "incident_id": "INC012",
+  "title": "Cloud VM Unexpected Shutdown Due to Spot Instance Reclamation",
+  "timestamp": "2025-03-31T16:45:00Z",
+  "severity": "P2",
+  "department": "Cloud Infrastructure",
+  "system": "AWS EC2 Spot Instances",
+  "component": "batch-processor-spot-12",
+  "location": "US-West-2 (AWS)",
+  "status": "Resolved",
+  "symptoms": [
+    "Batch processing VM terminated without application-initiated shutdown",
+    "EC2 instance state changed to terminated with spot interruption notice",
+    "Batch job status showing incomplete at 75% progress",
+    "No checkpoint data saved for job resumption",
+    "CloudWatch showing 2-minute spot interruption warning was unhandled"
+  ],
+  "root_cause": "Critical long-running batch workload incorrectly deployed on spot instances without checkpointing, instance diversification, or fallback to on-demand capacity",
+  "resolution": "Restarted the batch job on an on-demand instance, migrated all critical batch workloads off spot instances, and implemented job checkpointing for future resilience",
+  "preventive_actions": [
+    "Migrate all critical batch workloads to on-demand or reserved instances",
+    "Implement job checkpointing every 15 minutes for batch processing",
+    "Add spot interruption handling with automatic migration to on-demand",
+    "Create workload classification policy for spot vs on-demand usage",
+    "Implement batch job progress monitoring with alerts for stalled jobs"
+  ],
+  "affected_services": [
+    "financial-reconciliation",
+    "quarterly-reporting",
+    "audit-data-service"
+  ],
+  "engineers": [
+    "Lisa Park",
+    "Tom Williams",
+    "James Wright"
+  ],
+  "timeline": [
+    {
+      "time": "16:43 UTC",
+      "event": "AWS issues 2-minute spot interruption warning (unhandled)"
+    },
+    {
+      "time": "16:45 UTC",
+      "event": "Spot instance batch-processor-spot-12 terminated"
+    },
+    {
+      "time": "16:48 UTC",
+      "event": "Batch job monitoring detects stalled progress"
+    },
+    {
+      "time": "16:55 UTC",
+      "event": "Lisa Park investigates, confirms spot reclamation"
+    },
+    {
+      "time": "17:10 UTC",
+      "event": "Decision to restart job on on-demand instance"
+    },
+    {
+      "time": "17:25 UTC",
+      "event": "On-demand instance provisioned, batch job restarted from scratch"
+    },
+    {
+      "time": "21:30 UTC",
+      "event": "Batch job completed on on-demand instance"
+    },
+    {
+      "time": "22:00 UTC",
+      "event": "Financial reconciliation data validated and delivered"
+    }
+  ],
+  "ocr_entities": [
+    "Instance: batch-processor-spot-12",
+    "State: Terminated",
+    "Reason: Spot instance interruption",
+    "Batch Progress: 75%",
+    "Warning Lead Time: 2 min",
+    "Instance Type: r5.4xlarge"
+  ],
+  "audio_entities": [
+    "James Wright",
+    "Lisa Park",
+    "Tom Williams"
+  ],
+  "document_entities": [
+    "cloud-vm",
+    "spot-instance",
+    "reclamation",
+    "ec2",
+    "batch-processing"
+  ],
+  "evidence": {
+    "document": "INC012_incident_report.pdf",
+    "image": "spot_instance_terminated.png",
+    "audio": "INC012_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "EC2 Spot Instance",
+    "batch-processor-spot-12",
+    "Financial Reconciliation",
+    "Checkpointing",
+    "On-Demand Instance"
+  ],
+  "knowledge_graph_relations": [
+    "Spot_reclamation TERMINATED batch-processor-spot-12",
+    "Missing_checkpointing CAUSED data_loss",
+    "Migration_to_on-demand PREVENTS future_interruption"
+  ],
+  "embedding_summary": "Critical financial reconciliation batch job interrupted by AWS spot instance reclamation on batch-processor-spot-12. 3 hours of processing lost due to missing checkpointing. Q1 financial close delayed by one business day. Resolved by restarting on on-demand instance and migrating critical workloads off spot.",
+  "confidence": 0.93
+}

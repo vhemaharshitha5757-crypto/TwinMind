@@ -1,0 +1,23 @@
+{
+  "filename": "backup_job_failure.png",
+  "caption": "AWS Backup console showing failed backup job with authentication error",
+  "scene_description": "AWS Backup console showing the backup plan with a red FAILED status for the latest job. The error details show authentication failure. A calendar view shows a gap in the backup schedule.",
+  "detected_objects": [
+    "Backup Plan Status",
+    "Failed Job Details",
+    "Authentication Error Message",
+    "Backup Calendar View",
+    "Recovery Point Timeline"
+  ],
+  "ocr_text": [
+    "Backup Plan: daily-prod-backup",
+    "Status: FAILED",
+    "Error: Authentication failure - credentials expired",
+    "Last Successful: 24h ago",
+    "Service Account: backup-svc-prod",
+    "Credential Expiry: 2025-08-17"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "AWS Backup Service"
+}

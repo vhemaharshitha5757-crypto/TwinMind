@@ -1,0 +1,114 @@
+{
+  "incident_id": "INC001",
+  "title": "PostgreSQL Primary Database Crash on Production Cluster",
+  "timestamp": "2025-01-15T02:34:00Z",
+  "severity": "P1",
+  "department": "Database Engineering",
+  "system": "PostgreSQL Cluster",
+  "component": "db-prod-primary-01",
+  "location": "US-East-1 (AWS)",
+  "status": "Resolved",
+  "symptoms": [
+    "All application services returning connection refused errors to PostgreSQL",
+    "PostgreSQL process terminated with SIGABRT on db-prod-primary-01",
+    "WAL corruption errors (PANIC: could not locate valid checkpoint) in database logs",
+    "Zero active database connections across all connection poolers",
+    "Cascading 5xx errors across all dependent microservices"
+  ],
+  "root_cause": "WAL segment corruption caused by a failing NVMe SSD with degrading sectors on the primary database server",
+  "resolution": "Promoted synchronous standby replica db-prod-standby-01 to primary, reconfigured PgBouncer connection pooler, replaced failed NVMe drive, and rebuilt original server as new standby",
+  "preventive_actions": [
+    "Implement SMART drive monitoring with alerts on reallocated sector count",
+    "Add disk I/O latency alerting at p95 greater than 5ms",
+    "Deploy automated WAL integrity verification every 6 hours",
+    "Schedule quarterly NVMe health audits across database fleet",
+    "Implement monthly automated failover testing"
+  ],
+  "affected_services": [
+    "user-auth-service",
+    "payment-gateway",
+    "order-processing",
+    "inventory-service",
+    "notification-service"
+  ],
+  "engineers": [
+    "Rajesh Kumar",
+    "Sarah Chen",
+    "Mike Torres"
+  ],
+  "timeline": [
+    {
+      "time": "02:34 UTC",
+      "event": "PostgreSQL primary server crashes, automated PagerDuty alert triggered"
+    },
+    {
+      "time": "02:36 UTC",
+      "event": "On-call engineer Rajesh Kumar acknowledges the P1 alert"
+    },
+    {
+      "time": "02:40 UTC",
+      "event": "Initial assessment confirms database process is down and WAL corruption in logs"
+    },
+    {
+      "time": "02:48 UTC",
+      "event": "Decision made to initiate failover to standby replica"
+    },
+    {
+      "time": "02:55 UTC",
+      "event": "Failover initiated, PgBouncer configuration updated"
+    },
+    {
+      "time": "03:05 UTC",
+      "event": "Standby promoted to primary, read replicas reconnecting"
+    },
+    {
+      "time": "03:15 UTC",
+      "event": "All services confirmed operational with normal metrics"
+    },
+    {
+      "time": "03:21 UTC",
+      "event": "Post-failover validation complete, incident marked resolved"
+    }
+  ],
+  "ocr_entities": [
+    "Active Connections: 0 / 500",
+    "Query Latency: TIMEOUT",
+    "Disk I/O Errors: 847",
+    "Node: db-prod-primary-01",
+    "Status: CRITICAL",
+    "WAL Errors: 23"
+  ],
+  "audio_entities": [
+    "Rajesh Kumar",
+    "Sarah Chen",
+    "Mike Torres"
+  ],
+  "document_entities": [
+    "database",
+    "postgresql",
+    "crash",
+    "production",
+    "data-integrity"
+  ],
+  "evidence": {
+    "document": "INC001_incident_report.pdf",
+    "image": "postgres_crash_dashboard.png",
+    "audio": "INC001_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "PostgreSQL",
+    "db-prod-primary-01",
+    "db-prod-standby-01",
+    "NVMe SSD",
+    "WAL",
+    "PgBouncer"
+  ],
+  "knowledge_graph_relations": [
+    "PostgreSQL CRASHED_ON db-prod-primary-01",
+    "NVMe_SSD CAUSED WAL_corruption",
+    "db-prod-standby-01 PROMOTED_TO primary",
+    "PgBouncer RECONFIGURED_TO db-prod-standby-01"
+  ],
+  "embedding_summary": "Critical PostgreSQL database crash on production primary server db-prod-primary-01 caused by WAL segment corruption from a failing NVMe SSD. Resulted in 47-minute complete service outage affecting 12,000 users and 340 failed transactions. Resolved by failover to standby replica and NVMe drive replacement.",
+  "confidence": 0.96
+}

@@ -1,0 +1,162 @@
+INCIDENT REPORT
+========================================================================
+
+Incident ID:       INC010
+Title:             Firewall Rule Change Blocking Critical API Traffic
+Severity:          P2
+Date/Time:         2025-03-17T12:30:00Z
+Department:        Security Engineering
+System:            Azure Network Security Groups
+Component:         nsg-prod-api-tier
+Location:          East US (Azure)
+Assigned Engineer: David Kim
+Status:            Resolved
+
+========================================================================
+1. SUMMARY
+========================================================================
+
+A firewall rule change applied to the Azure Network Security Group (nsg-prod-api-tier) at 12:30 UTC on March 17, 2025 inadvertently blocked inbound HTTPS traffic on port 443 from the API gateway subnet. The change was part of a security hardening initiative that tightened ingress rules, but the new rules did not include an allow rule for the API gateway's updated IP range after a recent subnet expansion.
+
+This incident was classified as P2 severity and was assigned to
+David Kim in the Security Engineering department. The affected system was
+Azure Network Security Groups, specifically the nsg-prod-api-tier component located in East US (Azure).
+The incident was detected through automated monitoring and alerting systems,
+and the response team was engaged within minutes of the initial alert.
+
+========================================================================
+2. BUSINESS IMPACT
+========================================================================
+
+All API traffic from the gateway to backend services was blocked for 18 minutes. External API consumers received 502 Bad Gateway errors. Internal services using the API layer experienced failures. Approximately 4,200 API calls failed per minute during the incident.
+
+The incident triggered the organization's major incident response process,
+involving cross-functional coordination between engineering, operations, and
+business stakeholders. Customer support was notified and prepared to handle
+incoming queries related to the service degradation.
+
+========================================================================
+3. SYMPTOMS OBSERVED
+========================================================================
+
+The following symptoms were observed during the incident:
+
+  * 502 Bad Gateway errors on all API endpoints served by Azure backend
+  * API gateway unable to reach backend services on port 443
+  * NSG flow logs showing DENY actions for API gateway source IPs
+  * Backend services healthy and responsive when accessed directly
+  * Only traffic from the expanded API gateway subnet range blocked
+
+These symptoms were correlated across multiple monitoring systems including
+application performance monitoring, infrastructure metrics, and log
+aggregation platforms. The incident response team confirmed the symptoms
+during their initial assessment and used them to guide the investigation.
+
+========================================================================
+4. TIMELINE OF EVENTS
+========================================================================
+
+  [12:30 UTC] NSG rule change applied as part of security hardening initiative
+  [12:32 UTC] API endpoints begin returning 502 errors
+  [12:34 UTC] Automated alert fires for API error rate spike
+  [12:36 UTC] David Kim begins investigation, backend services confirmed healthy
+  [12:40 UTC] NSG flow logs reveal DENY actions for API gateway subnet
+  [12:43 UTC] Root cause identified as missing subnet range in new rules
+  [12:45 UTC] NSG rules updated to include expanded API gateway subnet
+  [12:48 UTC] Traffic flow restored, API endpoints operational
+
+========================================================================
+5. INVESTIGATION
+========================================================================
+
+Upon receiving the automated alert, the incident response team initiated a
+systematic investigation following established runbook procedures. The team
+began by examining the health and status of the nsg-prod-api-tier component
+within the Azure Network Security Groups system deployed in East US (Azure).
+
+Initial telemetry data from the monitoring stack was reviewed, including
+application logs, infrastructure metrics, and recent deployment and change
+history. The investigation revealed that the primary symptoms were consistent
+across multiple data sources and monitoring tools.
+
+Log analysis from the affected component showed error patterns that pointed
+toward network security group rule update during security hardening did not include the expanded api gateway subnet range in the allow list, blocking legitimate traffic. The team also reviewed recent change
+records, configuration modifications, and deployment history to rule out
+human-initiated causes. Cross-referencing the timeline of events with
+infrastructure metrics from the preceding 24-48 hours provided additional
+context that supported the final root cause determination.
+
+========================================================================
+6. ROOT CAUSE ANALYSIS
+========================================================================
+
+The root cause of this incident was determined to be:
+Network Security Group rule update during security hardening did not include the expanded API gateway subnet range in the allow list, blocking legitimate traffic.
+
+Further analysis confirmed that this issue had been developing over time but
+was not detected by existing monitoring thresholds and alerting rules. The
+failure point was within the nsg-prod-api-tier component of the Azure Network Security Groups
+system. Contributing factors included insufficient monitoring coverage for
+the specific failure mode encountered and the absence of automated
+remediation procedures for this particular scenario.
+
+========================================================================
+7. RESOLUTION
+========================================================================
+
+The incident was resolved by the following actions: Added the expanded API gateway subnet range to the NSG allow rules, verified traffic flow restoration, and implemented NSG change validation.
+
+The resolution was executed by David Kim with support from the incident
+response team. After applying the remediation steps, the team monitored the
+system for a stabilization period to confirm that the issue was fully
+resolved and no secondary or cascading failures had occurred. All affected
+services were verified to be operating within normal parameters before the
+incident was formally closed.
+
+========================================================================
+8. PREVENTIVE ACTIONS
+========================================================================
+
+The following preventive actions have been identified to reduce the
+likelihood and impact of similar incidents in the future:
+
+  1. Implement pre-deployment NSG rule validation against known traffic patterns
+  2. Create automated testing for NSG changes using synthetic API traffic
+  3. Maintain a service dependency map linking NSG rules to traffic flows
+  4. Require dual-approval for NSG rule modifications in production
+  5. Add NSG flow log monitoring for unexpected DENY events
+
+These action items will be tracked in the engineering backlog and prioritized
+based on risk assessment and business impact analysis.
+
+========================================================================
+9. RELATED STANDARD OPERATING PROCEDURES
+========================================================================
+
+SOP-SEC-002: Firewall Rule Change Procedures; SOP-SEC-006: Security Hardening Validation
+
+========================================================================
+10. LESSONS LEARNED
+========================================================================
+
+This incident provided several important learnings for the organization.
+The detection of network security group rule update during security hardening did not include the expanded api gateway subnet range in the allow list, blocking legitimate traffic was delayed due to gaps in
+monitoring coverage, highlighting the need for more comprehensive
+observability across the Azure Network Security Groups stack.
+
+The incident response process demonstrated effective team coordination and
+communication, but the overall time to resolution could be improved through
+automation of common diagnostic and remediation steps. The successful
+resolution validated existing runbooks and procedures while also identifying
+specific areas for improvement.
+
+The preventive actions identified during the post-mortem will strengthen
+organizational resilience against similar failure modes. Regular review of
+monitoring thresholds, alerting rules, and runbook procedures should be
+incorporated into the operational cadence to maintain readiness.
+
+========================================================================
+Report generated by TwinMind Incident Management System
+Date: 2025-03-17T12:30:00Z
+Classification: Internal - Confidential
+========================================================================

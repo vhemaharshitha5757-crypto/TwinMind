@@ -1,0 +1,59 @@
+MEETING TRANSCRIPT - INCIDENT INC004
+========================================================================
+Subject:      Production Server Disk Full Causing Service Failures
+Date/Time:    2025-02-03T18:22:00Z
+Participants: Lisa Park, Tom Williams, Alex Johnson
+Duration:     Approximately 3 minutes
+Type:         Emergency Incident Response Call
+========================================================================
+
+[BEGIN TRANSCRIPT]
+[Lisa Park]: Hey team, we've got a P2 incident on EC2 Instance Fleet. 500 Internal Server Error responses from app-prod-web-07. I need everyone's eyes on this immediately.
+
+[Tom Williams]: I'm here. Let me pull up the app-prod-web-07 dashboard. When did this start exactly?
+
+[Lisa Park]: First alert came in at 18:22 UTC. Disk utilization reaches 100% on app-prod-web-07. I've been looking at the logs since then.
+
+[Alex Johnson]: I just joined the call. Give me a quick rundown. What are we seeing on the infrastructure side?
+
+[Lisa Park]: Multiple symptoms. Disk utilization at 100% on the root volume. And we're also seeing Application unable to write to /tmp directory.
+
+[Tom Williams]: OK, I've got the metrics up. Log files consuming 95% of disk space with debug-level entries. This doesn't look like a normal blip.
+
+[Alex Johnson]: Any recent deployments or configuration changes that could have triggered this? I want to rule out human error first.
+
+[Lisa Park]: I checked the change log for app-prod-web-07. No deployments in the last 24 hours. No config changes either. This looks like an organic failure.
+
+[Tom Williams]: Based on what I'm seeing in the telemetry data, I think this is related to debug logging accidentally left enabled on production server app-prod-web-07 after a troubleshooting. The error pattern is very consistent with that.
+
+[Alex Johnson]: That makes sense given the symptoms. I've seen similar patterns before. What's our best remediation path here?
+
+[Lisa Park]: I recommend we cleared stale log files, disabled debug logging, resized the ebs volume from 200gb to 500gb, and upd. That should bring us back to a stable state.
+
+[Tom Williams]: Agreed. Let me start executing that now. Alex, can you monitor the dashboards and confirm when metrics start recovering?
+
+[Alex Johnson]: Will do. I've got the monitoring screen up. Go ahead with the fix.
+
+[Tom Williams]: Alright, executing the remediation now. This will take a couple of minutes. Stand by.
+
+[Alex Johnson]: I'm starting to see positive movement on the dashboards. EC2 Instance Fleet metrics are beginning to normalize.
+
+[Lisa Park]: Confirmed on my end too. Services are recovering. Let's keep monitoring for the next fifteen minutes to make sure we're stable.
+
+[Tom Williams]: Fix is fully applied. Everything looks green now. I'll document the resolution steps in the incident ticket.
+
+[Lisa Park]: Great work everyone. Let's schedule a post-mortem for tomorrow. Key action items from this incident: implement automated log rotation with size-based limits, add disk utilization alerting at 80% and 90% thresholds, and update health check endpoints to include disk space verification.
+
+[Alex Johnson]: I'll send out the post-mortem calendar invite and start drafting the incident report. Good job team, quick response on this one.
+
+[END TRANSCRIPT]
+
+========================================================================
+Action Items Captured:
+  - Implement automated log rotation with size-based limits
+  - Add disk utilization alerting at 80% and 90% thresholds
+  - Update health check endpoints to include disk space verification
+  - Create automated process to detect and disable debug logging in production
+
+Next Steps: Post-mortem meeting scheduled for following business day.
+========================================================================

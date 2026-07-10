@@ -1,0 +1,59 @@
+MEETING TRANSCRIPT - INCIDENT INC038
+========================================================================
+Subject:      Azure Blob Storage Permission Issue Blocking File Uploads
+Date/Time:    2025-09-29T09:15:00Z
+Participants: Lisa Park, Chris Evans, David Kim
+Duration:     Approximately 3 minutes
+Type:         Emergency Incident Response Call
+========================================================================
+
+[BEGIN TRANSCRIPT]
+[Lisa Park]: Hey team, we've got a P2 incident on Azure Blob Storage. Azure Blob Storage returning AuthorizationPermissionMismatch on PUT operations. I need everyone's eyes on this immediately.
+
+[Chris Evans]: I'm here. Let me pull up the stprodeufiles01 dashboard. When did this start exactly?
+
+[Lisa Park]: First alert came in at 09:15 UTC. SAS token rotation completes with incorrect permissions. I've been looking at the logs since then.
+
+[David Kim]: I just joined the call. Give me a quick rundown. What are we seeing on the infrastructure side?
+
+[Lisa Park]: Multiple symptoms. SAS token validation showing read-only permissions (missing write). And we're also seeing File upload API returning 403 Forbidden to all upload requests.
+
+[Chris Evans]: OK, I've got the metrics up. GET operations (file downloads) still working normally. This doesn't look like a normal blip.
+
+[David Kim]: Any recent deployments or configuration changes that could have triggered this? I want to rule out human error first.
+
+[Lisa Park]: I checked the change log for stprodeufiles01. No deployments in the last 24 hours. No config changes either. This looks like an organic failure.
+
+[Chris Evans]: Based on what I'm seeing in the telemetry data, I think this is related to sas token regenerated during routine key rotation with read-only permissions instead of required rea. The error pattern is very consistent with that.
+
+[David Kim]: That makes sense given the symptoms. I've seen similar patterns before. What's our best remediation path here?
+
+[Lisa Park]: I recommend we regenerated sas token with correct read-write-list permissions, updated the upload service configura. That should bring us back to a stable state.
+
+[Chris Evans]: Agreed. Let me start executing that now. David, can you monitor the dashboards and confirm when metrics start recovering?
+
+[David Kim]: Will do. I've got the monitoring screen up. Go ahead with the fix.
+
+[Chris Evans]: Alright, executing the remediation now. This will take a couple of minutes. Stand by.
+
+[David Kim]: I'm starting to see positive movement on the dashboards. Azure Blob Storage metrics are beginning to normalize.
+
+[Lisa Park]: Confirmed on my end too. Services are recovering. Let's keep monitoring for the next fifteen minutes to make sure we're stable.
+
+[Chris Evans]: Fix is fully applied. Everything looks green now. I'll document the resolution steps in the incident ticket.
+
+[Lisa Park]: Great work everyone. Let's schedule a post-mortem for tomorrow. Key action items from this incident: implement sas token permission validation in rotation automation, use managed identity instead of sas tokens for service authentication, and add write permission verification test after token rotation.
+
+[David Kim]: I'll send out the post-mortem calendar invite and start drafting the incident report. Good job team, quick response on this one.
+
+[END TRANSCRIPT]
+
+========================================================================
+Action Items Captured:
+  - Implement SAS token permission validation in rotation automation
+  - Use managed identity instead of SAS tokens for service authentication
+  - Add write permission verification test after token rotation
+  - Create SAS token rotation runbook with permission checklist
+
+Next Steps: Post-mortem meeting scheduled for following business day.
+========================================================================

@@ -1,0 +1,59 @@
+MEETING TRANSCRIPT - INCIDENT INC011
+========================================================================
+Subject:      TLS Certificate Expiry on Production Load Balancer
+Date/Time:    2025-03-24T00:01:00Z
+Participants: David Kim, Aisha Khan, Maria Garcia
+Duration:     Approximately 3 minutes
+Type:         Emergency Incident Response Call
+========================================================================
+
+[BEGIN TRANSCRIPT]
+[David Kim]: Hey team, we've got a P1 incident on AWS Application Load Balancer. SSL certificate error on all HTTPS connections to the platform. I need everyone's eyes on this immediately.
+
+[Aisha Khan]: I'm here. Let me pull up the alb-prod-main-01 dashboard. When did this start exactly?
+
+[David Kim]: First alert came in at 00:01 UTC. TLS certificate expires on alb-prod-main-01. I've been looking at the logs since then.
+
+[Maria Garcia]: I just joined the call. Give me a quick rundown. What are we seeing on the infrastructure side?
+
+[David Kim]: Multiple symptoms. Browser security warnings blocking user access. And we're also seeing Certificate expiry date showing March 23, 2025 in TLS handshake.
+
+[Aisha Khan]: OK, I've got the metrics up. AWS Certificate Manager showing failed renewal status. This doesn't look like a normal blip.
+
+[Maria Garcia]: Any recent deployments or configuration changes that could have triggered this? I want to rule out human error first.
+
+[David Kim]: I checked the change log for alb-prod-main-01. No deployments in the last 24 hours. No config changes either. This looks like an organic failure.
+
+[Aisha Khan]: Based on what I'm seeing in the telemetry data, I think this is related to tls certificate auto-renewal failed silently because the dns validation cname record was accidentall. The error pattern is very consistent with that.
+
+[Maria Garcia]: That makes sense given the symptoms. I've seen similar patterns before. What's our best remediation path here?
+
+[David Kim]: I recommend we restored the dns validation cname record, triggered manual certificate renewal in acm, and applied t. That should bring us back to a stable state.
+
+[Aisha Khan]: Agreed. Let me start executing that now. Maria, can you monitor the dashboards and confirm when metrics start recovering?
+
+[Maria Garcia]: Will do. I've got the monitoring screen up. Go ahead with the fix.
+
+[Aisha Khan]: Alright, executing the remediation now. This will take a couple of minutes. Stand by.
+
+[Maria Garcia]: I'm starting to see positive movement on the dashboards. AWS Application Load Balancer metrics are beginning to normalize.
+
+[David Kim]: Confirmed on my end too. Services are recovering. Let's keep monitoring for the next fifteen minutes to make sure we're stable.
+
+[Aisha Khan]: Fix is fully applied. Everything looks green now. I'll document the resolution steps in the incident ticket.
+
+[David Kim]: Great work everyone. Let's schedule a post-mortem for tomorrow. Key action items from this incident: implement certificate expiry monitoring with 30-day, 14-day, and 7-day alerts, add dns validation record protection with deletion prevention, and create automated certificate renewal verification test.
+
+[Maria Garcia]: I'll send out the post-mortem calendar invite and start drafting the incident report. Good job team, quick response on this one.
+
+[END TRANSCRIPT]
+
+========================================================================
+Action Items Captured:
+  - Implement certificate expiry monitoring with 30-day, 14-day, and 7-day alerts
+  - Add DNS validation record protection with deletion prevention
+  - Create automated certificate renewal verification test
+  - Implement certificate transparency log monitoring
+
+Next Steps: Post-mortem meeting scheduled for following business day.
+========================================================================

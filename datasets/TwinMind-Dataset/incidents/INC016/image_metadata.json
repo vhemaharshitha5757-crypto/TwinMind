@@ -1,0 +1,23 @@
+{
+  "filename": "lb_health_check_flap.png",
+  "caption": "GCP load balancer showing backend instances flapping between healthy and unhealthy",
+  "scene_description": "A GCP load balancer monitoring page showing backend instance count oscillating between 2 and 10 in a rapid pattern. Health check status shows rapid state changes. A 503 error rate graph correlates with capacity dips.",
+  "detected_objects": [
+    "Backend Instance Count Graph",
+    "Health Check State Timeline",
+    "503 Error Rate Panel",
+    "Auto-scaler Activity Log",
+    "Instance Status Table"
+  ],
+  "ocr_text": [
+    "Healthy Backends: 3/10 (fluctuating)",
+    "Health Check Interval: 1s",
+    "Healthy Threshold: 1",
+    "503 Errors: 2,847/min (peak)",
+    "Auto-scaled Instances: 14",
+    "Status: UNSTABLE"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "GCP Cloud Load Balancer"
+}

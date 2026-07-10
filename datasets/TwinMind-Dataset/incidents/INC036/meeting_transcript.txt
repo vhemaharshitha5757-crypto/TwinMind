@@ -1,0 +1,59 @@
+MEETING TRANSCRIPT - INCIDENT INC036
+========================================================================
+Subject:      MongoDB Connection Pool Exhaustion on User Service
+Date/Time:    2025-09-15T20:10:00Z
+Participants: James Wright, Aisha Khan, Priya Sharma
+Duration:     Approximately 3 minutes
+Type:         Emergency Incident Response Call
+========================================================================
+
+[BEGIN TRANSCRIPT]
+[James Wright]: Hey team, we've got a P2 incident on MongoDB Atlas Cluster. MongoDB connection pool at 500/500 connections with all marked as in-use. I need everyone's eyes on this immediately.
+
+[Aisha Khan]: I'm here. Let me pull up the mongo-user-prod-cluster dashboard. When did this start exactly?
+
+[James Wright]: First alert came in at 20:10 UTC. MongoDB connection pool reaches maximum capacity. I've been looking at the logs since then.
+
+[Priya Sharma]: I just joined the call. Give me a quick rundown. What are we seeing on the infrastructure side?
+
+[James Wright]: Multiple symptoms. User service returning 503 errors on all user-related endpoints. And we're also seeing MongoDB Atlas showing connection count at cluster maximum.
+
+[Aisha Khan]: OK, I've got the metrics up. Application logs showing MongoTimeoutException on connection acquisition. This doesn't look like a normal blip.
+
+[Priya Sharma]: Any recent deployments or configuration changes that could have triggered this? I want to rule out human error first.
+
+[James Wright]: I checked the change log for mongo-user-prod-cluster. No deployments in the last 24 hours. No config changes either. This looks like an organic failure.
+
+[Aisha Khan]: Based on what I'm seeing in the telemetry data, I think this is related to code path in new feature deployment opened mongodb connections in a try block but failed to close th. The error pattern is very consistent with that.
+
+[Priya Sharma]: That makes sense given the symptoms. I've seen similar patterns before. What's our best remediation path here?
+
+[James Wright]: I recommend we deployed hotfix to properly close connections in error handlers using try-with-resources pattern, re. That should bring us back to a stable state.
+
+[Aisha Khan]: Agreed. Let me start executing that now. Priya, can you monitor the dashboards and confirm when metrics start recovering?
+
+[Priya Sharma]: Will do. I've got the monitoring screen up. Go ahead with the fix.
+
+[Aisha Khan]: Alright, executing the remediation now. This will take a couple of minutes. Stand by.
+
+[Priya Sharma]: I'm starting to see positive movement on the dashboards. MongoDB Atlas Cluster metrics are beginning to normalize.
+
+[James Wright]: Confirmed on my end too. Services are recovering. Let's keep monitoring for the next fifteen minutes to make sure we're stable.
+
+[Aisha Khan]: Fix is fully applied. Everything looks green now. I'll document the resolution steps in the incident ticket.
+
+[James Wright]: Great work everyone. Let's schedule a post-mortem for tomorrow. Key action items from this incident: enforce try-with-resources pattern for all database connection usage via static analysis, add connection pool utilization monitoring with alerts at 70% capacity, and implement connection pool leak detection in integration tests.
+
+[Priya Sharma]: I'll send out the post-mortem calendar invite and start drafting the incident report. Good job team, quick response on this one.
+
+[END TRANSCRIPT]
+
+========================================================================
+Action Items Captured:
+  - Enforce try-with-resources pattern for all database connection usage via static analysis
+  - Add connection pool utilization monitoring with alerts at 70% capacity
+  - Implement connection pool leak detection in integration tests
+  - Set connection pool max lifetime to force recycling of stale connections
+
+Next Steps: Post-mortem meeting scheduled for following business day.
+========================================================================

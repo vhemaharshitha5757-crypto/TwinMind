@@ -1,0 +1,23 @@
+{
+  "filename": "rate_limit_false_positive.png",
+  "caption": "Rate limiter dashboard showing false-positive 429 errors for legitimate traffic",
+  "scene_description": "An API rate limiting dashboard showing 429 error rate spiking for clients well below their rate limits. A counter comparison panel shows measured vs actual request rates diverging. Clock drift indicator shows 3-minute discrepancy.",
+  "detected_objects": [
+    "429 Error Rate Graph",
+    "Rate Limit Counter Comparison",
+    "Clock Drift Indicator",
+    "Partner Impact List",
+    "Redis Node Status"
+  ],
+  "ocr_text": [
+    "429 Error Rate: 25% of traffic",
+    "Client Actual Rate: 50 req/min",
+    "Measured Rate: 847 req/min (inflated)",
+    "Clock Drift: +180 seconds",
+    "Affected Partners: 35",
+    "Redis Node: redis-rl-03 (drifted)"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "API Rate Limiter"
+}

@@ -1,0 +1,115 @@
+{
+  "incident_id": "INC029",
+  "title": "Grafana Dashboard Data Source Connection Failure",
+  "timestamp": "2025-07-28T11:20:00Z",
+  "severity": "P3",
+  "department": "Observability",
+  "system": "Grafana Monitoring Platform",
+  "component": "grafana-prod-eu-01",
+  "location": "EU-West-1 (AWS)",
+  "status": "Resolved",
+  "symptoms": [
+    "Grafana dashboards showing 'Data source is not available' errors",
+    "InfluxDB data source health check failing in Grafana",
+    "Grafana logs showing connection refused to old InfluxDB endpoint",
+    "New InfluxDB host healthy and accepting queries directly",
+    "Only InfluxDB-backed panels affected, Prometheus panels working"
+  ],
+  "root_cause": "Infrastructure migration of InfluxDB to new host was completed without updating the Grafana data source configuration to point to the new endpoint",
+  "resolution": "Updated Grafana data source configuration with the new InfluxDB endpoint, verified all dashboard panels loading correctly, and implemented data source health monitoring",
+  "preventive_actions": [
+    "Create infrastructure migration checklist including all downstream consumer updates",
+    "Implement Grafana data source health monitoring with alerts",
+    "Use DNS-based service endpoints instead of IP addresses for data sources",
+    "Add data source connectivity verification to infrastructure migration playbooks",
+    "Implement automated data source configuration testing"
+  ],
+  "affected_services": [
+    "monitoring-dashboards",
+    "operations-visibility",
+    "sla-monitoring",
+    "capacity-planning-dashboards"
+  ],
+  "engineers": [
+    "Nina Patel",
+    "Chris Evans",
+    "Tom Williams"
+  ],
+  "timeline": [
+    {
+      "time": "11:20 UTC",
+      "event": "Grafana data source health check begins failing for InfluxDB"
+    },
+    {
+      "time": "11:22 UTC",
+      "event": "Dashboard panels start showing data source error messages"
+    },
+    {
+      "time": "11:30 UTC",
+      "event": "EU operations team notices dashboard errors"
+    },
+    {
+      "time": "11:35 UTC",
+      "event": "Nina Patel notified, begins investigating data source connectivity"
+    },
+    {
+      "time": "11:42 UTC",
+      "event": "Old InfluxDB endpoint confirmed unreachable, migration records found"
+    },
+    {
+      "time": "11:48 UTC",
+      "event": "New InfluxDB endpoint identified and verified accessible"
+    },
+    {
+      "time": "11:55 UTC",
+      "event": "Grafana data source configuration updated with new endpoint"
+    },
+    {
+      "time": "12:00 UTC",
+      "event": "All dashboards loading correctly, connection verified stable"
+    },
+    {
+      "time": "12:10 UTC",
+      "event": "Incident resolved, missed SLA alerts reviewed"
+    }
+  ],
+  "ocr_entities": [
+    "Data Source: InfluxDB-Production",
+    "Status: UNREACHABLE",
+    "URL: influxdb-old.internal:8086",
+    "Error: connection refused",
+    "Affected Dashboards: 45",
+    "Last Successful Query: 50min ago"
+  ],
+  "audio_entities": [
+    "Chris Evans",
+    "Tom Williams",
+    "Nina Patel"
+  ],
+  "document_entities": [
+    "grafana",
+    "datasource",
+    "connection-failure",
+    "dashboard",
+    "monitoring"
+  ],
+  "evidence": {
+    "document": "INC029_incident_report.pdf",
+    "image": "grafana_datasource_error.png",
+    "audio": "INC029_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "Grafana",
+    "grafana-prod-eu-01",
+    "InfluxDB",
+    "Data Source",
+    "Infrastructure Migration"
+  ],
+  "knowledge_graph_relations": [
+    "InfluxDB_migration CHANGED endpoint_address",
+    "Stale_config CAUSED connection_failure",
+    "Config_update RESTORED dashboard_data"
+  ],
+  "embedding_summary": "Grafana lost connection to InfluxDB data source after infrastructure migration changed the host without updating Grafana configuration. 45 dashboards showed errors for 50 minutes. Two SLA alerts missed. Resolved by updating data source endpoint configuration.",
+  "confidence": 0.95
+}

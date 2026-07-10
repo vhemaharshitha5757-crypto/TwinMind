@@ -1,0 +1,24 @@
+{
+  "filename": "postgres_crash_dashboard.png",
+  "caption": "Grafana dashboard showing PostgreSQL connection drop and WAL errors",
+  "scene_description": "A Grafana monitoring dashboard with multiple panels showing a sharp drop in active PostgreSQL connections from 450 to 0, query latency spiking to timeout values, and disk I/O errors incrementing rapidly. A red critical alert banner is visible at the top.",
+  "detected_objects": [
+    "Connection Count Graph",
+    "Query Latency Panel",
+    "Disk I/O Error Counter",
+    "Critical Alert Banner",
+    "Server Hostname Label",
+    "Time Range Selector"
+  ],
+  "ocr_text": [
+    "Active Connections: 0 / 500",
+    "Query Latency: TIMEOUT",
+    "Disk I/O Errors: 847",
+    "Node: db-prod-primary-01",
+    "Status: CRITICAL",
+    "WAL Errors: 23"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "PostgreSQL Cluster"
+}

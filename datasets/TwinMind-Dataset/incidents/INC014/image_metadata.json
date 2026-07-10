@@ -1,0 +1,23 @@
+{
+  "filename": "rabbitmq_queue_overflow.png",
+  "caption": "RabbitMQ management console showing queue overflow and flow control",
+  "scene_description": "RabbitMQ management UI showing the notification-events queue with 4.2GB of messages. Flow control is shown as active. Disk space alarm is displayed prominently. Message rates show publish rate exceeding consume rate.",
+  "detected_objects": [
+    "Queue Depth Bar",
+    "Flow Control Indicator",
+    "Disk Alarm Banner",
+    "Message Rate Graph",
+    "Consumer Count Panel"
+  ],
+  "ocr_text": [
+    "Queue: notification-events",
+    "Messages: 8,472,331",
+    "Memory: 4.2GB / 4GB Limit",
+    "Flow Control: ACTIVE",
+    "Disk Free: 102MB",
+    "Consumers: 3 (blocked)"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "RabbitMQ Cluster"
+}

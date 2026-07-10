@@ -1,0 +1,23 @@
+{
+  "filename": "vpn_session_exhaustion.png",
+  "caption": "VPN gateway dashboard showing session table at maximum capacity",
+  "scene_description": "A Palo Alto VPN monitoring dashboard showing the session count at 10,000 (maximum). A timeline shows sessions growing over weeks. A new connection failure counter is climbing. A pie chart shows active vs orphaned sessions.",
+  "detected_objects": [
+    "Session Count Gauge",
+    "Session Growth Timeline",
+    "Connection Failure Counter",
+    "Active vs Orphaned Pie Chart",
+    "Gateway Status Panel"
+  ],
+  "ocr_text": [
+    "VPN Sessions: 10,000/10,000",
+    "Orphaned Sessions: 3,247",
+    "New Connection Failures: 2,218",
+    "Gateway: vpn-gw-london-01",
+    "CPU: 45%",
+    "Status: SESSION TABLE FULL"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "Palo Alto GlobalProtect VPN"
+}

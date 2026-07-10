@@ -1,0 +1,23 @@
+{
+  "filename": "nfs_mount_failure.png",
+  "caption": "Storage monitoring showing NFS mount failure across application servers",
+  "scene_description": "A storage monitoring dashboard showing 12 application servers with NFS mount status in red. The NetApp controller shows a successful failover event. I/O wait graphs on affected servers show 100%. Process state chart shows many processes in D state.",
+  "detected_objects": [
+    "NFS Mount Status Grid",
+    "Storage Controller Failover Event",
+    "I/O Wait Graph",
+    "Process State Chart",
+    "Server List Panel"
+  ],
+  "ocr_text": [
+    "NFS Share: nfs-prod-share-01",
+    "Affected Servers: 12/12 STALE",
+    "Controller: NetApp-01 (failed over)",
+    "I/O Wait: 100%",
+    "Processes in D state: 347",
+    "Mount Type: hard (no timeout)"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "NetApp NFS Cluster"
+}

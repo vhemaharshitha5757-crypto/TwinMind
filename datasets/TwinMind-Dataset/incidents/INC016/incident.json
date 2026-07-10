@@ -1,0 +1,111 @@
+{
+  "incident_id": "INC016",
+  "title": "Load Balancer Health Check Failure Removing Healthy Nodes",
+  "timestamp": "2025-04-28T07:30:00Z",
+  "severity": "P2",
+  "department": "SRE",
+  "system": "GCP Cloud Load Balancer",
+  "component": "glb-prod-frontend",
+  "location": "GCP us-central1",
+  "status": "Resolved",
+  "symptoms": [
+    "Backend instances being removed and re-added to load balancer every 5-15 seconds",
+    "Intermittent 503 Service Unavailable errors during capacity dips",
+    "Health check logs showing rapid HEALTHY/UNHEALTHY state transitions",
+    "Auto-scaler launching excessive instances to compensate for perceived failures",
+    "Application response times normal when accessed directly"
+  ],
+  "root_cause": "Overly aggressive health check configuration with 1-second interval and single-check threshold causing false-positive failures from normal response time variance",
+  "resolution": "Restored health check configuration to 10-second interval with 3 consecutive checks required, stabilized the backend pool, and terminated excess auto-scaled instances",
+  "preventive_actions": [
+    "Implement health check configuration change validation with performance testing",
+    "Set minimum thresholds for health check intervals and healthy counts",
+    "Add backend pool stability monitoring for flapping detection",
+    "Create health check tuning guidelines documentation",
+    "Implement canary testing for load balancer configuration changes"
+  ],
+  "affected_services": [
+    "web-frontend",
+    "static-assets",
+    "image-service",
+    "cdn-origin"
+  ],
+  "engineers": [
+    "Alex Johnson",
+    "Lisa Park",
+    "Sarah Chen"
+  ],
+  "timeline": [
+    {
+      "time": "07:30 UTC",
+      "event": "Health check configuration change deployed to production"
+    },
+    {
+      "time": "07:32 UTC",
+      "event": "Backend instances begin flapping between healthy and unhealthy"
+    },
+    {
+      "time": "07:35 UTC",
+      "event": "503 error rate increases, auto-scaler begins launching instances"
+    },
+    {
+      "time": "07:38 UTC",
+      "event": "Alert fires for backend pool instability"
+    },
+    {
+      "time": "07:42 UTC",
+      "event": "Alex Johnson identifies health check change as trigger"
+    },
+    {
+      "time": "07:46 UTC",
+      "event": "Health check configuration reverted to previous settings"
+    },
+    {
+      "time": "07:50 UTC",
+      "event": "Backend pool stabilizes, excess instances terminated"
+    },
+    {
+      "time": "07:55 UTC",
+      "event": "Error rate at zero, incident resolved"
+    }
+  ],
+  "ocr_entities": [
+    "Healthy Backends: 3/10 (fluctuating)",
+    "Health Check Interval: 1s",
+    "Healthy Threshold: 1",
+    "503 Errors: 2,847/min (peak)",
+    "Auto-scaled Instances: 14",
+    "Status: UNSTABLE"
+  ],
+  "audio_entities": [
+    "Alex Johnson",
+    "Lisa Park",
+    "Sarah Chen"
+  ],
+  "document_entities": [
+    "load-balancer",
+    "health-check",
+    "gcp",
+    "false-positive",
+    "capacity"
+  ],
+  "evidence": {
+    "document": "INC016_incident_report.pdf",
+    "image": "lb_health_check_flap.png",
+    "audio": "INC016_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "GCP Load Balancer",
+    "glb-prod-frontend",
+    "Health Check",
+    "Auto-scaler",
+    "Backend Pool"
+  ],
+  "knowledge_graph_relations": [
+    "Aggressive_health_check CAUSED backend_flapping",
+    "Backend_flapping LED_TO 503_errors",
+    "Config_restoration STABILIZED backend_pool"
+  ],
+  "embedding_summary": "GCP Cloud Load Balancer health check misconfiguration with overly aggressive interval (1s) and threshold (1) caused healthy backends to flap in and out of serving pool. Intermittent 503 errors for 25 minutes affecting 3,800 users. Resolved by restoring conservative health check parameters.",
+  "confidence": 0.95
+}

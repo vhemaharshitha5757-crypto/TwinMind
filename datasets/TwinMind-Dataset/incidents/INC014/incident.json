@@ -1,0 +1,112 @@
+{
+  "incident_id": "INC014",
+  "title": "RabbitMQ Queue Overflow Causing Message Loss",
+  "timestamp": "2025-04-14T22:10:00Z",
+  "severity": "P1",
+  "department": "Platform Engineering",
+  "system": "RabbitMQ Cluster",
+  "component": "rabbitmq-prod-eu-01",
+  "location": "EU-West-1 (AWS)",
+  "status": "Resolved",
+  "symptoms": [
+    "RabbitMQ queue depth exceeding 4GB memory limit",
+    "Flow control activated on publisher connections",
+    "Disk space alarm triggered on RabbitMQ nodes",
+    "Publisher application not handling flow control signals",
+    "Message publish confirmations failing silently"
+  ],
+  "root_cause": "Publisher service did not implement RabbitMQ backpressure handling, continuing to publish messages during flow control, leading to message drops when both memory and disk limits were breached",
+  "resolution": "Cleared the overflowed queue, implemented publisher-side backpressure handling with confirms, increased disk space allocation, and resent lost notifications from application event log",
+  "preventive_actions": [
+    "Implement mandatory publisher confirms and backpressure handling",
+    "Add queue depth monitoring with alerts at 1GB and 3GB",
+    "Configure dead letter queues for overflow scenarios",
+    "Implement message persistence for critical notification events",
+    "Create disaster recovery playbook for message loss scenarios"
+  ],
+  "affected_services": [
+    "email-notification",
+    "sms-notification",
+    "push-notification",
+    "order-confirmation"
+  ],
+  "engineers": [
+    "Mike Torres",
+    "Sarah Chen",
+    "Priya Sharma"
+  ],
+  "timeline": [
+    {
+      "time": "22:10 UTC",
+      "event": "notification-events queue exceeds 4GB memory limit"
+    },
+    {
+      "time": "22:15 UTC",
+      "event": "RabbitMQ flow control activated, publishers throttled"
+    },
+    {
+      "time": "22:20 UTC",
+      "event": "Alert fires for queue depth exceeding threshold"
+    },
+    {
+      "time": "22:30 UTC",
+      "event": "Mike Torres investigates, identifies publisher ignoring flow control"
+    },
+    {
+      "time": "22:45 UTC",
+      "event": "Disk space alarm triggers, messages begin being dropped"
+    },
+    {
+      "time": "23:00 UTC",
+      "event": "Queue cleared, publisher hotfix deployed with backpressure handling"
+    },
+    {
+      "time": "23:30 UTC",
+      "event": "Queue processing normalized, lost message audit initiated"
+    },
+    {
+      "time": "00:10 UTC",
+      "event": "34,000 lost notifications resent from application event log"
+    }
+  ],
+  "ocr_entities": [
+    "Queue: notification-events",
+    "Messages: 8,472,331",
+    "Memory: 4.2GB / 4GB Limit",
+    "Flow Control: ACTIVE",
+    "Disk Free: 102MB",
+    "Consumers: 3 (blocked)"
+  ],
+  "audio_entities": [
+    "Priya Sharma",
+    "Sarah Chen",
+    "Mike Torres"
+  ],
+  "document_entities": [
+    "rabbitmq",
+    "queue-overflow",
+    "message-loss",
+    "messaging",
+    "backpressure"
+  ],
+  "evidence": {
+    "document": "INC014_incident_report.pdf",
+    "image": "rabbitmq_queue_overflow.png",
+    "audio": "INC014_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "RabbitMQ",
+    "rabbitmq-prod-eu-01",
+    "notification-events Queue",
+    "Flow Control",
+    "Backpressure",
+    "Dead Letter Queue"
+  ],
+  "knowledge_graph_relations": [
+    "Missing_backpressure CAUSED continued_publishing",
+    "Queue_overflow TRIGGERED flow_control",
+    "Disk_exhaustion LED_TO message_drops"
+  ],
+  "embedding_summary": "RabbitMQ queue overflow on notification-events queue due to publisher not implementing backpressure handling. 34,000 notification messages permanently lost when both memory and disk limits breached. Resolved by implementing publisher confirms, clearing queue, and resending lost notifications.",
+  "confidence": 0.92
+}

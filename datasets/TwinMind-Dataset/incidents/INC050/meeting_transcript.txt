@@ -1,0 +1,59 @@
+MEETING TRANSCRIPT - INCIDENT INC050
+========================================================================
+Subject:      Terraform State Lock Conflict Blocking Infrastructure Changes
+Date/Time:    2025-12-22T14:55:00Z
+Participants: Tom Williams, Lisa Park, Sarah Chen
+Duration:     Approximately 3 minutes
+Type:         Emergency Incident Response Call
+========================================================================
+
+[BEGIN TRANSCRIPT]
+[Tom Williams]: Hey team, we've got a P3 incident on Terraform Cloud. Terraform operations failing with 'Error locking state: ConditionalCheckFailedException'. I need everyone's eyes on this immediately.
+
+[Lisa Park]: I'm here. Let me pull up the terraform-state-prod-infra dashboard. When did this start exactly?
+
+[Tom Williams]: First alert came in at 14:55 UTC. CI/CD pipeline crashes during terraform apply. I've been looking at the logs since then.
+
+[Sarah Chen]: I just joined the call. Give me a quick rundown. What are we seeing on the infrastructure side?
+
+[Tom Williams]: Multiple symptoms. DynamoDB state lock table showing stale lock from crashed pipeline. And we're also seeing Lock owner showing terminated CI/CD pipeline job ID.
+
+[Lisa Park]: OK, I've got the metrics up. Terraform Cloud workspace showing locked status. This doesn't look like a normal blip.
+
+[Sarah Chen]: Any recent deployments or configuration changes that could have triggered this? I want to rule out human error first.
+
+[Tom Williams]: I checked the change log for terraform-state-prod-infra. No deployments in the last 24 hours. No config changes either. This looks like an organic failure.
+
+[Lisa Park]: Based on what I'm seeing in the telemetry data, I think this is related to ci/cd pipeline crashed during terraform apply operation leaving a stale state lock in dynamodb that . The error pattern is very consistent with that.
+
+[Sarah Chen]: That makes sense given the symptoms. I've seen similar patterns before. What's our best remediation path here?
+
+[Tom Williams]: I recommend we manually removed the stale state lock from dynamodb after verifying no active operations, ran terraf. That should bring us back to a stable state.
+
+[Lisa Park]: Agreed. Let me start executing that now. Sarah, can you monitor the dashboards and confirm when metrics start recovering?
+
+[Sarah Chen]: Will do. I've got the monitoring screen up. Go ahead with the fix.
+
+[Lisa Park]: Alright, executing the remediation now. This will take a couple of minutes. Stand by.
+
+[Sarah Chen]: I'm starting to see positive movement on the dashboards. Terraform Cloud metrics are beginning to normalize.
+
+[Tom Williams]: Confirmed on my end too. Services are recovering. Let's keep monitoring for the next fifteen minutes to make sure we're stable.
+
+[Lisa Park]: Fix is fully applied. Everything looks green now. I'll document the resolution steps in the incident ticket.
+
+[Tom Williams]: Great work everyone. Let's schedule a post-mortem for tomorrow. Key action items from this incident: implement automatic state lock cleanup for terminated pipeline jobs, add state lock duration monitoring with alerts for locks exceeding 30 minutes, and create emergency state lock removal runbook with verification steps.
+
+[Sarah Chen]: I'll send out the post-mortem calendar invite and start drafting the incident report. Good job team, quick response on this one.
+
+[END TRANSCRIPT]
+
+========================================================================
+Action Items Captured:
+  - Implement automatic state lock cleanup for terminated pipeline jobs
+  - Add state lock duration monitoring with alerts for locks exceeding 30 minutes
+  - Create emergency state lock removal runbook with verification steps
+  - Implement terraform lock timeout with automatic release after 1 hour
+
+Next Steps: Post-mortem meeting scheduled for following business day.
+========================================================================

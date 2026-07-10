@@ -1,0 +1,23 @@
+{
+  "filename": "mysql_replication_lag.png",
+  "caption": "MySQL replication monitoring showing 45-minute lag on EU replica",
+  "scene_description": "A MySQL replication monitoring dashboard showing Seconds_Behind_Master climbing from 0 to 2,700. A relay log size graph shows rapid growth. The SQL thread throughput panel shows lower throughput than I/O thread.",
+  "detected_objects": [
+    "Replication Lag Graph",
+    "Relay Log Size Panel",
+    "Thread Status Indicators",
+    "Throughput Comparison Chart",
+    "Replica Status Table"
+  ],
+  "ocr_text": [
+    "Seconds_Behind_Master: 2,700",
+    "Relay Log Size: 12.4GB",
+    "SQL Thread: Running (slow)",
+    "I/O Thread: Running",
+    "Replica: mysql-replica-eu-02",
+    "Batch Update: 8M rows processing"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "MySQL Replication Cluster"
+}

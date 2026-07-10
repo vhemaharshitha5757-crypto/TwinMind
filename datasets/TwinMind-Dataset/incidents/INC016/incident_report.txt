@@ -1,0 +1,162 @@
+INCIDENT REPORT
+========================================================================
+
+Incident ID:       INC016
+Title:             Load Balancer Health Check Failure Removing Healthy Nodes
+Severity:          P2
+Date/Time:         2025-04-28T07:30:00Z
+Department:        SRE
+System:            GCP Cloud Load Balancer
+Component:         glb-prod-frontend
+Location:          GCP us-central1
+Assigned Engineer: Alex Johnson
+Status:            Resolved
+
+========================================================================
+1. SUMMARY
+========================================================================
+
+The GCP Cloud Load Balancer (glb-prod-frontend) began removing healthy backend instances from its serving pool at 07:30 UTC on April 28, 2025. A health check configuration change reduced the check interval from 10 seconds to 1 second and the healthy threshold from 2 to 1, making the health checks overly sensitive. Normal application response time jitter caused intermittent health check failures, leading to instances being cycled in and out of the pool.
+
+This incident was classified as P2 severity and was assigned to
+Alex Johnson in the SRE department. The affected system was
+GCP Cloud Load Balancer, specifically the glb-prod-frontend component located in GCP us-central1.
+The incident was detected through automated monitoring and alerting systems,
+and the response team was engaged within minutes of the initial alert.
+
+========================================================================
+2. BUSINESS IMPACT
+========================================================================
+
+Backend capacity fluctuated between 20% and 100% over 25 minutes, causing intermittent 503 errors during low-capacity windows. Approximately 3,800 users experienced sporadic errors. Auto-scaler attempted to compensate by launching new instances, increasing cloud costs by $2,400.
+
+The incident triggered the organization's major incident response process,
+involving cross-functional coordination between engineering, operations, and
+business stakeholders. Customer support was notified and prepared to handle
+incoming queries related to the service degradation.
+
+========================================================================
+3. SYMPTOMS OBSERVED
+========================================================================
+
+The following symptoms were observed during the incident:
+
+  * Backend instances being removed and re-added to load balancer every 5-15 seconds
+  * Intermittent 503 Service Unavailable errors during capacity dips
+  * Health check logs showing rapid HEALTHY/UNHEALTHY state transitions
+  * Auto-scaler launching excessive instances to compensate for perceived failures
+  * Application response times normal when accessed directly
+
+These symptoms were correlated across multiple monitoring systems including
+application performance monitoring, infrastructure metrics, and log
+aggregation platforms. The incident response team confirmed the symptoms
+during their initial assessment and used them to guide the investigation.
+
+========================================================================
+4. TIMELINE OF EVENTS
+========================================================================
+
+  [07:30 UTC] Health check configuration change deployed to production
+  [07:32 UTC] Backend instances begin flapping between healthy and unhealthy
+  [07:35 UTC] 503 error rate increases, auto-scaler begins launching instances
+  [07:38 UTC] Alert fires for backend pool instability
+  [07:42 UTC] Alex Johnson identifies health check change as trigger
+  [07:46 UTC] Health check configuration reverted to previous settings
+  [07:50 UTC] Backend pool stabilizes, excess instances terminated
+  [07:55 UTC] Error rate at zero, incident resolved
+
+========================================================================
+5. INVESTIGATION
+========================================================================
+
+Upon receiving the automated alert, the incident response team initiated a
+systematic investigation following established runbook procedures. The team
+began by examining the health and status of the glb-prod-frontend component
+within the GCP Cloud Load Balancer system deployed in GCP us-central1.
+
+Initial telemetry data from the monitoring stack was reviewed, including
+application logs, infrastructure metrics, and recent deployment and change
+history. The investigation revealed that the primary symptoms were consistent
+across multiple data sources and monitoring tools.
+
+Log analysis from the affected component showed error patterns that pointed
+toward overly aggressive health check configuration with 1-second interval and single-check threshold causing false-positive failures from normal response time variance. The team also reviewed recent change
+records, configuration modifications, and deployment history to rule out
+human-initiated causes. Cross-referencing the timeline of events with
+infrastructure metrics from the preceding 24-48 hours provided additional
+context that supported the final root cause determination.
+
+========================================================================
+6. ROOT CAUSE ANALYSIS
+========================================================================
+
+The root cause of this incident was determined to be:
+Overly aggressive health check configuration with 1-second interval and single-check threshold causing false-positive failures from normal response time variance.
+
+Further analysis confirmed that this issue had been developing over time but
+was not detected by existing monitoring thresholds and alerting rules. The
+failure point was within the glb-prod-frontend component of the GCP Cloud Load Balancer
+system. Contributing factors included insufficient monitoring coverage for
+the specific failure mode encountered and the absence of automated
+remediation procedures for this particular scenario.
+
+========================================================================
+7. RESOLUTION
+========================================================================
+
+The incident was resolved by the following actions: Restored health check configuration to 10-second interval with 3 consecutive checks required, stabilized the backend pool, and terminated excess auto-scaled instances.
+
+The resolution was executed by Alex Johnson with support from the incident
+response team. After applying the remediation steps, the team monitored the
+system for a stabilization period to confirm that the issue was fully
+resolved and no secondary or cascading failures had occurred. All affected
+services were verified to be operating within normal parameters before the
+incident was formally closed.
+
+========================================================================
+8. PREVENTIVE ACTIONS
+========================================================================
+
+The following preventive actions have been identified to reduce the
+likelihood and impact of similar incidents in the future:
+
+  1. Implement health check configuration change validation with performance testing
+  2. Set minimum thresholds for health check intervals and healthy counts
+  3. Add backend pool stability monitoring for flapping detection
+  4. Create health check tuning guidelines documentation
+  5. Implement canary testing for load balancer configuration changes
+
+These action items will be tracked in the engineering backlog and prioritized
+based on risk assessment and business impact analysis.
+
+========================================================================
+9. RELATED STANDARD OPERATING PROCEDURES
+========================================================================
+
+SOP-LB-001: Load Balancer Health Check Configuration; SOP-LB-003: Backend Pool Recovery
+
+========================================================================
+10. LESSONS LEARNED
+========================================================================
+
+This incident provided several important learnings for the organization.
+The detection of overly aggressive health check configuration with 1-second interval and single-check threshold causing false-positive failures from normal response time variance was delayed due to gaps in
+monitoring coverage, highlighting the need for more comprehensive
+observability across the GCP Cloud Load Balancer stack.
+
+The incident response process demonstrated effective team coordination and
+communication, but the overall time to resolution could be improved through
+automation of common diagnostic and remediation steps. The successful
+resolution validated existing runbooks and procedures while also identifying
+specific areas for improvement.
+
+The preventive actions identified during the post-mortem will strengthen
+organizational resilience against similar failure modes. Regular review of
+monitoring thresholds, alerting rules, and runbook procedures should be
+incorporated into the operational cadence to maintain readiness.
+
+========================================================================
+Report generated by TwinMind Incident Management System
+Date: 2025-04-28T07:30:00Z
+Classification: Internal - Confidential
+========================================================================

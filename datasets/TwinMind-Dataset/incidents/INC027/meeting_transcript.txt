@@ -1,0 +1,59 @@
+MEETING TRANSCRIPT - INCIDENT INC027
+========================================================================
+Subject:      Corporate VPN Tunnel Outage Blocking Remote Access
+Date/Time:    2025-07-14T07:00:00Z
+Participants: Maria Garcia, David Kim, Alex Johnson
+Duration:     Approximately 3 minutes
+Type:         Emergency Incident Response Call
+========================================================================
+
+[BEGIN TRANSCRIPT]
+[Maria Garcia]: Hey team, we've got a P2 incident on Palo Alto GlobalProtect VPN. VPN connection attempts timing out for new users. I need everyone's eyes on this immediately.
+
+[David Kim]: I'm here. Let me pull up the vpn-gw-london-01 dashboard. When did this start exactly?
+
+[Maria Garcia]: First alert came in at 07:00 UTC. VPN gateway stops accepting new connections. I've been looking at the logs since then.
+
+[Alex Johnson]: I just joined the call. Give me a quick rundown. What are we seeing on the infrastructure side?
+
+[Maria Garcia]: Multiple symptoms. VPN gateway session table at 10,000/10,000 capacity. And we're also seeing Existing VPN sessions functioning normally.
+
+[David Kim]: OK, I've got the metrics up. GlobalProtect client showing connection timeout errors. This doesn't look like a normal blip.
+
+[Alex Johnson]: Any recent deployments or configuration changes that could have triggered this? I want to rule out human error first.
+
+[Maria Garcia]: I checked the change log for vpn-gw-london-01. No deployments in the last 24 hours. No config changes either. This looks like an organic failure.
+
+[David Kim]: Based on what I'm seeing in the telemetry data, I think this is related to vpn session table exhaustion due to orphaned sessions from improper disconnects accumulating over ti. The error pattern is very consistent with that.
+
+[Alex Johnson]: That makes sense given the symptoms. I've seen similar patterns before. What's our best remediation path here?
+
+[Maria Garcia]: I recommend we cleared 3,200 orphaned vpn sessions, increased session table limit to 15,000, implemented aggressive. That should bring us back to a stable state.
+
+[David Kim]: Agreed. Let me start executing that now. Alex, can you monitor the dashboards and confirm when metrics start recovering?
+
+[Alex Johnson]: Will do. I've got the monitoring screen up. Go ahead with the fix.
+
+[David Kim]: Alright, executing the remediation now. This will take a couple of minutes. Stand by.
+
+[Alex Johnson]: I'm starting to see positive movement on the dashboards. Palo Alto GlobalProtect VPN metrics are beginning to normalize.
+
+[Maria Garcia]: Confirmed on my end too. Services are recovering. Let's keep monitoring for the next fifteen minutes to make sure we're stable.
+
+[David Kim]: Fix is fully applied. Everything looks green now. I'll document the resolution steps in the incident ticket.
+
+[Maria Garcia]: Great work everyone. Let's schedule a post-mortem for tomorrow. Key action items from this incident: implement automated orphaned session cleanup every 4 hours, increase vpn capacity planning reviews to quarterly, and deploy secondary vpn gateway for load distribution and redundancy.
+
+[Alex Johnson]: I'll send out the post-mortem calendar invite and start drafting the incident report. Good job team, quick response on this one.
+
+[END TRANSCRIPT]
+
+========================================================================
+Action Items Captured:
+  - Implement automated orphaned session cleanup every 4 hours
+  - Increase VPN capacity planning reviews to quarterly
+  - Deploy secondary VPN gateway for load distribution and redundancy
+  - Add VPN session utilization monitoring with alerts at 70% and 90%
+
+Next Steps: Post-mortem meeting scheduled for following business day.
+========================================================================

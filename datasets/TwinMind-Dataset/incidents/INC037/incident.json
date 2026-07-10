@@ -1,0 +1,116 @@
+{
+  "incident_id": "INC037",
+  "title": "AWS S3 Access Denied Errors After Bucket Policy Update",
+  "timestamp": "2025-09-22T15:30:00Z",
+  "severity": "P2",
+  "department": "Cloud Infrastructure",
+  "system": "AWS S3",
+  "component": "s3-prod-assets-bucket",
+  "location": "US-East-1 (AWS)",
+  "status": "Resolved",
+  "symptoms": [
+    "S3 GetObject calls returning 403 AccessDenied for application IAM role",
+    "Website loading without CSS, JavaScript, or images",
+    "CloudTrail logs showing denied S3 API calls from VPC endpoint",
+    "S3 bucket policy recently modified removing VPC endpoint condition",
+    "Direct S3 access via console working (IAM admin role unaffected)"
+  ],
+  "root_cause": "S3 bucket policy update intended to block public access also removed the VPC endpoint policy statement that allowed application server access via the VPC endpoint",
+  "resolution": "Added VPC endpoint policy statement back to the S3 bucket policy while maintaining the public access restrictions, verified asset loading restored across all services",
+  "preventive_actions": [
+    "Implement S3 bucket policy change simulation before applying",
+    "Create bucket policy templates that include standard VPC endpoint access",
+    "Add S3 access monitoring with immediate alerting on AccessDenied spikes",
+    "Implement bucket policy change approval workflow",
+    "Create pre-deployment checklist for S3 policy modifications"
+  ],
+  "affected_services": [
+    "web-frontend",
+    "mobile-app",
+    "email-templates",
+    "partner-portal"
+  ],
+  "engineers": [
+    "Lisa Park",
+    "David Kim",
+    "Sarah Chen"
+  ],
+  "timeline": [
+    {
+      "time": "15:30 UTC",
+      "event": "S3 bucket policy updated to restrict public access"
+    },
+    {
+      "time": "15:31 UTC",
+      "event": "Application servers begin receiving AccessDenied on asset requests"
+    },
+    {
+      "time": "15:33 UTC",
+      "event": "Website starts loading without CSS, JS, and images"
+    },
+    {
+      "time": "15:35 UTC",
+      "event": "Alert fires for asset loading failures"
+    },
+    {
+      "time": "15:38 UTC",
+      "event": "Lisa Park investigates, identifies bucket policy change"
+    },
+    {
+      "time": "15:42 UTC",
+      "event": "Missing VPC endpoint policy statement identified"
+    },
+    {
+      "time": "15:45 UTC",
+      "event": "VPC endpoint statement added back to bucket policy"
+    },
+    {
+      "time": "15:48 UTC",
+      "event": "Asset loading restored, website rendering normally"
+    },
+    {
+      "time": "15:50 UTC",
+      "event": "Incident resolved, all services verified"
+    }
+  ],
+  "ocr_entities": [
+    "Event: s3:GetObject",
+    "Error: AccessDenied",
+    "Bucket: s3-prod-assets-bucket",
+    "Source: vpce-0a1b2c3d (VPC Endpoint)",
+    "Denied Requests: 45,231",
+    "Policy Change: VPC statement REMOVED"
+  ],
+  "audio_entities": [
+    "Sarah Chen",
+    "Lisa Park",
+    "David Kim"
+  ],
+  "document_entities": [
+    "s3",
+    "access-denied",
+    "bucket-policy",
+    "iam",
+    "cloud-storage"
+  ],
+  "evidence": {
+    "document": "INC037_incident_report.pdf",
+    "image": "s3_access_denied.png",
+    "audio": "INC037_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "S3",
+    "s3-prod-assets-bucket",
+    "Bucket Policy",
+    "VPC Endpoint",
+    "CloudTrail",
+    "AccessDenied"
+  ],
+  "knowledge_graph_relations": [
+    "Policy_update REMOVED VPC_endpoint_access",
+    "Missing_VPC_statement CAUSED AccessDenied",
+    "Policy_restoration FIXED asset_access"
+  ],
+  "embedding_summary": "S3 bucket returning AccessDenied after bucket policy update removed VPC endpoint access statement while blocking public access. All static assets unavailable for 20 minutes affecting 18,000 users. Website rendered without styling. Resolved by restoring VPC endpoint policy while maintaining public access restrictions.",
+  "confidence": 0.96
+}

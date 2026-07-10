@@ -1,0 +1,111 @@
+{
+  "incident_id": "INC025",
+  "title": "HashiCorp Vault Secrets Engine Misconfiguration Leaking to Wrong Environment",
+  "timestamp": "2025-06-30T22:15:00Z",
+  "severity": "P1",
+  "department": "Security Engineering",
+  "system": "HashiCorp Vault",
+  "component": "vault-prod-cluster-01",
+  "location": "US-East-1 (AWS)",
+  "status": "Resolved",
+  "symptoms": [
+    "Production services connecting to staging database successfully but with wrong data",
+    "Staging database showing unexpected write traffic and performance degradation",
+    "Vault audit logs showing production services reading staging secrets path",
+    "Data inconsistencies reported by QA team testing in staging",
+    "Application logs showing unfamiliar database hostname in connection strings"
+  ],
+  "root_cause": "Vault secrets path mapping error during policy migration pointed production applications to the staging secrets engine path instead of the production path",
+  "resolution": "Corrected Vault secrets path mapping, rotated all database credentials for both environments, removed the 2,300 erroneous records from staging database, and verified environment isolation",
+  "preventive_actions": [
+    "Implement Vault policy change validation with environment isolation checks",
+    "Add secrets path verification in application startup health checks",
+    "Create automated environment isolation testing for Vault configurations",
+    "Implement Vault policy review requiring dual approval",
+    "Add database hostname verification in application connection initialization"
+  ],
+  "affected_services": [
+    "order-service",
+    "user-service",
+    "payment-service",
+    "staging-database"
+  ],
+  "engineers": [
+    "David Kim",
+    "Aisha Khan",
+    "Rajesh Kumar"
+  ],
+  "timeline": [
+    {
+      "time": "22:15 UTC",
+      "event": "Vault policy migration deployed with incorrect path mapping"
+    },
+    {
+      "time": "22:18 UTC",
+      "event": "Production services begin connecting to staging database"
+    },
+    {
+      "time": "22:20 UTC",
+      "event": "Staging database performance alerts fire from unexpected traffic"
+    },
+    {
+      "time": "22:25 UTC",
+      "event": "QA team reports unfamiliar data appearing in staging"
+    },
+    {
+      "time": "22:28 UTC",
+      "event": "David Kim investigates, discovers Vault path misconfiguration"
+    },
+    {
+      "time": "22:30 UTC",
+      "event": "Vault secrets path corrected to production path"
+    },
+    {
+      "time": "22:32 UTC",
+      "event": "All database credentials rotated for both environments"
+    },
+    {
+      "time": "22:33 UTC",
+      "event": "Erroneous records identified for cleanup in staging"
+    }
+  ],
+  "ocr_entities": [
+    "Service: order-svc-prod",
+    "Secrets Path: secret/staging/db-creds (WRONG)",
+    "Expected Path: secret/production/db-creds",
+    "Access Count: 2,347",
+    "Policy: prod-app-policy-v2 (misconfigured)",
+    "Alert: ENVIRONMENT ISOLATION BREACH"
+  ],
+  "audio_entities": [
+    "Rajesh Kumar",
+    "Aisha Khan",
+    "David Kim"
+  ],
+  "document_entities": [
+    "vault",
+    "secrets",
+    "misconfiguration",
+    "security",
+    "environment-isolation"
+  ],
+  "evidence": {
+    "document": "INC025_incident_report.pdf",
+    "image": "vault_secrets_misconfig.png",
+    "audio": "INC025_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "HashiCorp Vault",
+    "vault-prod-cluster-01",
+    "Secrets Path",
+    "Policy Migration",
+    "Environment Isolation"
+  ],
+  "knowledge_graph_relations": [
+    "Policy_migration ERROR_IN secrets_path_mapping",
+    "Production_services READ staging_credentials",
+    "Path_correction RESTORED environment_isolation"
+  ],
+  "embedding_summary": "HashiCorp Vault secrets engine misconfiguration during policy migration caused production services to read staging database credentials. 2,300 records incorrectly written to staging database over 18 minutes. Environment isolation breach triggered security review. Resolved by correcting path mapping and rotating all credentials.",
+  "confidence": 0.95
+}

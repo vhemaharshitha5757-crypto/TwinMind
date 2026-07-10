@@ -1,0 +1,163 @@
+INCIDENT REPORT
+========================================================================
+
+Incident ID:       INC037
+Title:             AWS S3 Access Denied Errors After Bucket Policy Update
+Severity:          P2
+Date/Time:         2025-09-22T15:30:00Z
+Department:        Cloud Infrastructure
+System:            AWS S3
+Component:         s3-prod-assets-bucket
+Location:          US-East-1 (AWS)
+Assigned Engineer: Lisa Park
+Status:            Resolved
+
+========================================================================
+1. SUMMARY
+========================================================================
+
+AWS S3 bucket (s3-prod-assets-bucket) began returning AccessDenied errors for all read operations at 15:30 UTC on September 22, 2025. A bucket policy update intended to restrict public access inadvertently also removed the VPC endpoint policy that allowed application servers to read assets. All static asset loading (images, CSS, JS) failed across the platform.
+
+This incident was classified as P2 severity and was assigned to
+Lisa Park in the Cloud Infrastructure department. The affected system was
+AWS S3, specifically the s3-prod-assets-bucket component located in US-East-1 (AWS).
+The incident was detected through automated monitoring and alerting systems,
+and the response team was engaged within minutes of the initial alert.
+
+========================================================================
+2. BUSINESS IMPACT
+========================================================================
+
+All static assets (images, stylesheets, JavaScript bundles) unavailable for 20 minutes. Website rendered without styling or images, appearing broken. 18,000 users experienced degraded visual experience. Mobile app asset loading failed. Revenue impact from degraded user experience estimated at $45,000.
+
+The incident triggered the organization's major incident response process,
+involving cross-functional coordination between engineering, operations, and
+business stakeholders. Customer support was notified and prepared to handle
+incoming queries related to the service degradation.
+
+========================================================================
+3. SYMPTOMS OBSERVED
+========================================================================
+
+The following symptoms were observed during the incident:
+
+  * S3 GetObject calls returning 403 AccessDenied for application IAM role
+  * Website loading without CSS, JavaScript, or images
+  * CloudTrail logs showing denied S3 API calls from VPC endpoint
+  * S3 bucket policy recently modified removing VPC endpoint condition
+  * Direct S3 access via console working (IAM admin role unaffected)
+
+These symptoms were correlated across multiple monitoring systems including
+application performance monitoring, infrastructure metrics, and log
+aggregation platforms. The incident response team confirmed the symptoms
+during their initial assessment and used them to guide the investigation.
+
+========================================================================
+4. TIMELINE OF EVENTS
+========================================================================
+
+  [15:30 UTC] S3 bucket policy updated to restrict public access
+  [15:31 UTC] Application servers begin receiving AccessDenied on asset requests
+  [15:33 UTC] Website starts loading without CSS, JS, and images
+  [15:35 UTC] Alert fires for asset loading failures
+  [15:38 UTC] Lisa Park investigates, identifies bucket policy change
+  [15:42 UTC] Missing VPC endpoint policy statement identified
+  [15:45 UTC] VPC endpoint statement added back to bucket policy
+  [15:48 UTC] Asset loading restored, website rendering normally
+  [15:50 UTC] Incident resolved, all services verified
+
+========================================================================
+5. INVESTIGATION
+========================================================================
+
+Upon receiving the automated alert, the incident response team initiated a
+systematic investigation following established runbook procedures. The team
+began by examining the health and status of the s3-prod-assets-bucket component
+within the AWS S3 system deployed in US-East-1 (AWS).
+
+Initial telemetry data from the monitoring stack was reviewed, including
+application logs, infrastructure metrics, and recent deployment and change
+history. The investigation revealed that the primary symptoms were consistent
+across multiple data sources and monitoring tools.
+
+Log analysis from the affected component showed error patterns that pointed
+toward s3 bucket policy update intended to block public access also removed the vpc endpoint policy statement that allowed application server access via the vpc endpoint. The team also reviewed recent change
+records, configuration modifications, and deployment history to rule out
+human-initiated causes. Cross-referencing the timeline of events with
+infrastructure metrics from the preceding 24-48 hours provided additional
+context that supported the final root cause determination.
+
+========================================================================
+6. ROOT CAUSE ANALYSIS
+========================================================================
+
+The root cause of this incident was determined to be:
+S3 bucket policy update intended to block public access also removed the VPC endpoint policy statement that allowed application server access via the VPC endpoint.
+
+Further analysis confirmed that this issue had been developing over time but
+was not detected by existing monitoring thresholds and alerting rules. The
+failure point was within the s3-prod-assets-bucket component of the AWS S3
+system. Contributing factors included insufficient monitoring coverage for
+the specific failure mode encountered and the absence of automated
+remediation procedures for this particular scenario.
+
+========================================================================
+7. RESOLUTION
+========================================================================
+
+The incident was resolved by the following actions: Added VPC endpoint policy statement back to the S3 bucket policy while maintaining the public access restrictions, verified asset loading restored across all services.
+
+The resolution was executed by Lisa Park with support from the incident
+response team. After applying the remediation steps, the team monitored the
+system for a stabilization period to confirm that the issue was fully
+resolved and no secondary or cascading failures had occurred. All affected
+services were verified to be operating within normal parameters before the
+incident was formally closed.
+
+========================================================================
+8. PREVENTIVE ACTIONS
+========================================================================
+
+The following preventive actions have been identified to reduce the
+likelihood and impact of similar incidents in the future:
+
+  1. Implement S3 bucket policy change simulation before applying
+  2. Create bucket policy templates that include standard VPC endpoint access
+  3. Add S3 access monitoring with immediate alerting on AccessDenied spikes
+  4. Implement bucket policy change approval workflow
+  5. Create pre-deployment checklist for S3 policy modifications
+
+These action items will be tracked in the engineering backlog and prioritized
+based on risk assessment and business impact analysis.
+
+========================================================================
+9. RELATED STANDARD OPERATING PROCEDURES
+========================================================================
+
+SOP-STOR-003: S3 Access Management; SOP-STOR-006: Bucket Policy Recovery
+
+========================================================================
+10. LESSONS LEARNED
+========================================================================
+
+This incident provided several important learnings for the organization.
+The detection of s3 bucket policy update intended to block public access also removed the vpc endpoint policy statement that allowed application server access via the vpc endpoint was delayed due to gaps in
+monitoring coverage, highlighting the need for more comprehensive
+observability across the AWS S3 stack.
+
+The incident response process demonstrated effective team coordination and
+communication, but the overall time to resolution could be improved through
+automation of common diagnostic and remediation steps. The successful
+resolution validated existing runbooks and procedures while also identifying
+specific areas for improvement.
+
+The preventive actions identified during the post-mortem will strengthen
+organizational resilience against similar failure modes. Regular review of
+monitoring thresholds, alerting rules, and runbook procedures should be
+incorporated into the operational cadence to maintain readiness.
+
+========================================================================
+Report generated by TwinMind Incident Management System
+Date: 2025-09-22T15:30:00Z
+Classification: Internal - Confidential
+========================================================================

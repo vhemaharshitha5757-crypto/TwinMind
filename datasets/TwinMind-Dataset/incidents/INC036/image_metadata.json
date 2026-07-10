@@ -1,0 +1,23 @@
+{
+  "filename": "mongo_connection_pool.png",
+  "caption": "MongoDB Atlas showing connection pool exhaustion on user service cluster",
+  "scene_description": "MongoDB Atlas dashboard showing connection count at the 500 maximum. A connection lifecycle graph shows connections being created but not released. Atlas alerts panel shows connection limit warnings.",
+  "detected_objects": [
+    "Connection Count Gauge",
+    "Connection Lifecycle Graph",
+    "Atlas Alert Panel",
+    "Cluster Metrics Dashboard",
+    "Application Connection Breakdown"
+  ],
+  "ocr_text": [
+    "Connections: 500/500 (MAX)",
+    "Available: 0",
+    "Leaked (est): 347",
+    "Cluster: mongo-user-prod-cluster",
+    "Error: MongoTimeoutException",
+    "Service: user-service-v3.2"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "MongoDB Atlas Cluster"
+}

@@ -1,0 +1,59 @@
+MEETING TRANSCRIPT - INCIDENT INC035
+========================================================================
+Subject:      MySQL Lock Wait Timeout on Reporting Queries
+Date/Time:    2025-09-08T06:30:00Z
+Participants: Rajesh Kumar, Nina Patel, Tom Williams
+Duration:     Approximately 3 minutes
+Type:         Emergency Incident Response Call
+========================================================================
+
+[BEGIN TRANSCRIPT]
+[Rajesh Kumar]: Hey team, we've got a P3 incident on MySQL Database. InnoDB lock wait timeout exceeded errors across all account operations. I need everyone's eyes on this immediately.
+
+[Nina Patel]: I'm here. Let me pull up the mysql-prod-primary-01 dashboard. When did this start exactly?
+
+[Rajesh Kumar]: First alert came in at 06:30 UTC. Reporting query starts executing against production primary. I've been looking at the logs since then.
+
+[Tom Williams]: I just joined the call. Give me a quick rundown. What are we seeing on the infrastructure side?
+
+[Rajesh Kumar]: Multiple symptoms. SHOW PROCESSLIST showing 340 queries waiting for lock on accounts table. And we're also seeing Single long-running SELECT query holding table-level lock for 15+ minutes.
+
+[Nina Patel]: OK, I've got the metrics up. Application logs showing 'Lock wait timeout exceeded; try restarting transaction'. This doesn't look like a normal blip.
+
+[Tom Williams]: Any recent deployments or configuration changes that could have triggered this? I want to rule out human error first.
+
+[Rajesh Kumar]: I checked the change log for mysql-prod-primary-01. No deployments in the last 24 hours. No config changes either. This looks like an organic failure.
+
+[Nina Patel]: Based on what I'm seeing in the telemetry data, I think this is related to long-running analytical reporting query executed against production primary instead of read replica,. The error pattern is very consistent with that.
+
+[Tom Williams]: That makes sense given the symptoms. I've seen similar patterns before. What's our best remediation path here?
+
+[Rajesh Kumar]: I recommend we killed the blocking reporting query, waiting connections automatically retried, implemented query ro. That should bring us back to a stable state.
+
+[Nina Patel]: Agreed. Let me start executing that now. Tom, can you monitor the dashboards and confirm when metrics start recovering?
+
+[Tom Williams]: Will do. I've got the monitoring screen up. Go ahead with the fix.
+
+[Nina Patel]: Alright, executing the remediation now. This will take a couple of minutes. Stand by.
+
+[Tom Williams]: I'm starting to see positive movement on the dashboards. MySQL Database metrics are beginning to normalize.
+
+[Rajesh Kumar]: Confirmed on my end too. Services are recovering. Let's keep monitoring for the next fifteen minutes to make sure we're stable.
+
+[Nina Patel]: Fix is fully applied. Everything looks green now. I'll document the resolution steps in the incident ticket.
+
+[Rajesh Kumar]: Great work everyone. Let's schedule a post-mortem for tomorrow. Key action items from this incident: implement query routing to automatically redirect analytical queries to read replicas, set innodb_lock_wait_timeout to 10 seconds with application retry logic, and add long-running query detection with automatic kill after threshold.
+
+[Tom Williams]: I'll send out the post-mortem calendar invite and start drafting the incident report. Good job team, quick response on this one.
+
+[END TRANSCRIPT]
+
+========================================================================
+Action Items Captured:
+  - Implement query routing to automatically redirect analytical queries to read replicas
+  - Set innodb_lock_wait_timeout to 10 seconds with application retry logic
+  - Add long-running query detection with automatic kill after threshold
+  - Create network-level access control limiting reporting tools to read replicas
+
+Next Steps: Post-mortem meeting scheduled for following business day.
+========================================================================

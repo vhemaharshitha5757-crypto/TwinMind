@@ -1,0 +1,113 @@
+{
+  "incident_id": "INC009",
+  "title": "DNS Resolution Failure for Internal Service Discovery",
+  "timestamp": "2025-03-10T15:42:00Z",
+  "severity": "P1",
+  "department": "Networking",
+  "system": "Route 53 Private Hosted Zone",
+  "component": "internal-dns-resolver-01",
+  "location": "US-East-1 (AWS)",
+  "status": "Resolved",
+  "symptoms": [
+    "DNS resolution failures for all *.internal.company.com hostnames",
+    "All microservices logging NXDOMAIN errors for internal service names",
+    "Service mesh health checks failing across all namespaces",
+    "Route 53 private hosted zone showing no VPC associations",
+    "External DNS resolution working normally (issue isolated to internal)"
+  ],
+  "root_cause": "Automated infrastructure cleanup script accidentally deleted the Route 53 private hosted zone VPC association, disabling internal DNS resolution",
+  "resolution": "Re-associated the Route 53 private hosted zone with the production VPC, flushed DNS caches on all service nodes, and restarted affected services to clear stale DNS entries",
+  "preventive_actions": [
+    "Add deletion protection on Route 53 hosted zone associations",
+    "Implement dry-run mode for all infrastructure cleanup scripts",
+    "Create DNS resolution canary monitoring with 30-second intervals",
+    "Add IAM guardrails preventing hosted zone association deletion",
+    "Implement service mesh fallback to IP-based routing during DNS failures"
+  ],
+  "affected_services": [
+    "all-microservices",
+    "api-gateway",
+    "message-broker",
+    "cache-layer",
+    "database-proxy"
+  ],
+  "engineers": [
+    "Maria Garcia",
+    "Alex Johnson",
+    "Lisa Park"
+  ],
+  "timeline": [
+    {
+      "time": "15:42 UTC",
+      "event": "Internal DNS resolution stops working across all services"
+    },
+    {
+      "time": "15:43 UTC",
+      "event": "Cascading alerts fire for service health check failures"
+    },
+    {
+      "time": "15:45 UTC",
+      "event": "Maria Garcia begins investigation, confirms external DNS working"
+    },
+    {
+      "time": "15:50 UTC",
+      "event": "Route 53 console shows no VPC association on private hosted zone"
+    },
+    {
+      "time": "15:55 UTC",
+      "event": "Cleanup script execution log reviewed, accidental deletion confirmed"
+    },
+    {
+      "time": "16:00 UTC",
+      "event": "Hosted zone re-associated with production VPC"
+    },
+    {
+      "time": "16:04 UTC",
+      "event": "DNS caches flushed, services beginning to recover"
+    },
+    {
+      "time": "16:07 UTC",
+      "event": "All services confirmed operational, DNS resolution normal"
+    }
+  ],
+  "ocr_entities": [
+    "DNS Success Rate: 0%",
+    "NXDOMAIN Errors: 1.2M/min",
+    "Hosted Zone: prod-internal",
+    "VPC Association: NONE",
+    "Affected Services: ALL",
+    "Status: CRITICAL"
+  ],
+  "audio_entities": [
+    "Alex Johnson",
+    "Lisa Park",
+    "Maria Garcia"
+  ],
+  "document_entities": [
+    "dns",
+    "resolution-failure",
+    "route53",
+    "service-discovery",
+    "networking"
+  ],
+  "evidence": {
+    "document": "INC009_incident_report.pdf",
+    "image": "dns_failure_dashboard.png",
+    "audio": "INC009_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "Route 53",
+    "Private Hosted Zone",
+    "VPC",
+    "DNS",
+    "Cleanup Script",
+    "NXDOMAIN"
+  ],
+  "knowledge_graph_relations": [
+    "Cleanup_script DELETED hosted_zone_association",
+    "Missing_association CAUSED DNS_resolution_failure",
+    "Re-association RESTORED internal_DNS"
+  ],
+  "embedding_summary": "Complete internal DNS resolution failure caused by automated cleanup script accidentally deleting Route 53 private hosted zone VPC association. All inter-service communication ceased for 25 minutes affecting 68,000 users. Resolved by re-associating the hosted zone and flushing DNS caches.",
+  "confidence": 0.96
+}

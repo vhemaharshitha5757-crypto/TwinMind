@@ -1,0 +1,111 @@
+{
+  "incident_id": "INC007",
+  "title": "Docker Container OOMKilled on Analytics Processing Nodes",
+  "timestamp": "2025-02-24T20:33:00Z",
+  "severity": "P2",
+  "department": "Data Engineering",
+  "system": "Docker Swarm Cluster",
+  "component": "analytics-worker-04",
+  "location": "EU-West-1 (AWS)",
+  "status": "Resolved",
+  "symptoms": [
+    "Docker containers exiting with OOMKilled status code 137",
+    "Container memory usage spiking to 4GB limit before termination",
+    "Analytics job queue depth increasing with no active consumers",
+    "Docker events showing repeated container restarts",
+    "Stale data on customer-facing analytics dashboards"
+  ],
+  "root_cause": "Recent code change in analytics aggregation module loading entire SQL result sets into memory instead of using cursor-based streaming for large datasets",
+  "resolution": "Deployed code fix to implement cursor-based streaming for large datasets, increased container memory limit to 8GB as interim measure, and reprocessed stalled analytics jobs",
+  "preventive_actions": [
+    "Implement memory profiling in CI pipeline for data processing services",
+    "Add container memory usage alerting at 75% of limit",
+    "Mandate cursor-based streaming for all database queries returning over 10K rows",
+    "Create load testing with production-scale datasets in staging",
+    "Implement progressive memory limit increases with validation"
+  ],
+  "affected_services": [
+    "analytics-pipeline",
+    "reporting-service",
+    "customer-dashboard",
+    "bi-export-service"
+  ],
+  "engineers": [
+    "Tom Williams",
+    "Priya Sharma",
+    "Lisa Park"
+  ],
+  "timeline": [
+    {
+      "time": "20:33 UTC",
+      "event": "First OOMKill event on analytics-worker-04 containers"
+    },
+    {
+      "time": "20:38 UTC",
+      "event": "Alert fires for analytics pipeline stall"
+    },
+    {
+      "time": "20:45 UTC",
+      "event": "Tom Williams investigates, identifies OOMKill pattern"
+    },
+    {
+      "time": "21:00 UTC",
+      "event": "Memory profiling reveals full result set loading in aggregation module"
+    },
+    {
+      "time": "21:15 UTC",
+      "event": "Interim fix: container memory limit increased to 8GB"
+    },
+    {
+      "time": "21:30 UTC",
+      "event": "Code fix developed for cursor-based streaming"
+    },
+    {
+      "time": "22:00 UTC",
+      "event": "Fix deployed, analytics jobs resuming"
+    },
+    {
+      "time": "23:00 UTC",
+      "event": "All stalled jobs reprocessed, pipeline fully recovered"
+    }
+  ],
+  "ocr_entities": [
+    "Container Memory: 4096MB / 4096MB",
+    "Exit Code: 137 (OOMKilled)",
+    "Restarts: 14",
+    "Queue Depth: 2,847 jobs",
+    "Node: analytics-worker-04",
+    "Status: OOMKilled"
+  ],
+  "audio_entities": [
+    "Priya Sharma",
+    "Lisa Park",
+    "Tom Williams"
+  ],
+  "document_entities": [
+    "docker",
+    "oomkilled",
+    "analytics",
+    "container",
+    "memory-limit"
+  ],
+  "evidence": {
+    "document": "INC007_incident_report.pdf",
+    "image": "docker_oom_analytics.png",
+    "audio": "INC007_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "Docker",
+    "analytics-worker-04",
+    "OOMKilled",
+    "SQL Result Set",
+    "Cursor Streaming"
+  ],
+  "knowledge_graph_relations": [
+    "Code_change CAUSED memory_spike",
+    "Memory_spike TRIGGERED OOMKill",
+    "Cursor_streaming FIXED memory_issue"
+  ],
+  "embedding_summary": "Docker containers running analytics workloads OOMKilled repeatedly due to code change loading entire SQL result sets into memory instead of streaming. Analytics pipeline stalled for 2.5 hours affecting 350 enterprise customer reports. Resolved by implementing cursor-based streaming and increasing container memory limits.",
+  "confidence": 0.94
+}

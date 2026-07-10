@@ -1,0 +1,163 @@
+INCIDENT REPORT
+========================================================================
+
+Incident ID:       INC026
+Title:             Network Partition Between Availability Zones Causing Split-Brain
+Severity:          P1
+Date/Time:         2025-07-07T01:45:00Z
+Department:        Networking
+System:            AWS VPC Networking
+Component:         vpc-prod-us-east-1
+Location:          US-East-1 (AWS)
+Assigned Engineer: Maria Garcia
+Status:            Resolved
+
+========================================================================
+1. SUMMARY
+========================================================================
+
+A network partition between Availability Zones us-east-1a and us-east-1b occurred at 01:45 UTC on July 7, 2025. The partition isolated the database primary (in AZ-a) from its replicas and application servers (in AZ-b). The application's consensus layer detected the partition and promoted a replica in AZ-b to primary, resulting in a split-brain scenario with two active primaries writing conflicting data for 12 minutes before the partition healed.
+
+This incident was classified as P1 severity and was assigned to
+Maria Garcia in the Networking department. The affected system was
+AWS VPC Networking, specifically the vpc-prod-us-east-1 component located in US-East-1 (AWS).
+The incident was detected through automated monitoring and alerting systems,
+and the response team was engaged within minutes of the initial alert.
+
+========================================================================
+2. BUSINESS IMPACT
+========================================================================
+
+Split-brain condition caused 847 conflicting database records across 3 tables. Data reconciliation required 6 hours of manual effort by the data engineering team. 4 customers received duplicate order confirmations. Financial records required audit. Estimated remediation cost of $35,000.
+
+The incident triggered the organization's major incident response process,
+involving cross-functional coordination between engineering, operations, and
+business stakeholders. Customer support was notified and prepared to handle
+incoming queries related to the service degradation.
+
+========================================================================
+3. SYMPTOMS OBSERVED
+========================================================================
+
+The following symptoms were observed during the incident:
+
+  * Network connectivity loss between AZ-a and AZ-b subnets
+  * Database cluster showing two active primary nodes simultaneously
+  * Application servers in AZ-b unable to reach services in AZ-a
+  * Consensus layer triggering automatic failover in isolated AZ
+  * Conflicting write operations detected after partition healed
+
+These symptoms were correlated across multiple monitoring systems including
+application performance monitoring, infrastructure metrics, and log
+aggregation platforms. The incident response team confirmed the symptoms
+during their initial assessment and used them to guide the investigation.
+
+========================================================================
+4. TIMELINE OF EVENTS
+========================================================================
+
+  [01:45 UTC] Network partition detected between us-east-1a and us-east-1b
+  [01:47 UTC] Consensus layer in AZ-b promotes replica to primary
+  [01:48 UTC] Split-brain condition begins with two active primaries
+  [01:50 UTC] Alerts fire for network partition and dual-primary detection
+  [01:52 UTC] Maria Garcia assesses situation, confirms partition
+  [01:55 UTC] Decision to wait for partition healing rather than force intervention
+  [01:57 UTC] Network partition self-heals, connectivity restored
+  [02:00 UTC] Split-brain detected, conflicting records identified
+  [02:15 UTC] Original primary restored as sole primary, reconciliation begins
+
+========================================================================
+5. INVESTIGATION
+========================================================================
+
+Upon receiving the automated alert, the incident response team initiated a
+systematic investigation following established runbook procedures. The team
+began by examining the health and status of the vpc-prod-us-east-1 component
+within the AWS VPC Networking system deployed in US-East-1 (AWS).
+
+Initial telemetry data from the monitoring stack was reviewed, including
+application logs, infrastructure metrics, and recent deployment and change
+history. The investigation revealed that the primary symptoms were consistent
+across multiple data sources and monitoring tools.
+
+Log analysis from the affected component showed error patterns that pointed
+toward aws inter-az network fabric degradation caused complete connectivity loss between us-east-1a and us-east-1b, and the consensus algorithm had insufficient quorum requirements to prevent split-brain. The team also reviewed recent change
+records, configuration modifications, and deployment history to rule out
+human-initiated causes. Cross-referencing the timeline of events with
+infrastructure metrics from the preceding 24-48 hours provided additional
+context that supported the final root cause determination.
+
+========================================================================
+6. ROOT CAUSE ANALYSIS
+========================================================================
+
+The root cause of this incident was determined to be:
+AWS inter-AZ network fabric degradation caused complete connectivity loss between us-east-1a and us-east-1b, and the consensus algorithm had insufficient quorum requirements to prevent split-brain.
+
+Further analysis confirmed that this issue had been developing over time but
+was not detected by existing monitoring thresholds and alerting rules. The
+failure point was within the vpc-prod-us-east-1 component of the AWS VPC Networking
+system. Contributing factors included insufficient monitoring coverage for
+the specific failure mode encountered and the absence of automated
+remediation procedures for this particular scenario.
+
+========================================================================
+7. RESOLUTION
+========================================================================
+
+The incident was resolved by the following actions: Partition self-healed after 12 minutes, manual split-brain resolution performed by identifying and merging conflicting records, consensus algorithm updated to require majority quorum across all AZs.
+
+The resolution was executed by Maria Garcia with support from the incident
+response team. After applying the remediation steps, the team monitored the
+system for a stabilization period to confirm that the issue was fully
+resolved and no secondary or cascading failures had occurred. All affected
+services were verified to be operating within normal parameters before the
+incident was formally closed.
+
+========================================================================
+8. PREVENTIVE ACTIONS
+========================================================================
+
+The following preventive actions have been identified to reduce the
+likelihood and impact of similar incidents in the future:
+
+  1. Update consensus algorithm to require strict majority quorum across AZs
+  2. Implement fencing tokens to prevent split-brain write conflicts
+  3. Add network partition detection with automatic write-lock on minority partition
+  4. Create data reconciliation runbook for split-brain scenarios
+  5. Deploy cross-AZ network monitoring with partition detection alerts
+
+These action items will be tracked in the engineering backlog and prioritized
+based on risk assessment and business impact analysis.
+
+========================================================================
+9. RELATED STANDARD OPERATING PROCEDURES
+========================================================================
+
+SOP-NET-003: Network Partition Response; SOP-DB-010: Split-Brain Resolution
+
+========================================================================
+10. LESSONS LEARNED
+========================================================================
+
+This incident provided several important learnings for the organization.
+The detection of aws inter-az network fabric degradation caused complete connectivity loss between us-east-1a and us-east-1b, and the consensus algorithm had insufficient quorum requirements to prevent split-brain was delayed due to gaps in
+monitoring coverage, highlighting the need for more comprehensive
+observability across the AWS VPC Networking stack.
+
+The incident response process demonstrated effective team coordination and
+communication, but the overall time to resolution could be improved through
+automation of common diagnostic and remediation steps. The successful
+resolution validated existing runbooks and procedures while also identifying
+specific areas for improvement.
+
+The preventive actions identified during the post-mortem will strengthen
+organizational resilience against similar failure modes. Regular review of
+monitoring thresholds, alerting rules, and runbook procedures should be
+incorporated into the operational cadence to maintain readiness.
+
+========================================================================
+Report generated by TwinMind Incident Management System
+Date: 2025-07-07T01:45:00Z
+Classification: Internal - Confidential
+========================================================================

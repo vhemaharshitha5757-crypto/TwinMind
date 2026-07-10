@@ -1,0 +1,59 @@
+MEETING TRANSCRIPT - INCIDENT INC040
+========================================================================
+Subject:      HAProxy Returning 503 Errors Due to Backend Server Pool Drain
+Date/Time:    2025-10-13T16:20:00Z
+Participants: Alex Johnson, Chris Evans, Tom Williams
+Duration:     Approximately 3 minutes
+Type:         Emergency Incident Response Call
+========================================================================
+
+[BEGIN TRANSCRIPT]
+[Alex Johnson]: Hey team, we've got a P2 incident on HAProxy Load Balancer. HAProxy returning 503 Service Unavailable for all requests. I need everyone's eyes on this immediately.
+
+[Chris Evans]: I'm here. Let me pull up the haproxy-prod-chi-01 dashboard. When did this start exactly?
+
+[Alex Johnson]: First alert came in at 16:20 UTC. Maintenance script starts, drains all 8 backend servers simultaneously. I've been looking at the logs since then.
+
+[Tom Williams]: I just joined the call. Give me a quick rundown. What are we seeing on the infrastructure side?
+
+[Alex Johnson]: Multiple symptoms. All backend servers showing DRAIN status in HAProxy stats page. And we're also seeing HAProxy stats showing zero active backend servers.
+
+[Chris Evans]: OK, I've got the metrics up. Maintenance script log showing all servers drained simultaneously. This doesn't look like a normal blip.
+
+[Tom Williams]: Any recent deployments or configuration changes that could have triggered this? I want to rule out human error first.
+
+[Alex Johnson]: I checked the change log for haproxy-prod-chi-01. No deployments in the last 24 hours. No config changes either. This looks like an organic failure.
+
+[Chris Evans]: Based on what I'm seeing in the telemetry data, I think this is related to maintenance automation script issued drain commands to all backend servers simultaneously instead of. The error pattern is very consistent with that.
+
+[Tom Williams]: That makes sense given the symptoms. I've seen similar patterns before. What's our best remediation path here?
+
+[Alex Johnson]: I recommend we manually re-enabled all backend servers in haproxy, killed the errant maintenance script, and fixed . That should bring us back to a stable state.
+
+[Chris Evans]: Agreed. Let me start executing that now. Tom, can you monitor the dashboards and confirm when metrics start recovering?
+
+[Tom Williams]: Will do. I've got the monitoring screen up. Go ahead with the fix.
+
+[Chris Evans]: Alright, executing the remediation now. This will take a couple of minutes. Stand by.
+
+[Tom Williams]: I'm starting to see positive movement on the dashboards. HAProxy Load Balancer metrics are beginning to normalize.
+
+[Alex Johnson]: Confirmed on my end too. Services are recovering. Let's keep monitoring for the next fifteen minutes to make sure we're stable.
+
+[Chris Evans]: Fix is fully applied. Everything looks green now. I'll document the resolution steps in the incident ticket.
+
+[Alex Johnson]: Great work everyone. Let's schedule a post-mortem for tomorrow. Key action items from this incident: fix maintenance script to drain servers one at a time with health verification, implement minimum healthy backends guard preventing full pool drain, and add haproxy backend availability monitoring with zero-backend alerting.
+
+[Tom Williams]: I'll send out the post-mortem calendar invite and start drafting the incident report. Good job team, quick response on this one.
+
+[END TRANSCRIPT]
+
+========================================================================
+Action Items Captured:
+  - Fix maintenance script to drain servers one at a time with health verification
+  - Implement minimum healthy backends guard preventing full pool drain
+  - Add HAProxy backend availability monitoring with zero-backend alerting
+  - Create maintenance window scheduling with change management approval
+
+Next Steps: Post-mortem meeting scheduled for following business day.
+========================================================================

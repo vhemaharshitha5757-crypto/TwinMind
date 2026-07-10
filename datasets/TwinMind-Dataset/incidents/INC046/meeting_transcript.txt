@@ -1,0 +1,59 @@
+MEETING TRANSCRIPT - INCIDENT INC046
+========================================================================
+Subject:      ElasticSearch Cluster Red Status Due to Unassigned Shards
+Date/Time:    2025-11-24T03:20:00Z
+Participants: Priya Sharma, Chris Evans, Alex Johnson
+Duration:     Approximately 3 minutes
+Type:         Emergency Incident Response Call
+========================================================================
+
+[BEGIN TRANSCRIPT]
+[Priya Sharma]: Hey team, we've got a P1 incident on ElasticSearch Cluster. ElasticSearch cluster health showing RED status. I need everyone's eyes on this immediately.
+
+[Chris Evans]: I'm here. Let me pull up the es-prod-cluster-01 dashboard. When did this start exactly?
+
+[Priya Sharma]: First alert came in at 03:20 UTC. es-data-05 goes offline due to disk failure. I've been looking at the logs since then.
+
+[Alex Johnson]: I just joined the call. Give me a quick rundown. What are we seeing on the infrastructure side?
+
+[Priya Sharma]: Multiple symptoms. 240 unassigned primary shards across 12 indices. And we're also seeing Remaining data nodes showing disk utilization above 85% watermark.
+
+[Chris Evans]: OK, I've got the metrics up. Search queries returning partial results with missing data. This doesn't look like a normal blip.
+
+[Alex Johnson]: Any recent deployments or configuration changes that could have triggered this? I want to rule out human error first.
+
+[Priya Sharma]: I checked the change log for es-prod-cluster-01. No deployments in the last 24 hours. No config changes either. This looks like an organic failure.
+
+[Chris Evans]: Based on what I'm seeing in the telemetry data, I think this is related to data node disk failure combined with insufficient free disk space on remaining nodes preventing shar. The error pattern is very consistent with that.
+
+[Alex Johnson]: That makes sense given the symptoms. I've seen similar patterns before. What's our best remediation path here?
+
+[Priya Sharma]: I recommend we added two new data nodes with 2tb storage each, manually triggered shard reallocation, recovered dat. That should bring us back to a stable state.
+
+[Chris Evans]: Agreed. Let me start executing that now. Alex, can you monitor the dashboards and confirm when metrics start recovering?
+
+[Alex Johnson]: Will do. I've got the monitoring screen up. Go ahead with the fix.
+
+[Chris Evans]: Alright, executing the remediation now. This will take a couple of minutes. Stand by.
+
+[Alex Johnson]: I'm starting to see positive movement on the dashboards. ElasticSearch Cluster metrics are beginning to normalize.
+
+[Priya Sharma]: Confirmed on my end too. Services are recovering. Let's keep monitoring for the next fifteen minutes to make sure we're stable.
+
+[Chris Evans]: Fix is fully applied. Everything looks green now. I'll document the resolution steps in the incident ticket.
+
+[Priya Sharma]: Great work everyone. Let's schedule a post-mortem for tomorrow. Key action items from this incident: implement disk space capacity planning with 40% headroom for reallocation, add disk watermark monitoring with alerts at 70% utilization, and deploy disk health monitoring (smart) on all elasticsearch data nodes.
+
+[Alex Johnson]: I'll send out the post-mortem calendar invite and start drafting the incident report. Good job team, quick response on this one.
+
+[END TRANSCRIPT]
+
+========================================================================
+Action Items Captured:
+  - Implement disk space capacity planning with 40% headroom for reallocation
+  - Add disk watermark monitoring with alerts at 70% utilization
+  - Deploy disk health monitoring (SMART) on all ElasticSearch data nodes
+  - Implement ILM (Index Lifecycle Management) for automatic data tiering
+
+Next Steps: Post-mortem meeting scheduled for following business day.
+========================================================================

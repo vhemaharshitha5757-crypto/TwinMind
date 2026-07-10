@@ -1,0 +1,23 @@
+{
+  "filename": "cicd_rollback_pipeline.png",
+  "caption": "Jenkins pipeline showing failed deployment with partial rollback status",
+  "scene_description": "Jenkins deployment pipeline visualization showing the build stage green, database migration stage green, but application deployment stage red with partial rollback. A health check panel shows 40% of instances failing.",
+  "detected_objects": [
+    "Pipeline Stage Visualization",
+    "Health Check Status Panel",
+    "Deployment Log Window",
+    "Rollback Button",
+    "Instance Status Grid"
+  ],
+  "ocr_text": [
+    "Pipeline: prod-deploy-v3.2.0",
+    "Stage: Application Deploy - FAILED",
+    "Migration: column_drop - COMPLETED",
+    "Healthy Instances: 6/10",
+    "Rollback Status: PARTIAL",
+    "Error: column 'user_legacy_id' does not exist"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "Jenkins CI/CD Pipeline"
+}

@@ -1,0 +1,111 @@
+{
+  "incident_id": "INC023",
+  "title": "CDN Serving Stale Cached Content After Backend Update",
+  "timestamp": "2025-06-16T08:20:00Z",
+  "severity": "P3",
+  "department": "Platform Engineering",
+  "system": "AWS CloudFront CDN",
+  "component": "cdn-dist-prod-01",
+  "location": "Global (CloudFront)",
+  "status": "Resolved",
+  "symptoms": [
+    "Product prices on the website not matching backend database values",
+    "CDN cache headers showing content served from stale cache",
+    "CloudFront invalidation request in failed state",
+    "Deployment script logging IAM credential error for invalidation API",
+    "Different pricing shown to users in different regions based on edge cache age"
+  ],
+  "root_cause": "CDN cache invalidation failed silently during deployment because the IAM service account credentials used by the deployment script had expired",
+  "resolution": "Rotated IAM credentials, triggered manual CloudFront cache invalidation for all product-related paths, verified fresh content being served from all edge locations",
+  "preventive_actions": [
+    "Implement IAM credential rotation monitoring with expiry alerts",
+    "Add cache invalidation verification step in deployment pipeline",
+    "Create automated cache freshness testing after deployments",
+    "Implement cache-busting versioned URLs for dynamic content",
+    "Add deployment pipeline gate requiring successful invalidation before completion"
+  ],
+  "affected_services": [
+    "product-catalog",
+    "pricing-service",
+    "inventory-display",
+    "search-results"
+  ],
+  "engineers": [
+    "Sarah Chen",
+    "Tom Williams",
+    "Lisa Park"
+  ],
+  "timeline": [
+    {
+      "time": "08:20 UTC",
+      "event": "Backend product pricing update deployed"
+    },
+    {
+      "time": "08:22 UTC",
+      "event": "Cache invalidation request fails silently due to expired IAM credentials"
+    },
+    {
+      "time": "08:45 UTC",
+      "event": "First customer report of incorrect pricing"
+    },
+    {
+      "time": "09:00 UTC",
+      "event": "Support tickets accumulating, pricing discrepancy pattern identified"
+    },
+    {
+      "time": "09:15 UTC",
+      "event": "Sarah Chen investigates, discovers failed invalidation in CloudFront"
+    },
+    {
+      "time": "09:30 UTC",
+      "event": "Expired IAM credentials identified as root cause"
+    },
+    {
+      "time": "09:40 UTC",
+      "event": "IAM credentials rotated, manual cache invalidation triggered"
+    },
+    {
+      "time": "10:20 UTC",
+      "event": "All edge locations serving fresh content, incident resolved"
+    }
+  ],
+  "ocr_entities": [
+    "Invalidation: FAILED",
+    "Error: AccessDenied - IAM credentials expired",
+    "Cache Age: 7200s (stale)",
+    "Edge Locations Stale: 47/47",
+    "Path: /api/products/*",
+    "Distribution: cdn-dist-prod-01"
+  ],
+  "audio_entities": [
+    "Lisa Park",
+    "Sarah Chen",
+    "Tom Williams"
+  ],
+  "document_entities": [
+    "cdn",
+    "cache",
+    "stale-content",
+    "cloudfront",
+    "invalidation"
+  ],
+  "evidence": {
+    "document": "INC023_incident_report.pdf",
+    "image": "cdn_stale_cache.png",
+    "audio": "INC023_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "CloudFront",
+    "cdn-dist-prod-01",
+    "Cache Invalidation",
+    "IAM Credentials",
+    "Edge Locations"
+  ],
+  "knowledge_graph_relations": [
+    "Expired_IAM_credentials CAUSED invalidation_failure",
+    "Failed_invalidation LED_TO stale_content",
+    "Credential_rotation ENABLED cache_invalidation"
+  ],
+  "embedding_summary": "CloudFront CDN serving stale product pricing for 2 hours after backend update because cache invalidation failed due to expired IAM credentials. 340 orders placed with incorrect pricing. Resolved by rotating IAM credentials and triggering manual cache invalidation.",
+  "confidence": 0.93
+}

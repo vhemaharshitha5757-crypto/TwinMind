@@ -1,0 +1,59 @@
+MEETING TRANSCRIPT - INCIDENT INC026
+========================================================================
+Subject:      Network Partition Between Availability Zones Causing Split-Brain
+Date/Time:    2025-07-07T01:45:00Z
+Participants: Maria Garcia, Rajesh Kumar, David Kim
+Duration:     Approximately 3 minutes
+Type:         Emergency Incident Response Call
+========================================================================
+
+[BEGIN TRANSCRIPT]
+[Maria Garcia]: Hey team, we've got a P1 incident on AWS VPC Networking. Network connectivity loss between AZ-a and AZ-b subnets. I need everyone's eyes on this immediately.
+
+[Rajesh Kumar]: I'm here. Let me pull up the vpc-prod-us-east-1 dashboard. When did this start exactly?
+
+[Maria Garcia]: First alert came in at 01:45 UTC. Network partition detected between us-east-1a and us-east-1b. I've been looking at the logs since then.
+
+[David Kim]: I just joined the call. Give me a quick rundown. What are we seeing on the infrastructure side?
+
+[Maria Garcia]: Multiple symptoms. Database cluster showing two active primary nodes simultaneously. And we're also seeing Application servers in AZ-b unable to reach services in AZ-a.
+
+[Rajesh Kumar]: OK, I've got the metrics up. Consensus layer triggering automatic failover in isolated AZ. This doesn't look like a normal blip.
+
+[David Kim]: Any recent deployments or configuration changes that could have triggered this? I want to rule out human error first.
+
+[Maria Garcia]: I checked the change log for vpc-prod-us-east-1. No deployments in the last 24 hours. No config changes either. This looks like an organic failure.
+
+[Rajesh Kumar]: Based on what I'm seeing in the telemetry data, I think this is related to aws inter-az network fabric degradation caused complete connectivity loss between us-east-1a and us-. The error pattern is very consistent with that.
+
+[David Kim]: That makes sense given the symptoms. I've seen similar patterns before. What's our best remediation path here?
+
+[Maria Garcia]: I recommend we partition self-healed after 12 minutes, manual split-brain resolution performed by identifying and m. That should bring us back to a stable state.
+
+[Rajesh Kumar]: Agreed. Let me start executing that now. David, can you monitor the dashboards and confirm when metrics start recovering?
+
+[David Kim]: Will do. I've got the monitoring screen up. Go ahead with the fix.
+
+[Rajesh Kumar]: Alright, executing the remediation now. This will take a couple of minutes. Stand by.
+
+[David Kim]: I'm starting to see positive movement on the dashboards. AWS VPC Networking metrics are beginning to normalize.
+
+[Maria Garcia]: Confirmed on my end too. Services are recovering. Let's keep monitoring for the next fifteen minutes to make sure we're stable.
+
+[Rajesh Kumar]: Fix is fully applied. Everything looks green now. I'll document the resolution steps in the incident ticket.
+
+[Maria Garcia]: Great work everyone. Let's schedule a post-mortem for tomorrow. Key action items from this incident: update consensus algorithm to require strict majority quorum across azs, implement fencing tokens to prevent split-brain write conflicts, and add network partition detection with automatic write-lock on minority partition.
+
+[David Kim]: I'll send out the post-mortem calendar invite and start drafting the incident report. Good job team, quick response on this one.
+
+[END TRANSCRIPT]
+
+========================================================================
+Action Items Captured:
+  - Update consensus algorithm to require strict majority quorum across AZs
+  - Implement fencing tokens to prevent split-brain write conflicts
+  - Add network partition detection with automatic write-lock on minority partition
+  - Create data reconciliation runbook for split-brain scenarios
+
+Next Steps: Post-mortem meeting scheduled for following business day.
+========================================================================

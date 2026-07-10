@@ -1,0 +1,59 @@
+MEETING TRANSCRIPT - INCIDENT INC013
+========================================================================
+Subject:      Kafka Consumer Lag Spike Causing Event Processing Delays
+Date/Time:    2025-04-07T03:18:00Z
+Participants: Priya Sharma, James Wright, Alex Johnson
+Duration:     Approximately 3 minutes
+Type:         Emergency Incident Response Call
+========================================================================
+
+[BEGIN TRANSCRIPT]
+[Priya Sharma]: Hey team, we've got a P2 incident on Apache Kafka Cluster. Consumer lag on order-events topic exceeding 2.4 million messages. I need everyone's eyes on this immediately.
+
+[James Wright]: I'm here. Let me pull up the kafka-prod-broker-03 dashboard. When did this start exactly?
+
+[Priya Sharma]: First alert came in at 03:18 UTC. Consumer lag begins climbing on order-events topic. I've been looking at the logs since then.
+
+[Alex Johnson]: I just joined the call. Give me a quick rundown. What are we seeing on the infrastructure side?
+
+[Priya Sharma]: Multiple symptoms. Consumer group showing repeated rebalance events every 30 seconds. And we're also seeing Individual consumer instances showing long GC pauses over 45 seconds.
+
+[James Wright]: OK, I've got the metrics up. Order processing throughput dropped from 15K/min to near zero. This doesn't look like a normal blip.
+
+[Alex Johnson]: Any recent deployments or configuration changes that could have triggered this? I want to rule out human error first.
+
+[Priya Sharma]: I checked the change log for kafka-prod-broker-03. No deployments in the last 24 hours. No config changes either. This looks like an organic failure.
+
+[James Wright]: Based on what I'm seeing in the telemetry data, I think this is related to consumer group rebalance storm triggered by gc pauses exceeding the session timeout (30s) on one con. The error pattern is very consistent with that.
+
+[Alex Johnson]: That makes sense given the symptoms. I've seen similar patterns before. What's our best remediation path here?
+
+[Priya Sharma]: I recommend we increased consumer session timeout to 120 seconds, tuned jvm garbage collection parameters, added a . That should bring us back to a stable state.
+
+[James Wright]: Agreed. Let me start executing that now. Alex, can you monitor the dashboards and confirm when metrics start recovering?
+
+[Alex Johnson]: Will do. I've got the monitoring screen up. Go ahead with the fix.
+
+[James Wright]: Alright, executing the remediation now. This will take a couple of minutes. Stand by.
+
+[Alex Johnson]: I'm starting to see positive movement on the dashboards. Apache Kafka Cluster metrics are beginning to normalize.
+
+[Priya Sharma]: Confirmed on my end too. Services are recovering. Let's keep monitoring for the next fifteen minutes to make sure we're stable.
+
+[James Wright]: Fix is fully applied. Everything looks green now. I'll document the resolution steps in the incident ticket.
+
+[Priya Sharma]: Great work everyone. Let's schedule a post-mortem for tomorrow. Key action items from this incident: tune jvm gc parameters for all kafka consumer services, increase session timeout to accommodate worst-case gc pauses, and implement consumer lag alerting at 100k and 500k message thresholds.
+
+[Alex Johnson]: I'll send out the post-mortem calendar invite and start drafting the incident report. Good job team, quick response on this one.
+
+[END TRANSCRIPT]
+
+========================================================================
+Action Items Captured:
+  - Tune JVM GC parameters for all Kafka consumer services
+  - Increase session timeout to accommodate worst-case GC pauses
+  - Implement consumer lag alerting at 100K and 500K message thresholds
+  - Add consumer group stability monitoring for rebalance frequency
+
+Next Steps: Post-mortem meeting scheduled for following business day.
+========================================================================

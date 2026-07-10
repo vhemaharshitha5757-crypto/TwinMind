@@ -1,0 +1,23 @@
+{
+  "filename": "prometheus_targets_down.png",
+  "caption": "Prometheus targets page showing 23 critical targets in DOWN state",
+  "scene_description": "Prometheus web UI targets page showing a group of 23 targets with red DOWN status badges. Other target groups are green and healthy. A configuration panel shows the malformed scrape config section highlighted.",
+  "detected_objects": [
+    "Target Status Table",
+    "DOWN Status Badges",
+    "Scrape Config Panel",
+    "Target Group Header",
+    "Last Scrape Timestamp"
+  ],
+  "ocr_text": [
+    "Targets DOWN: 23/156",
+    "Target Group: production-services-east",
+    "Last Scrape: 4h ago",
+    "Scrape Error: context deadline exceeded",
+    "Config: MALFORMED (line 247)",
+    "Status: SILENT FAILURE"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "Prometheus Monitoring Stack"
+}

@@ -1,0 +1,113 @@
+{
+  "incident_id": "INC041",
+  "title": "OAuth2 Token Refresh Loop Causing Authentication Service Overload",
+  "timestamp": "2025-10-20T08:45:00Z",
+  "severity": "P1",
+  "department": "Identity Engineering",
+  "system": "OAuth2 Authorization Server",
+  "component": "oauth-svc-prod-01",
+  "location": "US-East-1 (AWS)",
+  "status": "Resolved",
+  "symptoms": [
+    "OAuth2 token refresh endpoint receiving 3.2 million requests per minute",
+    "Authentication service CPU at 100% across all instances",
+    "Token refresh requests from mobile app with 0ms interval between retries",
+    "All login attempts timing out for web and API users",
+    "Mobile app client logs showing rapid token refresh retry loop"
+  ],
+  "root_cause": "Mobile app OAuth client bug incorrectly parsing valid token responses as errors, triggering immediate retry loops across all 35,000 connected mobile users",
+  "resolution": "Deployed server-side rate limiting on token refresh endpoint per client ID, pushed emergency mobile app update with fix, and scaled auth service to handle the transitional load",
+  "preventive_actions": [
+    "Implement per-client rate limiting on all OAuth endpoints",
+    "Add exponential backoff requirement in OAuth client SDK",
+    "Create server-side circuit breaker for token refresh storms",
+    "Implement OAuth client behavior monitoring with anomaly detection",
+    "Add mandatory code review for OAuth client library changes"
+  ],
+  "affected_services": [
+    "mobile-app",
+    "web-login",
+    "api-authentication",
+    "partner-oauth",
+    "sso-service"
+  ],
+  "engineers": [
+    "Aisha Khan",
+    "Priya Sharma",
+    "David Kim"
+  ],
+  "timeline": [
+    {
+      "time": "08:45 UTC",
+      "event": "Token refresh rate spikes from mobile app clients"
+    },
+    {
+      "time": "08:47 UTC",
+      "event": "Auth service CPU reaches 100% across all instances"
+    },
+    {
+      "time": "08:48 UTC",
+      "event": "All login attempts begin failing"
+    },
+    {
+      "time": "08:50 UTC",
+      "event": "P1 alert fires, Aisha Khan begins investigation"
+    },
+    {
+      "time": "08:55 UTC",
+      "event": "Mobile app client identified as source of refresh storm"
+    },
+    {
+      "time": "09:00 UTC",
+      "event": "Server-side rate limiting deployed on refresh endpoint"
+    },
+    {
+      "time": "09:05 UTC",
+      "event": "Auth service load reducing, web and API logins recovering"
+    },
+    {
+      "time": "09:10 UTC",
+      "event": "Emergency mobile app update submitted for review"
+    }
+  ],
+  "ocr_entities": [
+    "Token Refresh Rate: 3.2M/min",
+    "Auth CPU: 100%",
+    "Source: mobile-app-client (99.9%)",
+    "Login Failures: 47,231",
+    "Rate Limit: NOT CONFIGURED",
+    "Status: OVERLOADED"
+  ],
+  "audio_entities": [
+    "David Kim",
+    "Priya Sharma",
+    "Aisha Khan"
+  ],
+  "document_entities": [
+    "oauth2",
+    "token-refresh",
+    "loop",
+    "authentication",
+    "overload"
+  ],
+  "evidence": {
+    "document": "INC041_incident_report.pdf",
+    "image": "oauth_refresh_loop.png",
+    "audio": "INC041_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "OAuth2",
+    "oauth-svc-prod-01",
+    "Token Refresh",
+    "Mobile App Client",
+    "Rate Limiting",
+    "Circuit Breaker"
+  ],
+  "knowledge_graph_relations": [
+    "Client_bug CAUSED token_refresh_loop",
+    "Refresh_loop OVERLOADED auth_service",
+    "Rate_limiting MITIGATED refresh_storm"
+  ],
+  "embedding_summary": "OAuth2 token refresh loop from mobile app bug overwhelmed authentication service with 3.2 million requests per minute. 47,000 users across all platforms unable to authenticate for 25 minutes. Resolved by server-side rate limiting and emergency mobile app update.",
+  "confidence": 0.95
+}

@@ -1,0 +1,112 @@
+{
+  "incident_id": "INC033",
+  "title": "MySQL Replication Lag Causing Data Inconsistencies",
+  "timestamp": "2025-08-25T17:45:00Z",
+  "severity": "P2",
+  "department": "Database Engineering",
+  "system": "MySQL Replication Cluster",
+  "component": "mysql-replica-eu-02",
+  "location": "EU-West-1 (AWS)",
+  "status": "Resolved",
+  "symptoms": [
+    "MySQL SHOW SLAVE STATUS showing Seconds_Behind_Master at 2,700",
+    "Read queries returning data 45 minutes stale compared to primary",
+    "Customer reports of order status not updating after changes",
+    "Relay log growing faster than it could be applied",
+    "Replica I/O thread running but SQL thread falling behind"
+  ],
+  "root_cause": "Large batch UPDATE on 8 million rows replicated as row-based binlog events, causing the single-threaded SQL applier on the replica to fall 45 minutes behind the primary",
+  "resolution": "Temporarily routed EU read traffic to the primary, enabled parallel replication on the replica, chunked the batch operation for future use, and waited for replica to catch up",
+  "preventive_actions": [
+    "Enable multi-threaded parallel replication on all read replicas",
+    "Implement batch operation chunking policy limiting to 100K rows per transaction",
+    "Add replication lag monitoring with alerts at 5-minute and 15-minute thresholds",
+    "Create read routing policy to exclude replicas with lag above threshold",
+    "Implement automated read traffic failover when replication lag is detected"
+  ],
+  "affected_services": [
+    "read-api-eu",
+    "order-status-service",
+    "inventory-display",
+    "product-catalog-eu"
+  ],
+  "engineers": [
+    "Rajesh Kumar",
+    "Priya Sharma",
+    "Nina Patel"
+  ],
+  "timeline": [
+    {
+      "time": "17:45 UTC",
+      "event": "Replication lag begins growing on mysql-replica-eu-02"
+    },
+    {
+      "time": "17:55 UTC",
+      "event": "Lag reaches 10 minutes, monitoring alert fires"
+    },
+    {
+      "time": "18:00 UTC",
+      "event": "Rajesh Kumar begins investigation"
+    },
+    {
+      "time": "18:10 UTC",
+      "event": "Large batch UPDATE identified as cause of sequential replication"
+    },
+    {
+      "time": "18:15 UTC",
+      "event": "EU read traffic temporarily routed to primary"
+    },
+    {
+      "time": "18:30 UTC",
+      "event": "Parallel replication enabled on affected replica"
+    },
+    {
+      "time": "19:00 UTC",
+      "event": "Replica catching up with parallel processing"
+    },
+    {
+      "time": "19:15 UTC",
+      "event": "Replication lag at zero, read traffic restored to replica"
+    }
+  ],
+  "ocr_entities": [
+    "Seconds_Behind_Master: 2,700",
+    "Relay Log Size: 12.4GB",
+    "SQL Thread: Running (slow)",
+    "I/O Thread: Running",
+    "Replica: mysql-replica-eu-02",
+    "Batch Update: 8M rows processing"
+  ],
+  "audio_entities": [
+    "Rajesh Kumar",
+    "Priya Sharma",
+    "Nina Patel"
+  ],
+  "document_entities": [
+    "mysql",
+    "replication-lag",
+    "data-inconsistency",
+    "read-replica",
+    "binlog"
+  ],
+  "evidence": {
+    "document": "INC033_incident_report.pdf",
+    "image": "mysql_replication_lag.png",
+    "audio": "INC033_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "MySQL",
+    "mysql-replica-eu-02",
+    "Replication Lag",
+    "Binlog",
+    "Parallel Replication",
+    "Batch Update"
+  ],
+  "knowledge_graph_relations": [
+    "Large_batch_update CAUSED replication_lag",
+    "Single-threaded_applier BOTTLENECK_ON row-based_events",
+    "Parallel_replication REDUCES future_lag"
+  ],
+  "embedding_summary": "MySQL replication lag of 45 minutes on EU read replica caused by large batch UPDATE of 8 million rows processed sequentially. EU users saw stale data for 90 minutes. Resolved by routing reads to primary temporarily and enabling parallel replication.",
+  "confidence": 0.94
+}

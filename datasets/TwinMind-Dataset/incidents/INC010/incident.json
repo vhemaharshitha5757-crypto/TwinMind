@@ -1,0 +1,112 @@
+{
+  "incident_id": "INC010",
+  "title": "Firewall Rule Change Blocking Critical API Traffic",
+  "timestamp": "2025-03-17T12:30:00Z",
+  "severity": "P2",
+  "department": "Security Engineering",
+  "system": "Azure Network Security Groups",
+  "component": "nsg-prod-api-tier",
+  "location": "East US (Azure)",
+  "status": "Resolved",
+  "symptoms": [
+    "502 Bad Gateway errors on all API endpoints served by Azure backend",
+    "API gateway unable to reach backend services on port 443",
+    "NSG flow logs showing DENY actions for API gateway source IPs",
+    "Backend services healthy and responsive when accessed directly",
+    "Only traffic from the expanded API gateway subnet range blocked"
+  ],
+  "root_cause": "Network Security Group rule update during security hardening did not include the expanded API gateway subnet range in the allow list, blocking legitimate traffic",
+  "resolution": "Added the expanded API gateway subnet range to the NSG allow rules, verified traffic flow restoration, and implemented NSG change validation",
+  "preventive_actions": [
+    "Implement pre-deployment NSG rule validation against known traffic patterns",
+    "Create automated testing for NSG changes using synthetic API traffic",
+    "Maintain a service dependency map linking NSG rules to traffic flows",
+    "Require dual-approval for NSG rule modifications in production",
+    "Add NSG flow log monitoring for unexpected DENY events"
+  ],
+  "affected_services": [
+    "external-api",
+    "partner-integrations",
+    "webhook-service",
+    "api-analytics"
+  ],
+  "engineers": [
+    "David Kim",
+    "Maria Garcia",
+    "Jenny Liu"
+  ],
+  "timeline": [
+    {
+      "time": "12:30 UTC",
+      "event": "NSG rule change applied as part of security hardening initiative"
+    },
+    {
+      "time": "12:32 UTC",
+      "event": "API endpoints begin returning 502 errors"
+    },
+    {
+      "time": "12:34 UTC",
+      "event": "Automated alert fires for API error rate spike"
+    },
+    {
+      "time": "12:36 UTC",
+      "event": "David Kim begins investigation, backend services confirmed healthy"
+    },
+    {
+      "time": "12:40 UTC",
+      "event": "NSG flow logs reveal DENY actions for API gateway subnet"
+    },
+    {
+      "time": "12:43 UTC",
+      "event": "Root cause identified as missing subnet range in new rules"
+    },
+    {
+      "time": "12:45 UTC",
+      "event": "NSG rules updated to include expanded API gateway subnet"
+    },
+    {
+      "time": "12:48 UTC",
+      "event": "Traffic flow restored, API endpoints operational"
+    }
+  ],
+  "ocr_entities": [
+    "NSG: nsg-prod-api-tier",
+    "Action: DENY",
+    "Source: 10.0.4.0/24",
+    "Dest Port: 443",
+    "Denied Flows: 75,600",
+    "Rule: SecurityHardening-v2",
+    "Status: ALERT"
+  ],
+  "audio_entities": [
+    "Jenny Liu",
+    "David Kim",
+    "Maria Garcia"
+  ],
+  "document_entities": [
+    "firewall",
+    "nsg",
+    "azure",
+    "blocked-traffic",
+    "security"
+  ],
+  "evidence": {
+    "document": "INC010_incident_report.pdf",
+    "image": "firewall_blocked_traffic.png",
+    "audio": "INC010_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "Azure NSG",
+    "nsg-prod-api-tier",
+    "API Gateway Subnet",
+    "Port 443",
+    "Security Hardening"
+  ],
+  "knowledge_graph_relations": [
+    "NSG_rule_change BLOCKED api_gateway_traffic",
+    "Missing_subnet_range CAUSED traffic_deny",
+    "Rule_update RESTORED api_connectivity"
+  ],
+  "embedding_summary": "Azure Network Security Group rule change during security hardening blocked API gateway traffic on port 443 for 18 minutes. The expanded API gateway subnet was not included in the updated allow rules. 4,200 API calls per minute failed. Resolved by adding the correct subnet range to NSG rules.",
+  "confidence": 0.95
+}

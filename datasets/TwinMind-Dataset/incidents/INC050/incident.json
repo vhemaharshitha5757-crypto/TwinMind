@@ -1,0 +1,115 @@
+{
+  "incident_id": "INC050",
+  "title": "Terraform State Lock Conflict Blocking Infrastructure Changes",
+  "timestamp": "2025-12-22T14:55:00Z",
+  "severity": "P3",
+  "department": "DevOps",
+  "system": "Terraform Cloud",
+  "component": "terraform-state-prod-infra",
+  "location": "US-East-1 (AWS)",
+  "status": "Resolved",
+  "symptoms": [
+    "Terraform operations failing with 'Error locking state: ConditionalCheckFailedException'",
+    "DynamoDB state lock table showing stale lock from crashed pipeline",
+    "Lock owner showing terminated CI/CD pipeline job ID",
+    "Terraform Cloud workspace showing locked status",
+    "Multiple teams reporting inability to make infrastructure changes"
+  ],
+  "root_cause": "CI/CD pipeline crashed during terraform apply operation leaving a stale state lock in DynamoDB that was not automatically released, blocking all subsequent infrastructure operations",
+  "resolution": "Manually removed the stale state lock from DynamoDB after verifying no active operations, ran terraform plan to confirm state consistency, and implemented automatic lock cleanup for crashed pipelines",
+  "preventive_actions": [
+    "Implement automatic state lock cleanup for terminated pipeline jobs",
+    "Add state lock duration monitoring with alerts for locks exceeding 30 minutes",
+    "Create emergency state lock removal runbook with verification steps",
+    "Implement terraform lock timeout with automatic release after 1 hour",
+    "Add pipeline crash detection with automatic lock release webhook"
+  ],
+  "affected_services": [
+    "infrastructure-changes",
+    "auto-scaling-config",
+    "network-modifications",
+    "security-group-updates"
+  ],
+  "engineers": [
+    "Tom Williams",
+    "Lisa Park",
+    "Sarah Chen"
+  ],
+  "timeline": [
+    {
+      "time": "14:55 UTC",
+      "event": "CI/CD pipeline crashes during terraform apply"
+    },
+    {
+      "time": "14:56 UTC",
+      "event": "State lock remains in DynamoDB from crashed pipeline"
+    },
+    {
+      "time": "15:10 UTC",
+      "event": "Tom Williams attempts infrastructure change, encounters lock"
+    },
+    {
+      "time": "15:15 UTC",
+      "event": "Stale lock identified, investigation begins"
+    },
+    {
+      "time": "15:30 UTC",
+      "event": "Lock owner confirmed as terminated pipeline job"
+    },
+    {
+      "time": "15:40 UTC",
+      "event": "State consistency verified, no partial apply detected"
+    },
+    {
+      "time": "15:45 UTC",
+      "event": "Stale lock manually removed from DynamoDB"
+    },
+    {
+      "time": "15:50 UTC",
+      "event": "Terraform operations unblocked, pending changes applied"
+    },
+    {
+      "time": "16:25 UTC",
+      "event": "All queued infrastructure changes completed"
+    }
+  ],
+  "ocr_entities": [
+    "Workspace: prod-infra",
+    "State: LOCKED",
+    "Lock ID: ci-job-84721 (TERMINATED)",
+    "Lock Duration: 1h 30min",
+    "Blocked Operations: 5",
+    "DynamoDB: terraform-locks"
+  ],
+  "audio_entities": [
+    "Sarah Chen",
+    "Lisa Park",
+    "Tom Williams"
+  ],
+  "document_entities": [
+    "terraform",
+    "state-lock",
+    "infrastructure",
+    "conflict",
+    "devops"
+  ],
+  "evidence": {
+    "document": "INC050_incident_report.pdf",
+    "image": "terraform_state_lock.png",
+    "audio": "INC050_meeting.mp3"
+  },
+  "knowledge_graph_entities": [
+    "Terraform",
+    "terraform-state-prod-infra",
+    "DynamoDB",
+    "State Lock",
+    "CI/CD Pipeline"
+  ],
+  "knowledge_graph_relations": [
+    "Pipeline_crash LEFT stale_state_lock",
+    "Stale_lock BLOCKED infrastructure_changes",
+    "Manual_unlock RESTORED terraform_operations"
+  ],
+  "embedding_summary": "Terraform state lock conflict from crashed CI/CD pipeline leaving stale lock in DynamoDB. All production infrastructure changes blocked for 1.5 hours including critical auto-scaling configuration. Resolved by manually removing stale lock and implementing automatic lock cleanup for crashed pipelines.",
+  "confidence": 0.96
+}

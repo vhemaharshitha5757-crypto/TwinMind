@@ -1,0 +1,162 @@
+INCIDENT REPORT
+========================================================================
+
+Incident ID:       INC038
+Title:             Azure Blob Storage Permission Issue Blocking File Uploads
+Severity:          P2
+Date/Time:         2025-09-29T09:15:00Z
+Department:        Cloud Infrastructure
+System:            Azure Blob Storage
+Component:         stprodeufiles01
+Location:          West Europe (Azure)
+Assigned Engineer: Lisa Park
+Status:            Resolved
+
+========================================================================
+1. SUMMARY
+========================================================================
+
+Azure Blob Storage account (stprodeufiles01) stopped accepting file uploads at 09:15 UTC on September 29, 2025. The SAS (Shared Access Signature) token used by the upload service had been regenerated with read-only permissions instead of read-write during a routine key rotation. All user file uploads, document attachments, and media uploads failed with AuthorizationPermissionMismatch errors.
+
+This incident was classified as P2 severity and was assigned to
+Lisa Park in the Cloud Infrastructure department. The affected system was
+Azure Blob Storage, specifically the stprodeufiles01 component located in West Europe (Azure).
+The incident was detected through automated monitoring and alerting systems,
+and the response team was engaged within minutes of the initial alert.
+
+========================================================================
+2. BUSINESS IMPACT
+========================================================================
+
+File upload functionality unavailable for EU users for 30 minutes. 1,400 file upload attempts failed. Users unable to attach documents to support tickets, upload profile pictures, or submit forms with attachments. 280 support tickets created about upload failures.
+
+The incident triggered the organization's major incident response process,
+involving cross-functional coordination between engineering, operations, and
+business stakeholders. Customer support was notified and prepared to handle
+incoming queries related to the service degradation.
+
+========================================================================
+3. SYMPTOMS OBSERVED
+========================================================================
+
+The following symptoms were observed during the incident:
+
+  * Azure Blob Storage returning AuthorizationPermissionMismatch on PUT operations
+  * SAS token validation showing read-only permissions (missing write)
+  * File upload API returning 403 Forbidden to all upload requests
+  * GET operations (file downloads) still working normally
+  * Azure Storage Explorer confirming write operations blocked with current SAS
+
+These symptoms were correlated across multiple monitoring systems including
+application performance monitoring, infrastructure metrics, and log
+aggregation platforms. The incident response team confirmed the symptoms
+during their initial assessment and used them to guide the investigation.
+
+========================================================================
+4. TIMELINE OF EVENTS
+========================================================================
+
+  [09:15 UTC] SAS token rotation completes with incorrect permissions
+  [09:17 UTC] File upload requests begin failing with permission errors
+  [09:20 UTC] Upload failure alert fires
+  [09:25 UTC] Lisa Park investigates, reviews recent key rotation
+  [09:30 UTC] SAS token permissions identified as read-only
+  [09:35 UTC] New SAS token generated with read-write-list permissions
+  [09:40 UTC] Upload service configuration updated with new token
+  [09:45 UTC] File uploads functioning normally, incident resolved
+
+========================================================================
+5. INVESTIGATION
+========================================================================
+
+Upon receiving the automated alert, the incident response team initiated a
+systematic investigation following established runbook procedures. The team
+began by examining the health and status of the stprodeufiles01 component
+within the Azure Blob Storage system deployed in West Europe (Azure).
+
+Initial telemetry data from the monitoring stack was reviewed, including
+application logs, infrastructure metrics, and recent deployment and change
+history. The investigation revealed that the primary symptoms were consistent
+across multiple data sources and monitoring tools.
+
+Log analysis from the affected component showed error patterns that pointed
+toward sas token regenerated during routine key rotation with read-only permissions instead of required read-write permissions, blocking all write operations to blob storage. The team also reviewed recent change
+records, configuration modifications, and deployment history to rule out
+human-initiated causes. Cross-referencing the timeline of events with
+infrastructure metrics from the preceding 24-48 hours provided additional
+context that supported the final root cause determination.
+
+========================================================================
+6. ROOT CAUSE ANALYSIS
+========================================================================
+
+The root cause of this incident was determined to be:
+SAS token regenerated during routine key rotation with read-only permissions instead of required read-write permissions, blocking all write operations to blob storage.
+
+Further analysis confirmed that this issue had been developing over time but
+was not detected by existing monitoring thresholds and alerting rules. The
+failure point was within the stprodeufiles01 component of the Azure Blob Storage
+system. Contributing factors included insufficient monitoring coverage for
+the specific failure mode encountered and the absence of automated
+remediation procedures for this particular scenario.
+
+========================================================================
+7. RESOLUTION
+========================================================================
+
+The incident was resolved by the following actions: Regenerated SAS token with correct read-write-list permissions, updated the upload service configuration with new token, and verified upload functionality restored.
+
+The resolution was executed by Lisa Park with support from the incident
+response team. After applying the remediation steps, the team monitored the
+system for a stabilization period to confirm that the issue was fully
+resolved and no secondary or cascading failures had occurred. All affected
+services were verified to be operating within normal parameters before the
+incident was formally closed.
+
+========================================================================
+8. PREVENTIVE ACTIONS
+========================================================================
+
+The following preventive actions have been identified to reduce the
+likelihood and impact of similar incidents in the future:
+
+  1. Implement SAS token permission validation in rotation automation
+  2. Use managed identity instead of SAS tokens for service authentication
+  3. Add write permission verification test after token rotation
+  4. Create SAS token rotation runbook with permission checklist
+  5. Implement automated upload smoke test after credential changes
+
+These action items will be tracked in the engineering backlog and prioritized
+based on risk assessment and business impact analysis.
+
+========================================================================
+9. RELATED STANDARD OPERATING PROCEDURES
+========================================================================
+
+SOP-CLOUD-002: Azure Storage Key Rotation; SOP-CLOUD-005: Blob Storage Recovery
+
+========================================================================
+10. LESSONS LEARNED
+========================================================================
+
+This incident provided several important learnings for the organization.
+The detection of sas token regenerated during routine key rotation with read-only permissions instead of required read-write permissions, blocking all write operations to blob storage was delayed due to gaps in
+monitoring coverage, highlighting the need for more comprehensive
+observability across the Azure Blob Storage stack.
+
+The incident response process demonstrated effective team coordination and
+communication, but the overall time to resolution could be improved through
+automation of common diagnostic and remediation steps. The successful
+resolution validated existing runbooks and procedures while also identifying
+specific areas for improvement.
+
+The preventive actions identified during the post-mortem will strengthen
+organizational resilience against similar failure modes. Regular review of
+monitoring thresholds, alerting rules, and runbook procedures should be
+incorporated into the operational cadence to maintain readiness.
+
+========================================================================
+Report generated by TwinMind Incident Management System
+Date: 2025-09-29T09:15:00Z
+Classification: Internal - Confidential
+========================================================================

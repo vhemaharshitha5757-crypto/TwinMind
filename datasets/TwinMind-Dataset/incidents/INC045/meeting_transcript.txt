@@ -1,0 +1,59 @@
+MEETING TRANSCRIPT - INCIDENT INC045
+========================================================================
+Subject:      Session Store Redis Desynchronization Causing Random Logouts
+Date/Time:    2025-11-17T14:00:00Z
+Participants: James Wright, Sarah Chen, Aisha Khan
+Duration:     Approximately 3 minutes
+Type:         Emergency Incident Response Call
+========================================================================
+
+[BEGIN TRANSCRIPT]
+[James Wright]: Hey team, we've got a P2 incident on Redis Session Store. Users reporting being randomly logged out every few minutes. I need everyone's eyes on this immediately.
+
+[Sarah Chen]: I'm here. Let me pull up the redis-session-prod-01 dashboard. When did this start exactly?
+
+[James Wright]: First alert came in at 14:00 UTC. Redis replication failure occurs, nodes become desynchronized. I've been looking at the logs since then.
+
+[Aisha Khan]: I just joined the call. Give me a quick rundown. What are we seeing on the infrastructure side?
+
+[James Wright]: Multiple symptoms. Session lookup success rate at approximately 50% (should be 100%). And we're also seeing Redis cluster showing replication offset mismatch between nodes.
+
+[Sarah Chen]: OK, I've got the metrics up. Application logs showing alternating session-found and session-not-found for same user. This doesn't look like a normal blip.
+
+[Aisha Khan]: Any recent deployments or configuration changes that could have triggered this? I want to rule out human error first.
+
+[James Wright]: I checked the change log for redis-session-prod-01. No deployments in the last 24 hours. No config changes either. This looks like an organic failure.
+
+[Sarah Chen]: Based on what I'm seeing in the telemetry data, I think this is related to redis replication failure caused session data split between two nodes with inconsistent state, leadi. The error pattern is very consistent with that.
+
+[Aisha Khan]: That makes sense given the symptoms. I've seen similar patterns before. What's our best remediation path here?
+
+[James Wright]: I recommend we forced full resync of redis replica from primary, restarted the session proxy to clear routing incon. That should bring us back to a stable state.
+
+[Sarah Chen]: Agreed. Let me start executing that now. Aisha, can you monitor the dashboards and confirm when metrics start recovering?
+
+[Aisha Khan]: Will do. I've got the monitoring screen up. Go ahead with the fix.
+
+[Sarah Chen]: Alright, executing the remediation now. This will take a couple of minutes. Stand by.
+
+[Aisha Khan]: I'm starting to see positive movement on the dashboards. Redis Session Store metrics are beginning to normalize.
+
+[James Wright]: Confirmed on my end too. Services are recovering. Let's keep monitoring for the next fifteen minutes to make sure we're stable.
+
+[Sarah Chen]: Fix is fully applied. Everything looks green now. I'll document the resolution steps in the incident ticket.
+
+[James Wright]: Great work everyone. Let's schedule a post-mortem for tomorrow. Key action items from this incident: implement redis replication monitoring with offset difference alerting, add session lookup consistency check with automatic fallback to primary, and deploy redis sentinel for automatic failover and replication health.
+
+[Aisha Khan]: I'll send out the post-mortem calendar invite and start drafting the incident report. Good job team, quick response on this one.
+
+[END TRANSCRIPT]
+
+========================================================================
+Action Items Captured:
+  - Implement Redis replication monitoring with offset difference alerting
+  - Add session lookup consistency check with automatic fallback to primary
+  - Deploy Redis Sentinel for automatic failover and replication health
+  - Implement session backup in application-side encrypted cookies as fallback
+
+Next Steps: Post-mortem meeting scheduled for following business day.
+========================================================================

@@ -1,0 +1,23 @@
+{
+  "filename": "grafana_datasource_error.png",
+  "caption": "Grafana dashboard showing data source connection failure for InfluxDB",
+  "scene_description": "A Grafana dashboard with multiple panels showing red error banners reading 'Data source is not available'. The data source configuration page is visible in a side panel showing the connection test failing.",
+  "detected_objects": [
+    "Error Banner Panels",
+    "Data Source Config Page",
+    "Connection Test Result",
+    "Dashboard List",
+    "Health Check Status"
+  ],
+  "ocr_text": [
+    "Data Source: InfluxDB-Production",
+    "Status: UNREACHABLE",
+    "URL: influxdb-old.internal:8086",
+    "Error: connection refused",
+    "Affected Dashboards: 45",
+    "Last Successful Query: 50min ago"
+  ],
+  "resolution": "1920x1080",
+  "format": "PNG",
+  "source_system": "Grafana Monitoring Platform"
+}
